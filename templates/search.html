@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block extra_headers %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='search.css') }}" />
+{% endblock %}
+
+{% block content %}
+    {% for result in result_list %}
+        <a href="/weather/{{ encode_place_id(result.lat, result.lon) }}">{{ result.name }}</a>
+    {% endfor %}
+{% endblock %}

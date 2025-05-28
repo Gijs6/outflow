@@ -1,7 +1,8 @@
-from flask import Flask, jsonify, request, redirect, url_for, render_template
+from flask import Flask, request, render_template
 import dotenv
 import os
 import requests
+import string
 
 
 dotenv.load_dotenv()
@@ -17,25 +18,46 @@ def index():
     return "Between subtle shading and the absence of light lies the nuance of iqlusion"
 
 
-def encode_place_id(lat, lon):
-    lat_shortened = float(f"{lat:.6f}")
-    lon_shortened = float(f"{lon:.6f}")
-
-    lat_non_neg = lat_shortened + 180
-    lon_non_neg = lon_shortened + 180
-
-    lat_format = ("0" * (3 - len(str(lat_non_neg).split(".")[0])) + str(lat_non_neg)).replace(".", "")
-    lon_format = ("0" * (3 - len(str(lon_non_neg).split(".")[0])) + str(lon_non_neg)).replace(".", "")
-
-    encoded = f"{lat_format}_{lon_format}"
-    return encoded
+BASE36 = string.digits + string.ascii_lowercase
 
 
-def decode_place_id(encoded):
-    lat, lon = encoded.split("_")
-    lat_decoded = float(lat[:3] + "." + lat[3:]) - 180
-    lon_decoded = float(lon[:3] + "." + lon[3:]) - 180
-    return lat_decoded, lon_decoded
+def to_base36(num):
+    if num == 0:
+        return "0"
+    digits = []
+    while num:
+        num, rem = divmod(num, 36)
+        digits.append(BASE36[rem])
+    return "".join(reversed(digits))
+
+
+def from_base36(s):
+    num = 0
+    for char in s:
+        num = num * 36 + BASE36.index(char)
+    return num
+
+
+def encode_place_id(lat, lon, precision=4):
+    lat_int = int((lat + 90) * 10**precision)
+    lon_int = int((lon + 180) * 10**precision)
+
+    combined = (lat_int << 24) + lon_int
+
+    return to_base36(combined)
+
+
+def decode_place_id(encoded, precision=4):
+    combined = from_base36(encoded)
+
+    lon_mask = (1 << 24) - 1
+    lon_int = combined & lon_mask
+    lat_int = combined >> 24
+
+    lat = lat_int / 10**precision - 90
+    lon = lon_int / 10**precision - 180
+
+    return lat, lon
 
 
 @app.route("/search")
@@ -46,21 +68,27 @@ def search():
     response = requests.get(url)
     data = response.json()
 
-    return render_template("search.html", result_list=data, encode_place_id=encode_place_id)
+    return render_template(
+        "search.html", result_list=data, encode_place_id=encode_place_id
+    )
 
 
 @app.route("/weather/<string:place_id>")
 def weather_place(place_id):
     lat, lon = decode_place_id(place_id)
 
-    geo_data = requests.get(f"http://api.openweathermap.org/geo/1.0/reverse?lat={lat}&lon={lon}&limit=1&appid={API_KEY}").json()
+    geo_data = requests.get(
+        f"http://api.openweathermap.org/geo/1.0/reverse?lat={lat}&lon={lon}&limit=1&appid={API_KEY}"
+    ).json()
     place_info = geo_data[0]
 
     weather_data = requests.get(
         f"https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_KEY}&lang=en&units=metric"
     ).json()
 
-    return render_template("weather.html", weather_data=weather_data, place_info=place_info)
+    return render_template(
+        "weather.html", weather_data=weather_data, place_info=place_info
+    )
 
 
 if __name__ == "__main__":

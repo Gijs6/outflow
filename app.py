@@ -39,31 +39,41 @@ def from_base62(s):
     return num
 
 
-def encode_place_id(lat, lon, name, country, precision=5):
+def encode_place_id(lat, lon, data, precision=5):
     lat_int = int((lat + 90) * 10**precision)
     lon_int = int((lon + 180) * 10**precision)
     combined = (lat_int << 26) + lon_int
     id_str = to_base62(combined)
-    meta = f"{name.replace(' ', '_')}:{country}"
-    return f"{id_str}:{meta}"
+
+    set_place_data(id_str, data)
+
+    return id_str
 
 
 def decode_place_id(encoded, precision=5):
-    id_str, meta = encoded.split(":", 1)
-    combined = from_base62(id_str)
+    combined = from_base62(encoded)
     lon_mask = (1 << 26) - 1
     lon_int = combined & lon_mask
     lat_int = combined >> 26
     lat = lat_int / 10**precision - 90
     lon = lon_int / 10**precision - 180
-    name, country = meta.split(":", 1)
-    name = name.replace("_", " ")
-    return lat, lon, name, country
+    return lat, lon
 
 
 def full_country(country_code):
     country = pycountry.countries.get(alpha_2=country_code.upper())
     return country.name if country else None
+
+
+# Temp fix, probs use a db
+place_data = {}
+def get_place_data(id):
+    return place_data.get(id)
+def set_place_data(id, data):
+    place_data[id] = data
+
+
+
 
 
 @app.route("/search")
@@ -85,8 +95,9 @@ def search():
 
 @app.route("/weather/<string:place_id>")
 def weather_place(place_id):
-    lat, lon, name, country_code = decode_place_id(place_id)
-    country = full_country(country_code)
+    lat, lon = decode_place_id(place_id)
+    place_data = get_place_data(place_id)
+    country = full_country(place_data["country"])
 
     weather_data = requests.get(
         f"https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_KEY}&lang=en&units=metric"
@@ -98,7 +109,8 @@ def weather_place(place_id):
     return render_template(
         "weather.html",
         weather_data=weather_data,
-        place_info={"name": name, "country": country, "country_code": country_code},
+        place_data=place_data,
+        country=country,
         get_icon=get_icon,
     )
 

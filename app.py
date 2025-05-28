@@ -18,23 +18,23 @@ def index():
     return "Between subtle shading and the absence of light lies the nuance of iqlusion"
 
 
-BASE36 = string.digits + string.ascii_lowercase
+BASE62 = string.digits + string.ascii_lowercase + string.ascii_uppercase
 
 
-def to_base36(num):
+def to_base62(num):
     if num == 0:
         return "0"
     digits = []
     while num:
-        num, rem = divmod(num, 36)
-        digits.append(BASE36[rem])
+        num, rem = divmod(num, 62)
+        digits.append(BASE62[rem])
     return "".join(reversed(digits))
 
 
-def from_base36(s):
+def from_base62(s):
     num = 0
     for char in s:
-        num = num * 36 + BASE36.index(char)
+        num = num * 62 + BASE62.index(char)
     return num
 
 
@@ -44,11 +44,11 @@ def encode_place_id(lat, lon, precision=4):
 
     combined = (lat_int << 24) + lon_int
 
-    return to_base36(combined)
+    return to_base62(combined)
 
 
 def decode_place_id(encoded, precision=4):
-    combined = from_base36(encoded)
+    combined = from_base62(encoded)
 
     lon_mask = (1 << 24) - 1
     lon_int = combined & lon_mask

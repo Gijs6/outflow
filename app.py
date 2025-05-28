@@ -16,7 +16,7 @@ API_KEY = os.getenv("api_key")
 
 @app.route("/")
 def index():
-    return "Between subtle shading and the absence of light lies the nuance of iqlusion"
+    return render_template("index.html")
 
 
 BASE62 = string.digits + string.ascii_lowercase + string.ascii_uppercase
@@ -39,26 +39,26 @@ def from_base62(s):
     return num
 
 
-def encode_place_id(lat, lon, precision=5):
+def encode_place_id(lat, lon, name, country, precision=5):
     lat_int = int((lat + 90) * 10**precision)
     lon_int = int((lon + 180) * 10**precision)
-
     combined = (lat_int << 26) + lon_int
-
-    return to_base62(combined)
+    id_str = to_base62(combined)
+    meta = f"{name.replace(' ', '_')}:{country}"
+    return f"{id_str}:{meta}"
 
 
 def decode_place_id(encoded, precision=5):
-    combined = from_base62(encoded)
-
+    id_str, meta = encoded.split(":", 1)
+    combined = from_base62(id_str)
     lon_mask = (1 << 26) - 1
     lon_int = combined & lon_mask
     lat_int = combined >> 26
-
     lat = lat_int / 10**precision - 90
     lon = lon_int / 10**precision - 180
-
-    return lat, lon
+    name, country = meta.split(":", 1)
+    name = name.replace("_", " ")
+    return lat, lon, name, country
 
 
 def full_country(country_code):
@@ -79,17 +79,14 @@ def search():
         opt_list=data,
         encode_place_id=encode_place_id,
         full_country=full_country,
+        term=term,
     )
 
 
 @app.route("/weather/<string:place_id>")
 def weather_place(place_id):
-    lat, lon = decode_place_id(place_id)
-
-    geo_data = requests.get(
-        f"http://api.openweathermap.org/geo/1.0/reverse?lat={lat}&lon={lon}&limit=1&appid={API_KEY}"
-    ).json()
-    place_info = geo_data[0]
+    lat, lon, name, country_code = decode_place_id(place_id)
+    country = full_country(country_code)
 
     weather_data = requests.get(
         f"https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_KEY}&lang=en&units=metric"
@@ -101,7 +98,7 @@ def weather_place(place_id):
     return render_template(
         "weather.html",
         weather_data=weather_data,
-        place_info=place_info,
+        place_info={"name": name, "country": country, "country_code": country_code},
         get_icon=get_icon,
     )
 

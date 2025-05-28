@@ -1,18 +1,20 @@
 {% extends "base.html" %}
 
+{% block title %}Places found for '{{ term }}'{% endblock %}
+
 {% block extra_headers %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='search.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/search.css') }}" />
 {% endblock %}
 
 {% block content %}
+    <h1>Places found for '{{ term }}'</h1>
     <div id="search-opts">
         {% for opt in opt_list %}
-            <a href="/weather/{{ encode_place_id(opt.lat, opt.lon) }}" class="opt">
+            <a href="/weather/{{ encode_place_id(opt.lat, opt.lon, opt.name, opt.country) }}" class="opt">
                 <img src="/static/flags/{{ opt.country | lower }}.svg" />
                 <span class="opt-name">{{ opt.name }}</span>
-                <span class="opt-country">{{ full_country(opt.country) }}</span>
+                <span class="opt-country-region">{{ opt.state }} - {{ full_country(opt.country) }}</span>
                 <span class="opt-coords">{{ opt.lat }}, {{ opt.lon }}</span>
-                <span class="opt-region">{{ opt.state }}</span>
             </a>
         {% endfor %}
     </div>

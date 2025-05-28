@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block extra_headers %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='weather.css') }}" />
+{% endblock %}
+
+{% block content %}
+    {{ weather_data }}
+{% endblock %}

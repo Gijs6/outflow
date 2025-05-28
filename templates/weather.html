@@ -5,6 +5,12 @@
 {% endblock %}
 
 {% block content %}
+    <h1>{{ place_info.name }}</h1>
+    <div id="current-weather">
+        <img src="{{ get_icon(weather_data.current.weather.0.icon) }}">
+        <span id="current-temp">{{ weather_data.current.temp }} °C</span>
+        <span id="current-weather-title">{{ weather_data.current.weather.0.main }}</span>
+    </div>
     {{ place_info }}
     {{ weather_data }}
 {% endblock %}

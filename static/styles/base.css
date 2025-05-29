@@ -53,33 +53,35 @@ header span strong {
     font-weight: 900;
 }
 
-header form {
+.searchbar {
     display: flex;
     flex-direction: row;
     align-items: stretch;
 }
 
-header form input {
+.searchbar input {
     padding: 5px;
     border-radius: 10px 0 0 10px;
-    border: none;
+    border: 1px solid var(--oc-orange-9);
+    border-right: none;
 }
 
-header form button {
+.searchbar button {
     padding: 5px;
     border-radius: 0 10px 10px 0;
-    border: none;
+    border: 1px solid var(--oc-orange-9);
     background: var(--oc-yellow-8);
     color: white;
     transition: all ease 300ms;
+    border-left: none;
 }
 
-header form input:focus {
+.searchbar input:focus {
     outline: none;
     background: var(--oc-gray-1);
 }
 
-header form button:hover {
+.searchbar button:hover {
     background: var(--oc-yellow-9);
 }
 

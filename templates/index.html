@@ -8,14 +8,21 @@
         main {
             display: flex;
             align-items: center;
-            font-size: 3em;
+            font-size: 2em;
             text-align: center;
             max-width: unset;
             padding: 50px;
+            justify-content: center;
+            flex-direction: column;
+            gap: 100px;
         }
     </style>
 {% endblock %}
 
 {% block content %}
     <strong>Between subtle shading and the absence of light lies the nuance of iqlusion</strong>
+    <form action="/search" method="GET" class="searchbar">
+        <input type="text" name="q" placeholder="Search for a place..." required>
+        <button type="submit"><i class="fa-solid fa-arrow-right"></i></button>
+    </form>
 {% endblock %}

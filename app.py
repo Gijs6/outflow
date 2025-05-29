@@ -67,13 +67,21 @@ def full_country(country_code):
 
 # Temp fix, probs use a db
 place_data = {}
-def get_place_data(id):
-    return place_data.get(id)
+
+
+def get_place_data(id, lat, lon):
+    if place_data.get(id):
+        return place_data.get(id)
+    else:
+        geo_data = requests.get(
+            f"http://api.openweathermap.org/geo/1.0/reverse?lat={lat}&lon={lon}&limit=1&appid={API_KEY}"
+        ).json()[0]
+        set_place_data(id, geo_data)
+        return geo_data
+
+
 def set_place_data(id, data):
     place_data[id] = data
-
-
-
 
 
 @app.route("/search")
@@ -96,7 +104,7 @@ def search():
 @app.route("/weather/<string:place_id>")
 def weather_place(place_id):
     lat, lon = decode_place_id(place_id)
-    place_data = get_place_data(place_id)
+    place_data = get_place_data(place_id, lat, lon)
     country = full_country(place_data["country"])
 
     weather_data = requests.get(

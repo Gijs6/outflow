@@ -14,7 +14,14 @@
         {% block extra_headers %}{% endblock %}
     </head>
     <body>
-        <header>Outflow</header>
+        <header>
+            <a href="/">Outflow</a>
+            <span>{% block page_title %}{% endblock %}</span>
+            <form action="/search" method="GET">
+                <input type="text" name="q" placeholder="Search for a place..." required>
+                <button type="submit"><i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+        </header>
 
         <main>{% block content %}{% endblock %}</main>
 

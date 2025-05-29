@@ -4,6 +4,16 @@
 
 {% block extra_headers %}
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/index.css') }}" />
+    <style>
+        main {
+            display: flex;
+            align-items: center;
+            font-size: 3em;
+            text-align: center;
+            max-width: unset;
+            padding: 50px;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}

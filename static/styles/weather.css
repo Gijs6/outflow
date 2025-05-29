@@ -20,3 +20,43 @@
     font-weight: 400;
     color: var(--oc-gray-6);
 }
+
+#current-weather-main {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: repeat(3, auto);
+    align-items: center;
+}
+
+#current-icon {
+    grid-area: 1 / 1 / 4 / 2;
+}
+
+#current-temp {
+    grid-area: 1 / 2 / 2 / 3;
+    font-size: 2.5em;
+    font-weight: 900;
+}
+
+#current-feels-like {
+    grid-area: 2 / 2 / 3 / 3;
+    font-size: 1.3em;
+    font-weight: 200;
+}
+
+#current-weather-title {
+    grid-area: 3 / 2 / 4 / 3;
+    font-weight: 900;
+    padding-top: 5px;
+}
+
+#main-info-container {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    /*! max-width: 600px; */
+    /*! margin: auto; */
+}

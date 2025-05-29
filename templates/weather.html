@@ -1,22 +1,25 @@
 {% extends "base.html" %}
 
 {% block title %}Weather for {{ place_data.name }}{% endblock %}
+{% block page_title %}Weather for <strong>{{ place_data.name }}</strong>{% endblock %}
 
 {% block extra_headers %}
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/weather.css') }}" />
 {% endblock %}
 
 {% block content %}
-    <div id="place-info">
-        <img src="/static/flags/{{ place_data.country | lower }}.svg" />
-        <h1 id="place-info-name">{{ place_data.name }}</h1>
-        <span id="place-info-coords">{{ weather_data.lat }}, {{ weather_data.lon }}</span>
+    <div id="main-info-container">
+        <div id="place-info">
+            <img src="/static/flags/{{ place_data.country | lower }}.svg" />
+            <h1 id="place-info-name">{{ place_data.name }}</h1>
+            <span id="place-info-coords">{{ weather_data.lat }}, {{ weather_data.lon }}</span>
+        </div>
+        <div id="current-weather-main">
+            <img id="current-icon"src="{{ get_icon(weather_data.current.weather.0.icon) }}">
+            <span id="current-temp">{{ weather_data.current.temp }} °C</span>
+            <span id="current-feels-like">Feels like {{ weather_data.current.feels_like }} °C</span>
+            <!--<span id="current-weather-main">{{ weather_data.current.weather | map(attribute="main") | join(", ") }}</span>-->
+            <span id="current-weather-title">{{ weather_data.current.weather | map(attribute="description") | join(", ") | capitalize}}</span>
+        </div>
     </div>
-    <div id="current-weather">
-        <img src="{{ get_icon(weather_data.current.weather.0.icon) }}">
-        <span id="current-temp">{{ weather_data.current.temp }} °C</span>
-        <span id="current-weather-title">{{ weather_data.current.weather.0.main }}</span>
-    </div>
-    {{ place_data }}
-    {{ weather_data }}
 {% endblock %}

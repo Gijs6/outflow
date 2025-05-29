@@ -1,8 +1,10 @@
 from flask import Flask, request, render_template
+from datetime import datetime
 import dotenv
 import os
 import pycountry
 import requests
+import pytz
 import string
 
 
@@ -13,6 +15,11 @@ app = Flask(__name__)
 
 API_KEY = os.getenv("api_key")
 
+@app.template_filter("fmt_dt")
+def fmt_dt(unix_ts, fmt="%Y-%m-%d %H:%M:%S", tz_name="UTC"):
+    tz = pytz.timezone(tz_name)
+    dt = datetime.fromtimestamp(int(unix_ts), tz)
+    return dt.strftime(fmt)
 
 @app.route("/")
 def index():

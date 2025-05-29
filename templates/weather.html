@@ -12,14 +12,96 @@
         <div id="place-info">
             <img src="/static/flags/{{ place_data.country | lower }}.svg" />
             <h1 id="place-info-name">{{ place_data.name }}</h1>
-            <span id="place-info-coords">{{ weather_data.lat }}, {{ weather_data.lon }}</span>
+            <span id="place-info-coords">
+                <i class="fa-solid fa-map-marker-alt"></i> {{ weather_data.lat }}, {{ weather_data.lon }}
+            </span>
         </div>
-        <div id="current-weather-main">
-            <img id="current-icon"src="{{ get_icon(weather_data.current.weather.0.icon) }}">
+
+        <div id="current-weather-summary">
+            <img id="current-icon" src="{{ get_icon(weather_data.current.weather.0.icon) }}">
             <span id="current-temp">{{ weather_data.current.temp }} °C</span>
             <span id="current-feels-like">Feels like {{ weather_data.current.feels_like }} °C</span>
-            <!--<span id="current-weather-main">{{ weather_data.current.weather | map(attribute="main") | join(", ") }}</span>-->
-            <span id="current-weather-title">{{ weather_data.current.weather | map(attribute="description") | join(", ") | capitalize}}</span>
+            <span id="current-weather-title">{{ weather_data.current.weather | map(attribute="description") | join(", ") | capitalize }}</span>
         </div>
     </div>
+
+    <div id="current-weather">
+        <h2>Current weather</h2>
+        <div id="current-weather-tiles">
+            {% if weather_data.current.sunrise %}
+                <div class="weather-tile">
+                    <span class="weather-tile-title" id="sunrise-tile"><span>Sunrise</span><i class="fa-solid fa-sun"></i></span>
+                    <span class="weather-tile-title-result">{{ weather_data.current.sunrise | fmt_dt("%H:%M:%S", weather_data.timezone) }}</span>
+                </div>
+            {% endif %}
+            {% if weather_data.current.sunset %}
+                <div class="weather-tile">
+                    <span class="weather-tile-title" id="sunset-tile"><span>Sunset</span><i class="fa-solid fa-moon"></i></span>
+                    <span class="weather-tile-title-result">{{ weather_data.current.sunset | fmt_dt("%H:%M:%S", weather_data.timezone) }}</span>
+                </div>
+            {% endif %}
+            <div class="weather-tile">
+                <span class="weather-tile-title" id="pressure-tile"><span>Pressure</span><i class="fa-solid fa-tachometer-alt"></i></span>
+                <span class="weather-tile-title-result">{{ weather_data.current.pressure }} hPa</span>
+            </div>
+            <div class="weather-tile">
+                <span class="weather-tile-title" id="dewpoint-tile"><span>Dew point</span><i class="fa-solid fa-water"></i></span>
+                <span class="weather-tile-title-result">{{ weather_data.current.dew_point }} °C</span>
+            </div>
+            <div class="weather-tile">
+                <span class="weather-tile-title" id="humidity-tile"><span>Humidity</span><i class="fa-solid fa-droplet"></i></span>
+                <span class="weather-tile-title-result">{{ weather_data.current.humidity }} %</span>
+            </div>
+            <div class="weather-tile">
+                <span class="weather-tile-title" id="clouds-tile"><span>Clouds</span><i class="fa-solid fa-cloud"></i></span>
+                <span class="weather-tile-title-result">{{ weather_data.current.clouds }}%</span>
+            </div>
+            <div class="weather-tile">
+                <span class="weather-tile-title" id="uv-tile"><span>UV index</span><i class="fa-solid fa-sun"></i></span>
+                <span class="weather-tile-title-result">{{ weather_data.current.uvi }}</span>
+            </div>
+            {% if weather_data.current.visibility != 10000 %}
+                <div class="weather-tile">
+                    <span class="weather-tile-title" id="visb-tile"><span>Average visibility</span><i class="fa-solid fa-smog"></i></span>
+                    <span class="weather-tile-title-result">{{ weather_data.current.visibility }} m</span>
+                </div>
+            {% endif %}
+            <div class="weather-tile">
+                <span class="weather-tile-title" id="wind-tile"><span>Wind</span><i class="fa-solid fa-wind"></i></span>
+                <span class="weather-tile-title-result">{{ weather_data.current.wind_speed }} m/s <img src="/static/imgs/arrow.svg" style="width: 20px; height: 20px; transform: rotate({{ weather_data.current.wind_deg }}deg)" alt="Wind Direction Arrow" /></span>
+                {% if weather_data.current.wind_gust %}<span class="weather-tile-title-result">Gusts: {{ weather_data.current.wind_gust }} m/s</span>{% endif %}
+            </div>
+            {% if weather_data.current.rain and weather_data.current.rain["1h"] %}
+                <div class="weather-tile">
+                    <span class="weather-tile-title" id="rain-tile"><span>Rain (last hour)</span><i class="fa-solid fa-cloud-showers-heavy"></i></span>
+                    <span class="weather-tile-title-result">{{ weather_data.current.rain["1h"] }} mm</span>
+                </div>
+            {% endif %}
+            {% if weather_data.current.snow and weather_data.current.snow["1h"] %}
+                <div class="weather-tile">
+                    <span class="weather-tile-title" id="snow-tile"><span>Snow (last hour)</span><i class="fa-solid fa-snowflake"></i></span>
+                    <span class="weather-tile-title-result">{{ weather_data.current.snow["1h"] }} mm</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if weather_data.minutely %}
+        <div id="minute-precipitation">
+            <h2>Precipitation per minute</h2>
+            <div id="minute-precipitation-container">
+                {% for entry in weather_data.minutely %}
+                    <div class="minute-precipitation-item">
+                        <span class="minute-precipitation-amount">{{ entry.precipitation | round(2) }}</span>
+                        <div class="minute-precipitation-bar" style="height: {{ entry.precipitation * 20 }}px"></div>
+                        <span class="minute-precipitation-dt">{{ entry.dt | fmt_dt("%H:%M", weather_data.timezone) }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!--
+    <pre><code>{{ weather_data | tojson(indent=4) }}</code></pre>
+    -->
 {% endblock %}

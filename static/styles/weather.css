@@ -22,7 +22,7 @@
     color: var(--oc-gray-6);
 }
 
-#current-weather-main {
+#current-weather-summary {
     display: grid;
     grid-template-columns: auto 1fr;
     grid-template-rows: repeat(3, auto);
@@ -61,4 +61,122 @@
     flex-wrap: wrap;
     /*! max-width: 600px; */
     /*! margin: auto; */
+}
+
+#current-weather-tiles {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: center;
+    font-size: 0.9em;
+    background: var(--oc-gray-3);
+    gap: 2px;
+}
+
+.weather-tile {
+    padding: 10px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+    background: var(--oc-gray-0);
+}
+
+.weather-tile-title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    font-size: 1.2em;
+}
+
+.wind-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.wind-arrow span {
+    color: var(--oc-gray-0);
+    padding: 5px;
+    border-radius: 10px;
+    font-size: 0.8em;
+    background: var(--oc-orange-9);
+}
+
+.wind-arrow img {
+    width: 50px;
+}
+
+.weather-tile-title-result:has(img) {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5ch;
+}
+
+#clouds-tile i,
+#visb-tile i,
+#wind-tile i,
+#sunset-tile i,
+#snow-tile i {
+    color: var(--oc-gray-6);
+}
+
+#sunrise-tile i,
+#uv-tile i {
+    color: var(--oc-yellow-8);
+}
+
+#pressure-tile i {
+    color: var(--oc-orange-8);
+}
+
+#dewpoint-tile i,
+#humidity-tile i,
+#rain-tile i {
+    color: var(--oc-blue-8);
+}
+
+#current-weather {
+    margin-top: 20px;
+}
+
+#minute-precipitation-container {
+    display: flex;
+    overflow: scroll;
+    margin-top: 10px;
+}
+
+#minute-precipitation {
+    margin-top: 20px;
+}
+
+.minute-precipitation-item {
+    font-size: 0.9em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.minute-precipitation-bar {
+    background: var(--oc-blue-6);
+    width: 100%;
+    border: 1px solid white;
+    min-height: 4px;
+}
+
+.minute-precipitation-dt {
+    padding-inline: 3px;
+    font-weight: 300;
+}
+
+.minute-precipitation-amount {
+    color: var(--oc-blue-9);
+    font-weight: 900;
 }

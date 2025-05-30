@@ -1,11 +1,12 @@
 from flask import Flask, request, render_template
-from datetime import datetime
+from datetime import datetime, timedelta
 import dotenv
 import os
 import pycountry
 import requests
 import pytz
 import string
+import math
 
 
 dotenv.load_dotenv()
@@ -15,11 +16,20 @@ app = Flask(__name__)
 
 API_KEY = os.getenv("api_key")
 
+
 @app.template_filter("fmt_dt")
 def fmt_dt(unix_ts, fmt="%Y-%m-%d %H:%M:%S", tz_name="UTC"):
     tz = pytz.timezone(tz_name)
     dt = datetime.fromtimestamp(int(unix_ts), tz)
     return dt.strftime(fmt)
+
+@app.template_filter("to_bft")
+def to_bft(speed_ms):
+    if speed_ms < 0:
+        return 0
+    bft = int(math.floor((speed_ms / 0.836) ** (2/3)))
+    return min(bft, 12)
+
 
 @app.route("/")
 def index():
@@ -118,6 +128,20 @@ def weather_place(place_id):
         f"https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_KEY}&lang=en&units=metric"
     ).json()
 
+
+    today = datetime.now(pytz.timezone(weather_data["timezone"]))
+    today_fmt = today.strftime("%Y-%m-%d")
+    tomorrow = today + timedelta(days=1)
+    tomorrow_fmt = tomorrow.strftime("%Y-%m-%d")
+
+    today_overview = requests.get(
+        f"https://api.openweathermap.org/data/3.0/onecall/overview?lat={lat}&lon={lon}&appid={API_KEY}&date={today_fmt}&units=metric"
+    ).json()
+
+    tomorrow_overview = requests.get(
+        f"https://api.openweathermap.org/data/3.0/onecall/overview?lat={lat}&lon={lon}&appid={API_KEY}&date={tomorrow_fmt}&units=metric"
+    ).json()
+
     def get_icon(id):
         return f"https://openweathermap.org/img/wn/{id}@2x.png"
 
@@ -125,6 +149,8 @@ def weather_place(place_id):
         "weather.html",
         weather_data=weather_data,
         place_data=place_data,
+        today_overview=today_overview,
+        tomorrow_overview=tomorrow_overview,
         country=country,
         get_icon=get_icon,
     )

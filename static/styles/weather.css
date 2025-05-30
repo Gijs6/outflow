@@ -1,13 +1,13 @@
 main {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 50px;
 }
 
 main > div {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
 }
 
 #main-info-container {
@@ -159,6 +159,19 @@ main > div {
     color: var(--oc-blue-8);
 }
 
+#today-and-tomorrow {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+#today-and-tomorrow > div {
+    flex-grow: 1;
+    min-width: 200px;
+    width: min-content;
+}
+
 #minute-precipitation-container {
     display: flex;
     overflow: scroll;
@@ -202,8 +215,12 @@ main > div {
     font-weight: 900;
 }
 
-#hourly-container tr td {
-    padding: 5px;
+.hourly-overview td {
+    padding: 0 5px;
+}
+
+.hourly-details-row td {
+    padding-bottom: 10px;
 }
 
 .hourly-time {
@@ -212,7 +229,7 @@ main > div {
 }
 
 .hourly-icon img {
-    width: 30px;
+    width: 2em;
     background: var(--oc-orange-2);
     border-radius: 100px;
 }
@@ -235,16 +252,15 @@ main > div {
     padding: 15px;
     border-radius: 10px;
 
-    grid-template-columns: auto auto 1fr;
-    grid-template-rows: repeat(8, auto);
+    grid-template-columns: 6ch auto auto 1fr ;
+    grid-template-rows: repeat(5, auto);
 
     grid-template-areas:
-        "date date date"
-        "icon temp feels"
-        "icon max-min max-min"
-        "icon weather-title weather-title"
-        "icon weather-summary weather-summary"
-        "details details details";
+        "date icon temp feels"
+        "date icon max-min max-min"
+        "date icon weather-title weather-title"
+        "date icon weather-summary weather-summary"
+        "details details details details";
     align-items: center;
     column-gap: 10px;
     row-gap: 5px;
@@ -254,6 +270,7 @@ main > div {
     grid-area: date;
     font-size: 1.5em;
     font-weight: 800;
+    text-align: center;
 }
 
 .daily-icon {

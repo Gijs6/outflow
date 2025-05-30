@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template
 from datetime import datetime, timedelta
+from geopy.distance import distance
 import dotenv
 import os
 import pycountry
@@ -23,11 +24,12 @@ def fmt_dt(unix_ts, fmt="%Y-%m-%d %H:%M:%S", tz_name="UTC"):
     dt = datetime.fromtimestamp(int(unix_ts), tz)
     return dt.strftime(fmt)
 
+
 @app.template_filter("to_bft")
 def to_bft(speed_ms):
     if speed_ms < 0:
         return 0
-    bft = int(math.floor((speed_ms / 0.836) ** (2/3)))
+    bft = int(math.floor((speed_ms / 0.836) ** (2 / 3)))
     return min(bft, 12)
 
 
@@ -109,9 +111,24 @@ def search():
     response = requests.get(url)
     data = response.json()
 
+    used_coords = []
+    data_to_use = []
+
+    for opt in data:
+        keep = True
+        for lat2, lon2 in used_coords:
+            if (
+                distance((opt["lat"], opt["lon"]), (lat2, lon2)).km < 3
+            ):  # If the distance is less than 3 km, it is just the same place
+                keep = False
+                break
+        if keep:
+            used_coords.append((opt["lat"], opt["lon"]))
+            data_to_use.append(opt)
+
     return render_template(
         "search.html",
-        opt_list=data,
+        opt_list=data_to_use,
         encode_place_id=encode_place_id,
         full_country=full_country,
         term=term,
@@ -127,7 +144,6 @@ def weather_place(place_id):
     weather_data = requests.get(
         f"https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_KEY}&lang=en&units=metric"
     ).json()
-
 
     today = datetime.now(pytz.timezone(weather_data["timezone"]))
     today_fmt = today.strftime("%Y-%m-%d")

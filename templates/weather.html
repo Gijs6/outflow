@@ -23,12 +23,27 @@
         </div>
     </div>
 
+    {% if weather_data.alerts %}
+        <div id="alerts">
+            {% for alert in weather_data.alerts %}
+                <div class="alert {% if 'moderate' in alert.event.lower() %}alert-yellow{% elif 'severe' in alert.event.lower() %}alert-orange{% elif 'extreme' in alert.event.lower() %}alert-red{% else %}alert-basic{% endif %}">
+                    <span class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+                    <span class="alert-event">{{ alert.event }}</span>
+                    <span class="alert-dt">{{ alert.start | fmt_dt("%d-%m-%Y %H:%M", weather_data.timezone) }} - {{ alert.end | fmt_dt("%d-%m-%Y %H:%M", weather_data.timezone) }}</span>
+                    <details class="alert-description"><summary>More info</summary>{{ alert.description }}</details>
+                    <span class="alert-tags">{{ alert.tags | join(", ") }}</span>
+                    <span class="alert-sender">{{ alert.sender_name }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <div id="current-weather">
         <h2>Current weather</h2>
         <div class="weather-tiles">
             <div class="weather-tile weather-tile-datetime">
                 <span class="weather-tile-title"><span>Observation time</span><i class="fa-solid fa-clock"></i></span>
-                <span class="weather-tile-title-result">{{ weather_data.current.dt | fmt_dt("%Y-%m-%d %H:%M:%S", weather_data.timezone) }}</span>
+                <span class="weather-tile-title-result">{{ weather_data.current.dt | fmt_dt("%d-%m-%Y %H:%M:%S", weather_data.timezone) }}</span>
             </div>
             {% if weather_data.current.sunrise %}
                 <div class="weather-tile weather-tile-sunrise">

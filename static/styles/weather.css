@@ -76,6 +76,76 @@ main > div {
     font-size: 1.3em;
 }
 
+#alerts {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.alert {
+    background: var(--oc-orange-6);
+    color: var(--oc-gray-0);
+    font-weight: 500;
+    font-size: 1.1em;
+    padding: 15px 25px;
+    display: grid;
+    grid-template-areas:
+        "icon event tags"
+        "icon dt sender"
+        "icon description description";
+    align-items: center;
+    gap: 0 15px;
+    grid-template-columns: auto 1fr auto;
+    border-radius: 15px;
+}
+
+.alert-yellow {
+    background: var(--oc-yellow-7);
+}
+
+.alert-orange {
+    background: var(--oc-orange-7);
+}
+
+.alert-red {
+    background: var(--oc-red-7);
+}
+
+.alert-icon {
+    grid-area: icon;
+    font-size: 2.5em;
+}
+
+.alert-event {
+    grid-area: event;
+    font-size: 1.4em;
+    font-weight: 900;
+}
+
+.alert-dt {
+    grid-area: dt;
+}
+
+.alert-description {
+    grid-area: description;
+    margin-top: 10px;
+}
+
+.alert-tags {
+    grid-area: tags;
+    font-size: 0.9em;
+    font-weight: 500;
+    text-align: end;
+}
+
+.alert-sender {
+    grid-area: sender;
+    font-size: 0.9em;
+    opacity: 0.8;
+    font-weight: 400;
+    text-align: end;
+}
+
 .weather-tiles {
     display: flex;
     flex-direction: row;
@@ -252,7 +322,7 @@ main > div {
     padding: 15px;
     border-radius: 10px;
 
-    grid-template-columns: 6ch auto auto 1fr ;
+    grid-template-columns: 6ch auto auto 1fr;
     grid-template-rows: repeat(5, auto);
 
     grid-template-areas:

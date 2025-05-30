@@ -235,7 +235,7 @@ main > div {
 
 .daily-icon {
     grid-area: icon;
-    background: var(--oc-orange-5);
+    background: var(--oc-orange-3);
     border-radius: 100px;
     width: 70px;
 }
@@ -271,4 +271,14 @@ main > div {
 
 .daily-item details {
     grid-area: details;
+}
+
+.hourly-icon img {
+  width: 30px;
+  background: var(--oc-orange-3);
+  border-radius: 100px;
+}
+
+#hourly-container tr td {
+  padding: 5px;
 }

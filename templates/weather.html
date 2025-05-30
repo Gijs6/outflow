@@ -12,13 +12,11 @@
         <div id="place-info">
             <img src="/static/flags/{{ place_data.country | lower }}.svg" />
             <h1 id="place-info-name">{{ place_data.name }}</h1>
-            <span id="place-info-coords">
-                <i class="fa-solid fa-map-marker-alt"></i> {{ weather_data.lat }}, {{ weather_data.lon }}
-            </span>
+            <span id="place-info-coords"><i class="fa-solid fa-map-marker-alt"></i> {{ weather_data.lat }}, {{ weather_data.lon }}</span>
         </div>
 
         <div id="current-weather-summary">
-            <img id="current-icon" src="{{ get_icon(weather_data.current.weather.0.icon) }}">
+            <img id="current-icon" src="{{ get_icon(weather_data.current.weather.0.icon) }}" />
             <span id="current-temp">{{ weather_data.current.temp }} °C</span>
             <span id="current-feels-like">Feels like {{ weather_data.current.feels_like }} °C</span>
             <span id="current-weather-title">{{ weather_data.current.weather | map(attribute="description") | join(", ") | capitalize }}</span>
@@ -100,7 +98,28 @@
             </div>
         </div>
     {% endif %}
-
+    {% if weather_data.hourly %}
+        <div id="hourly">
+            <h2>Hourly Forecast</h2>
+            <table id="hourly-container">
+                {% for entry in weather_data.hourly %}
+                    <tr>
+                        <td class="hourly-time">{{ entry.dt | fmt_dt("%H:%M", weather_data.timezone) }}</td>
+                        <td class="hourly-icon"><img src="{{ get_icon(entry.weather.0.icon) }}" alt="{{ entry.weather.0.description }}" /></td>
+                        <td class="hourly-temp">{{ entry.temp }} °C</td>
+                        <td class="hourly-feels-like">Feels like {{ entry.feels_like }} °C</td>
+                        <td class="hourly-description">{{ entry.weather.0.description | capitalize }}</td>
+                        {% if entry.rain and entry.rain["1h"] %}
+                            <td class="hourly-rain">{{ entry.rain["1h"] }} mm</td>
+                        {% else %}
+                            <td class="hourly-rain">0 mm</td>
+                        {% endif %}
+                        <td class="hourly-wind">{{ entry.wind_speed }} m/s <img src="/static/imgs/arrow.svg" style="width: 16px; height: 16px; transform: rotate({{ entry.wind_deg }}deg)" alt="Wind Direction" /></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
     {% if weather_data.daily %}
         <div id="daily">
             <h2>This week</h2>
@@ -108,7 +127,7 @@
                 {% for entry in weather_data.daily %}
                     <div class="daily-item">
                         <span class="daily-date">{{ entry.dt | fmt_dt("%a", weather_data.timezone) }}</span>
-                        <img class="daily-icon" src="{{ get_icon(entry.weather.0.icon) }}">
+                        <img class="daily-icon" src="{{ get_icon(entry.weather.0.icon) }}" />
                         <span class="daily-temp">{{ entry.temp.day }} °C</span>
                         <span class="daily-feels-like">Feels like {{ entry.feels_like.day }} °C</span>
                         <span class="daily-max-min">{{ entry.temp.min }} °C - {{ entry.temp.max }} °C</span>
@@ -182,7 +201,4 @@
             </div>
         </div>
     {% endif %}
-
-    <pre><code>{{ weather_data | tojson(indent=4) }}</code></pre>
-
 {% endblock %}

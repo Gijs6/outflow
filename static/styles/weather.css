@@ -53,7 +53,7 @@ main > div {
 
 #current-icon {
     grid-area: 1 / 1 / 4 / 2;
-    background: var(--oc-orange-3);
+    background: var(--oc-orange-2);
     border-radius: 100px;
 }
 
@@ -132,6 +132,10 @@ main > div {
     width: 50px;
 }
 
+.weather-tile-datetime i {
+    color: var(--oc-teal-9);
+}
+
 .weather-tile-sunrise i,
 .weather-tile-uv i {
     color: var(--oc-yellow-8);
@@ -198,6 +202,26 @@ main > div {
     font-weight: 900;
 }
 
+#hourly-container tr td {
+    padding: 5px;
+}
+
+.hourly-time {
+    font-size: 1.2em;
+    font-weight: 900;
+}
+
+.hourly-icon img {
+    width: 30px;
+    background: var(--oc-orange-2);
+    border-radius: 100px;
+}
+
+.hourly-feels-like {
+    font-size: 0.9em;
+    color: var(--oc-gray-8);
+}
+
 #daily-container {
     display: flex;
     flex-direction: column;
@@ -224,7 +248,6 @@ main > div {
     align-items: center;
     column-gap: 10px;
     row-gap: 5px;
-    font-size: .9em;
 }
 
 .daily-date {
@@ -235,7 +258,7 @@ main > div {
 
 .daily-icon {
     grid-area: icon;
-    background: var(--oc-orange-3);
+    background: var(--oc-orange-2);
     border-radius: 100px;
     width: 70px;
 }
@@ -271,14 +294,4 @@ main > div {
 
 .daily-item details {
     grid-area: details;
-}
-
-.hourly-icon img {
-  width: 30px;
-  background: var(--oc-orange-3);
-  border-radius: 100px;
-}
-
-#hourly-container tr td {
-  padding: 5px;
 }

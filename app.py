@@ -1,6 +1,7 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
 from datetime import datetime, timedelta
 from geopy.distance import distance
+from geopy.geocoders import Nominatim
 import dotenv
 import os
 import pycountry
@@ -55,13 +56,11 @@ def from_base62(s):
     return num
 
 
-def encode_place_id(lat, lon, data, precision=5):
+def encode_place_id(lat, lon, precision=5):
     lat_int = int((lat + 90) * 10**precision)
     lon_int = int((lon + 180) * 10**precision)
     combined = (lat_int << 26) + lon_int
     id_str = to_base62(combined)
-
-    set_place_data(id_str, data)
 
     return id_str
 
@@ -81,23 +80,17 @@ def full_country(country_code):
     return country.name if country else None
 
 
-# Temp fix, probs use a db
-place_data = {}
-
-
-def get_place_data(id, lat, lon):
-    if place_data.get(id):
-        return place_data.get(id)
-    else:
-        geo_data = requests.get(
-            f"http://api.openweathermap.org/geo/1.0/reverse?lat={lat}&lon={lon}&limit=1&appid={API_KEY}"
-        ).json()[0]
-        set_place_data(id, geo_data)
-        return geo_data
-
-
-def set_place_data(id, data):
-    place_data[id] = data
+def country_for_coordinates(lat, lon):
+    geolocator = Nominatim(user_agent="geoapi")
+    try:
+        lat = float(lat)
+        lon = float(lon)
+        location = geolocator.reverse((lat, lon), language="en")
+        if location and "country_code" in location.raw["address"]:
+            return location.raw["address"]["country_code"].upper()
+    except (ValueError, TypeError):
+        pass
+    return None
 
 
 def search_city(term, limit=25):
@@ -126,25 +119,41 @@ def search_city(term, limit=25):
             "country": row[3],
             "lat": float(row[4]),
             "lon": float(row[5]),
+            "cool_id": encode_place_id(float(row[4]), float(row[5])),
         }
         for row in rows
     ]
 
 
-def fetch_places(term, limit=25, min_km=3):
-    if term:
-        data = search_city(term, limit)
-
-        used_coords, filtered = [], []
-        for opt in data:
-            if all(
-                distance((opt["lat"], opt["lon"]), (lat, lon)).km >= min_km
-                for lat, lon in used_coords
-            ):
-                used_coords.append((opt["lat"], opt["lon"]))
-                filtered.append(opt)
-        return filtered
-    return []
+def find_nearest_places(lat, lon):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    query = """
+        SELECT id, name, state_code, country_code, latitude, longitude, 
+        (6371 * acos(
+            cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) +
+            sin(radians(?)) * sin(radians(latitude))
+        )) AS distance
+        FROM cities
+        ORDER BY distance
+        LIMIT 10;
+    """
+    cur.execute(query, (lat, lon, lat))
+    rows = cur.fetchall()
+    conn.close()
+    return [
+        {
+            "stupid_id": row[0],
+            "name": row[1],
+            "state": row[2],
+            "country": row[3],
+            "lat": float(row[4]),
+            "lon": float(row[5]),
+            "cool_id": encode_place_id(float(row[4]), float(row[5])),
+            "distance": row[6],
+        }
+        for row in rows
+    ]
 
 
 @app.route("/")
@@ -155,12 +164,11 @@ def index():
 @app.route("/search")
 def search():
     term = request.args.get("q")
-    places = fetch_places(term)
+    places = search_city(term)
     return render_template(
         "search.html",
         opt_list=places,
         term=term,
-        encode_place_id=encode_place_id,
         full_country=full_country,
     )
 
@@ -168,12 +176,11 @@ def search():
 @app.route("/search_list")
 def search_list():
     term = request.args.get("q")
-    places = fetch_places(term, limit=5)
+    places = search_city(term, limit=5)
     return render_template(
         "search_results.html",
         opt_list=places,
         term=term,
-        encode_place_id=encode_place_id,
         full_country=full_country,
     )
 
@@ -181,7 +188,28 @@ def search_list():
 @app.route("/weather/<string:place_id>")
 def weather_place(place_id):
     lat, lon = decode_place_id(place_id)
-    place_data = get_place_data(place_id, lat, lon)
+    place_data = find_nearest_places(lat, lon)[0]
+
+    if place_data["distance"] > 5:
+        country = country_for_coordinates(lat, lon)
+
+        if country:
+            name = f"Somewhere in {full_country(country)}"
+            country_code = country
+        else:
+            name = f"{round(lat, 3)}, {round(lon, 3)}"
+            country_code = "globe"
+
+        place_data = {
+            "name": name,
+            "state": "Unknown",
+            "country": country_code,
+            "lat": lat,
+            "lon": lon,
+            "cool_id": place_id,
+            "distance": place_data["distance"],
+        }
+
     country = full_country(place_data["country"])
 
     weather_data = requests.get(
@@ -213,6 +241,16 @@ def weather_place(place_id):
         country=country,
         get_icon=get_icon,
     )
+
+
+@app.route("/encode_place_id")
+def encode_place_id_route():
+    lat = float(request.args.get("lat"))
+    lon = float(request.args.get("lon"))
+
+    place_id = encode_place_id(lat, lon)
+
+    return jsonify({"id": place_id})
 
 
 if __name__ == "__main__":

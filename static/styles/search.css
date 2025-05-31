@@ -33,6 +33,7 @@
 .opt img {
     grid-area: img;
     align-self: center;
+    width: 40px;
 }
 
 .opt-name {

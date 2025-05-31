@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found{% endblock %}
+
+{% block extra_headers %}
+    <style>
+        main {
+            display: flex;
+            align-items: center;
+            font-size: 2em;
+            text-align: center;
+            max-width: unset;
+            padding: 50px;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h1>404 - Page Not Found</h1>
+    <p>Sorry, we couldn't find what you were looking for.</p>
+    <a href="/">Go back home</a>
+{% endblock %}

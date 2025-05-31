@@ -10,11 +10,15 @@ import string
 import sqlite3
 import re
 import math
+import logging
+import traceback
+
 
 dotenv.load_dotenv()
 
 app = Flask(__name__)
 
+logging.basicConfig(level=logging.WARNING)
 
 API_KEY = os.getenv("api_key")
 
@@ -101,7 +105,7 @@ def full_country(country_code):
     ]
 
     if not country:
-        return None
+        return "Unknown"
     elif country_code.upper() in countries_that_need_an_article:
         return f"the {country.name}"
     else:
@@ -116,8 +120,8 @@ def country_for_coordinates(lat, lon):
         location = geolocator.reverse((lat, lon), language="en")
         if location and "country_code" in location.raw["address"]:
             return location.raw["address"]["country_code"].upper()
-    except (ValueError, TypeError):
-        pass
+    except Exception as e:
+        logging.warning(f"Error in country_for_coordinates: {e}")
     return None
 
 
@@ -155,66 +159,74 @@ def user_search(term, limit=25):
 
 
 def search_city(term, limit=25):
-    con = sqlite3.connect(DB_PATH)
-    cur = con.cursor()
-    query = """
-        SELECT id, name, state_code, country_code, latitude, longitude
-        FROM cities
-        WHERE name LIKE ?
-        ORDER BY 
-          CASE 
-            WHEN name = ? THEN 0
-            WHEN name LIKE ? THEN 1
-            ELSE 2
-          END,
-          name
-        LIMIT ?
-    """
-    rows = cur.execute(query, (f"%{term}%", term, f"{term}%", limit)).fetchall()
-    con.close()
-    return [
-        {
-            "stupid_id": row[0],
-            "name": row[1],
-            "state": row[2],
-            "country": row[3],
-            "lat": float(row[4]),
-            "lon": float(row[5]),
-            "cool_id": encode_place_id(float(row[4]), float(row[5])),
-        }
-        for row in rows
-    ]
+    try:
+        con = sqlite3.connect(DB_PATH)
+        cur = con.cursor()
+        query = """
+            SELECT id, name, state_code, country_code, latitude, longitude
+            FROM cities
+            WHERE name LIKE ?
+            ORDER BY 
+              CASE 
+                WHEN name = ? THEN 0
+                WHEN name LIKE ? THEN 1
+                ELSE 2
+              END,
+              name
+            LIMIT ?
+        """
+        rows = cur.execute(query, (f"%{term}%", term, f"{term}%", limit)).fetchall()
+        con.close()
+        return [
+            {
+                "stupid_id": row[0],
+                "name": row[1],
+                "state": row[2],
+                "country": row[3],
+                "lat": float(row[4]),
+                "lon": float(row[5]),
+                "cool_id": encode_place_id(float(row[4]), float(row[5])),
+            }
+            for row in rows
+        ]
+    except Exception as e:
+        logging.warning(f"Error in search_city: {e}")
+        return []
 
 
 def find_nearest_places(lat, lon):
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    query = """
-        SELECT id, name, state_code, country_code, latitude, longitude, 
-        (6371 * acos(
-            cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) +
-            sin(radians(?)) * sin(radians(latitude))
-        )) AS distance
-        FROM cities
-        ORDER BY distance
-        LIMIT 10;
-    """
-    cur.execute(query, (lat, lon, lat))
-    rows = cur.fetchall()
-    conn.close()
-    return [
-        {
-            "stupid_id": row[0],
-            "name": row[1],
-            "state": row[2],
-            "country": row[3],
-            "lat": float(row[4]),
-            "lon": float(row[5]),
-            "cool_id": encode_place_id(float(row[4]), float(row[5])),
-            "distance": row[6],
-        }
-        for row in rows
-    ]
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cur = conn.cursor()
+        query = """
+            SELECT id, name, state_code, country_code, latitude, longitude, 
+            (6371 * acos(
+                cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) +
+                sin(radians(?)) * sin(radians(latitude))
+            )) AS distance
+            FROM cities
+            ORDER BY distance
+            LIMIT 10;
+        """
+        cur.execute(query, (lat, lon, lat))
+        rows = cur.fetchall()
+        conn.close()
+        return [
+            {
+                "stupid_id": row[0],
+                "name": row[1],
+                "state": row[2],
+                "country": row[3],
+                "lat": float(row[4]),
+                "lon": float(row[5]),
+                "cool_id": encode_place_id(float(row[4]), float(row[5])),
+                "distance": row[6],
+            }
+            for row in rows
+        ]
+    except Exception as e:
+        logging.warning(f"Error in find_nearest_places: {e}")
+        return []
 
 
 @app.route("/")
@@ -225,7 +237,11 @@ def index():
 @app.route("/search")
 def search():
     term = request.args.get("q")
-    places = user_search(term)
+    try:
+        places = user_search(term)
+    except Exception as e:
+        logging.warning(f"Error in user_search: {e}")
+        places = []
 
     if len(places) == 1:  # If there is only 1 search result, skip the search page
         return redirect(f"/weather/{places[0]['cool_id']}")
@@ -241,7 +257,12 @@ def search():
 @app.route("/search_list")
 def search_list():
     term = request.args.get("q")
-    places = user_search(term, limit=5)
+    try:
+        places = user_search(term, limit=5)
+    except Exception as e:
+        logging.warning(f"Error in user_search (search_list): {e}")
+        places = []
+
     return render_template(
         "search_results.html",
         opt_list=places,
@@ -252,8 +273,28 @@ def search_list():
 
 @app.route("/weather/<string:place_id>")
 def weather_place(place_id):
-    lat, lon = decode_place_id(place_id)
-    place_data = find_nearest_places(lat, lon)[0]
+    try:
+        lat, lon = decode_place_id(place_id)
+    except Exception as e:
+        logging.warning(f"Error decoding place_id {place_id}: {e}")
+        return "Invalid place ID", 400
+
+    try:
+        place_data_list = find_nearest_places(lat, lon)
+        if not place_data_list:
+            raise ValueError("No nearby places found")
+        place_data = place_data_list[0]
+    except Exception as e:
+        logging.warning(f"Error finding nearest places: {e}")
+        place_data = {
+            "name": f"{round(lat, 3)}, {round(lon, 3)}",
+            "state": "Unknown",
+            "country": "globe",
+            "lat": lat,
+            "lon": lon,
+            "cool_id": place_id,
+            "distance": 0,
+        }
 
     if place_data["distance"] > 5:
         country = country_for_coordinates(lat, lon)
@@ -272,27 +313,43 @@ def weather_place(place_id):
             "lat": lat,
             "lon": lon,
             "cool_id": place_id,
-            "distance": place_data["distance"],
+            "distance": place_data.get("distance", 0),
         }
 
-    country = full_country(place_data["country"])
+    try:
+        weather_data = requests.get(
+            f"https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_KEY}&lang=en&units=metric"
+        ).json()
+    except Exception as e:
+        logging.warning(f"Error fetching weather data: {e}")
+        weather_data = {}
 
-    weather_data = requests.get(
-        f"https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_KEY}&lang=en&units=metric"
-    ).json()
+    try:
+        today = datetime.now(pytz.timezone(weather_data.get("timezone", "UTC")))
+        today_fmt = today.strftime("%Y-%m-%d")
+        tomorrow = today + timedelta(days=1)
+        tomorrow_fmt = tomorrow.strftime("%Y-%m-%d")
+    except Exception as e:
+        logging.warning(f"Error processing dates: {e}")
+        today_fmt = tomorrow_fmt = None
 
-    today = datetime.now(pytz.timezone(weather_data["timezone"]))
-    today_fmt = today.strftime("%Y-%m-%d")
-    tomorrow = today + timedelta(days=1)
-    tomorrow_fmt = tomorrow.strftime("%Y-%m-%d")
+    try:
+        today_overview = {}
+        tomorrow_overview = {}
 
-    today_overview = requests.get(
-        f"https://api.openweathermap.org/data/3.0/onecall/overview?lat={lat}&lon={lon}&appid={API_KEY}&date={today_fmt}&units=metric"
-    ).json()
+        if today_fmt:
+            today_overview = requests.get(
+                f"https://api.openweathermap.org/data/3.0/onecall/overview?lat={lat}&lon={lon}&appid={API_KEY}&date={today_fmt}&units=metric"
+            ).json()
 
-    tomorrow_overview = requests.get(
-        f"https://api.openweathermap.org/data/3.0/onecall/overview?lat={lat}&lon={lon}&appid={API_KEY}&date={tomorrow_fmt}&units=metric"
-    ).json()
+        if tomorrow_fmt:
+            tomorrow_overview = requests.get(
+                f"https://api.openweathermap.org/data/3.0/onecall/overview?lat={lat}&lon={lon}&appid={API_KEY}&date={tomorrow_fmt}&units=metric"
+            ).json()
+    except Exception as e:
+        logging.warning(f"Error fetching overview data: {e}")
+        today_overview = {}
+        tomorrow_overview = {}
 
     def get_icon(id):
         return f"https://openweathermap.org/img/wn/{id}@2x.png"
@@ -303,27 +360,44 @@ def weather_place(place_id):
         place_data=place_data,
         today_overview=today_overview,
         tomorrow_overview=tomorrow_overview,
-        country=country,
         get_icon=get_icon,
     )
 
 
 @app.route("/encode_place_id")
 def encode_place_id_route():
-    lat = float(request.args.get("lat"))
-    lon = float(request.args.get("lon"))
-
-    place_id = encode_place_id(lat, lon)
+    try:
+        lat = float(request.args.get("lat"))
+        lon = float(request.args.get("lon"))
+        place_id = encode_place_id(lat, lon)
+    except Exception as e:
+        logging.warning(f"Error in encode_place_id_route: {e}")
+        return jsonify({"error": "Invalid parameters"}), 400
 
     return jsonify({"id": place_id})
 
 
 @app.route("/decode_place_id")
 def decode_place_id_route():
-    id = request.args.get("id")
-    lat, lon = decode_place_id(id)
+    try:
+        id = request.args.get("id")
+        lat, lon = decode_place_id(id)
+    except Exception as e:
+        logging.warning(f"Error in decode_place_id_route: {e}")
+        return jsonify({"error": "Invalid place ID"}), 400
 
     return jsonify({"lat": lat, "lon": lon})
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("404.html"), 404
+
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    logging.error("Internal Server Error: %s", traceback.format_exc())
+    return render_template("500.html"), 500
 
 
 if __name__ == "__main__":

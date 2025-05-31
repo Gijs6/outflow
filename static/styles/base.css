@@ -108,3 +108,12 @@ main {
 details summary {
     width: fit-content;
 }
+
+footer {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}

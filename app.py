@@ -1,6 +1,5 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, redirect
 from datetime import datetime, timedelta
-from geopy.distance import distance
 from geopy.geocoders import Nominatim
 import dotenv
 import os
@@ -73,12 +72,40 @@ def decode_place_id(encoded, precision=5):
     lat_int = combined >> 26
     lat = lat_int / 10**precision - 90
     lon = lon_int / 10**precision - 180
-    return lat, lon
+    return round(lat, precision), round(lon, precision)  # Weird float behaviour
 
 
 def full_country(country_code):
     country = pycountry.countries.get(alpha_2=country_code.upper())
-    return country.name if country else None
+
+    countries_that_need_an_article = [
+        "BS",  # Bahamas
+        "GM",  # Gambia
+        "NL",  # Netherlands
+        "PH",  # Philippines
+        "AE",  # United Arab Emirates
+        "GB",  # United Kingdom
+        "US",  # United States
+        "CZ",  # Czech Republic
+        "DO",  # Dominican Republic
+        "CF",  # Central African Republic
+        "CG",  # Congo
+        "CD",  # Democratic Republic of the Congo
+        "MH",  # Marshall Islands
+        "SB",  # Solomon Islands
+        "MV",  # Maldives
+        "KM",  # Comoros
+        "FM",  # Federated States of Micronesia
+        "VI",  # United States Virgin Islands
+        "VG",  # British Virgin Islands
+    ]
+
+    if not country:
+        return None
+    elif country_code.upper() in countries_that_need_an_article:
+        return f"the {country.name}"
+    else:
+        return country.name
 
 
 def country_for_coordinates(lat, lon):
@@ -199,6 +226,10 @@ def index():
 def search():
     term = request.args.get("q")
     places = user_search(term)
+
+    if len(places) == 1:  # If there is only 1 search result, skip the search page
+        return redirect(f"/weather/{places[0]['cool_id']}")
+
     return render_template(
         "search.html",
         opt_list=places,
@@ -285,6 +316,14 @@ def encode_place_id_route():
     place_id = encode_place_id(lat, lon)
 
     return jsonify({"id": place_id})
+
+
+@app.route("/decode_place_id")
+def decode_place_id_route():
+    id = request.args.get("id")
+    lat, lon = decode_place_id(id)
+
+    return jsonify({"lat": lat, "lon": lon})
 
 
 if __name__ == "__main__":

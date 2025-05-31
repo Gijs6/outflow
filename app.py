@@ -12,7 +12,7 @@ import re
 import math
 import logging
 import traceback
-from flask_babel import Babel, get_locale, gettext
+from flask_babel import Babel, get_locale, gettext, format_datetime
 from babel import Locale
 
 dotenv.load_dotenv()
@@ -49,11 +49,38 @@ def set_lang(lang):
     return redirect("/")
 
 
+# Babel format_datetimes uses ICU for the format, while I'm already using the normal python strftime and strptime behaviour, so here is a stupid converter
+
+def strftime_to_icu(fmt):
+    replacements = {
+        '%Y': 'yyyy',
+        '%y': 'yy',
+        '%B': 'MMMM',
+        '%b': 'MMM',
+        '%m': 'MM',
+        '%d': 'dd',
+        '%A': 'EEEE',
+        '%a': 'EEE',
+        '%H': 'HH',
+        '%I': 'hh',
+        '%M': 'mm',
+        '%S': 'ss',
+        '%p': 'a',
+        '%z': 'Z',
+        '%Z': 'z',
+    }
+
+    for py_token, icu_token in replacements.items():
+        fmt = fmt.replace(py_token, icu_token)
+    return fmt
+
+
 @app.template_filter("fmt_dt")
 def fmt_dt(unix_ts, fmt="%Y-%m-%d %H:%M:%S", tz_name="UTC"):
     tz = pytz.timezone(tz_name)
     dt = datetime.fromtimestamp(int(unix_ts), tz)
-    return dt.strftime(fmt)
+    icu_fmt = strftime_to_icu(fmt)
+    return format_datetime(dt, icu_fmt)
 
 
 @app.template_filter("to_bft")
@@ -325,7 +352,6 @@ def weather_place(place_id):
             "cool_id": place_id,
             "distance": place_data.get("distance", 0),
         }
-
 
     lang = str(get_locale())
 

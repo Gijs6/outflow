@@ -10,7 +10,7 @@
         {% endfor %}
     {% else %}
         {% if term %}
-            <div class="opt unav">No result found for '{{ term }}'</div>
+            <div class="opt unav">{{ gettext("No result found for '%(term)s'", term=term) }}</div>
         {% endif %}
     {% endif %}
 </div>

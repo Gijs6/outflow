@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Page Not Found{% endblock %}
+{% block title %}{{ gettext("Page Not Found") }}{% endblock %}
 
 {% block extra_headers %}
     <style>
@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block content %}
-    <h1>404 - Page Not Found</h1>
-    <p>Sorry, we couldn't find what you were looking for.</p>
-    <a href="/">Go back home</a>
+    <h1>{{ gettext("404 - Page Not Found") }}</h1>
+    <p>{{ gettext("Sorry, we couldn't find what you were looking for.") }}</p>
+    <a href="/">{{ gettext("Return to home") }}</a>
 {% endblock %}

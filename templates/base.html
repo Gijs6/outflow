@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ g.get('babel_locale', 'en') }}">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -22,7 +22,7 @@
             <span>{% block page_title %}{% endblock %}</span>
             <div class="searchcontainer">
                 <form action="/search" method="GET" class="searchbar">
-                    <input type="search" name="q" placeholder="Search for a place..." spellcheck="false" autocomplete="off" required  />
+                    <input type="search" name="q" placeholder="{{ gettext('Search for a place...') }}" spellcheck="false" autocomplete="off" required />
                     <button type="submit"><i class="fa-solid fa-arrow-right"></i></button>
                 </form>
                 <div class="search-results"></div>
@@ -32,8 +32,8 @@
         <main>{% block content %}{% endblock %}</main>
 
         <footer>
-            <p>Made by <a href="https://gijs6.nl">Gijs6</a></p>
-            <p>Data from <a href="https://openweathermap.org">OpenWeatherMap</a></p>
+            <p>{{ gettext("Made by") }} <a href="https://gijs6.nl">Gijs6</a></p>
+            <p>{{ gettext("Data from") }} <a href="https://openweathermap.org">OpenWeatherMap</a></p>
         </footer>
     </body>
 </html>

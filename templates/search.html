@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Places found for '{{ term }}'{% endblock %}
+{% block title %}{{ gettext("Places found for '%(term)s'", term=term) }}{% endblock %}
 
 {% block extra_headers %}
     <style>
@@ -16,6 +16,6 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Places found for '{{ term }}'</h1>
+    <h1>{{ gettext("Places found for '%(term)s'", term=term) }}</h1>
     {% include "search_results.html" %}
 {% endblock %}

@@ -1,0 +1,228 @@
+# Translations template for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-05-31 17:52+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: app.py:119 app.py:301 app.py:321
+msgid "Unknown"
+msgstr ""
+
+#: app.py:161
+msgid "Your coordinates"
+msgstr ""
+
+#: app.py:313
+#, python-format
+msgid "Somewhere in %(place)s"
+msgstr ""
+
+#: templates/404.html:3
+msgid "Page Not Found"
+msgstr ""
+
+#: templates/404.html:22
+msgid "404 - Page Not Found"
+msgstr ""
+
+#: templates/404.html:23
+msgid "Sorry, we couldn't find what you were looking for."
+msgstr ""
+
+#: templates/404.html:24 templates/500.html:24
+msgid "Return to home"
+msgstr ""
+
+#: templates/500.html:3
+msgid "Server Error"
+msgstr ""
+
+#: templates/500.html:22
+msgid "500 - Server Error"
+msgstr ""
+
+#: templates/500.html:23
+msgid "Oops! Something went wrong on our end."
+msgstr ""
+
+#: templates/base.html:25 templates/index.html:42
+msgid "Search for a place..."
+msgstr ""
+
+#: templates/base.html:35
+msgid "Made by"
+msgstr ""
+
+#: templates/base.html:36
+msgid "Data from"
+msgstr ""
+
+#: templates/index.html:3
+msgid "Index"
+msgstr ""
+
+#: templates/search.html:3 templates/search.html:19
+#, python-format
+msgid "Places found for '%(term)s'"
+msgstr ""
+
+#: templates/search_results.html:13
+#, python-format
+msgid "No result found for '%(term)s'"
+msgstr ""
+
+#: templates/weather.html:3
+#, python-format
+msgid "Weather for %(place)s"
+msgstr ""
+
+#: templates/weather.html:4
+msgid "Weather for"
+msgstr ""
+
+#: templates/weather.html:21
+#, python-format
+msgid "Feels like %(temp)s °C"
+msgstr ""
+
+#: templates/weather.html:33
+msgid "More info"
+msgstr ""
+
+#: templates/weather.html:42
+msgid "Current weather"
+msgstr ""
+
+#: templates/weather.html:45
+msgid "Observation time"
+msgstr ""
+
+#: templates/weather.html:50 templates/weather.html:228
+msgid "Sunrise"
+msgstr ""
+
+#: templates/weather.html:56 templates/weather.html:232
+msgid "Sunset"
+msgstr ""
+
+#: templates/weather.html:61 templates/weather.html:159
+#: templates/weather.html:248
+msgid "Pressure"
+msgstr ""
+
+#: templates/weather.html:65 templates/weather.html:163
+#: templates/weather.html:252
+msgid "Dew point"
+msgstr ""
+
+#: templates/weather.html:69 templates/weather.html:167
+#: templates/weather.html:256
+msgid "Humidity"
+msgstr ""
+
+#: templates/weather.html:73 templates/weather.html:171
+#: templates/weather.html:260
+msgid "Clouds"
+msgstr ""
+
+#: templates/weather.html:77 templates/weather.html:175
+#: templates/weather.html:264
+msgid "UV index"
+msgstr ""
+
+#: templates/weather.html:82 templates/weather.html:180
+msgid "Average visibility"
+msgstr ""
+
+#: templates/weather.html:87 templates/weather.html:185
+#: templates/weather.html:268
+msgid "Wind"
+msgstr ""
+
+#: templates/weather.html:88 templates/weather.html:186
+#: templates/weather.html:269
+msgid "Wind Direction Arrow"
+msgstr ""
+
+#: templates/weather.html:89
+#, python-format
+msgid "Gusts: %(speed)s bft"
+msgstr ""
+
+#: templates/weather.html:93
+msgid "Rain (last hour)"
+msgstr ""
+
+#: templates/weather.html:99
+msgid "Snow (last hour)"
+msgstr ""
+
+#: templates/weather.html:108
+msgid "Today"
+msgstr ""
+
+#: templates/weather.html:112
+msgid "Tomorrow"
+msgstr ""
+
+#: templates/weather.html:119
+msgid "Precipitation per minute (mm/h)"
+msgstr ""
+
+#: templates/weather.html:134
+msgid "Hourly Forecast"
+msgstr ""
+
+#: templates/weather.html:141 templates/weather.html:220
+msgid "Feels like"
+msgstr ""
+
+#: templates/weather.html:150
+msgid "Wind Direction"
+msgstr ""
+
+#: templates/weather.html:156 templates/weather.html:225
+msgid "More"
+msgstr ""
+
+#: templates/weather.html:187 templates/weather.html:270
+msgid "Gusts:"
+msgstr ""
+
+#: templates/weather.html:191 templates/weather.html:274
+msgid "Rain"
+msgstr ""
+
+#: templates/weather.html:198 templates/weather.html:281
+msgid "Snow"
+msgstr ""
+
+#: templates/weather.html:213
+msgid "This week"
+msgstr ""
+
+#: templates/weather.html:236
+msgid "Moonrise"
+msgstr ""
+
+#: templates/weather.html:240
+msgid "Moonset"
+msgstr ""
+
+#: templates/weather.html:244
+msgid "Moon phase"
+msgstr ""
+

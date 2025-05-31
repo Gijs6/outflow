@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, jsonify, redirect
+from flask import Flask, request, render_template, jsonify, redirect, session
 from datetime import datetime, timedelta
 from geopy.geocoders import Nominatim
 import dotenv
@@ -12,7 +12,8 @@ import re
 import math
 import logging
 import traceback
-
+from flask_babel import Babel, get_locale, gettext
+from babel import Locale
 
 dotenv.load_dotenv()
 
@@ -23,6 +24,29 @@ logging.basicConfig(level=logging.WARNING)
 API_KEY = os.getenv("api_key")
 
 DB_PATH = "data/cities.sqlite3"
+
+app.config["BABEL_DEFAULT_LOCALE"] = "en"
+app.config["BABEL_SUPPORTED_LOCALES"] = ["en", "nl", "fr"]
+app.config["BABEL_TRANSLATION_DIRECTORIES"] = "./translations"
+
+app.secret_key = os.urandom(50)
+
+
+def get_locale_thing():
+    return (
+        request.args.get("lang")
+        or session.get("lang")
+        or request.accept_languages.best_match(["en", "nl", "fr"])
+    )
+
+
+babel = Babel(app, locale_selector=get_locale_thing)
+
+
+@app.route("/set_lang/<lang>")
+def set_lang(lang):
+    session["lang"] = lang
+    return redirect("/")
 
 
 @app.template_filter("fmt_dt")
@@ -80,36 +104,22 @@ def decode_place_id(encoded, precision=5):
 
 
 def full_country(country_code):
-    country = pycountry.countries.get(alpha_2=country_code.upper())
+    country_code = country_code.upper()
+    locale = str(get_locale())[:2]
 
-    countries_that_need_an_article = [
-        "BS",  # Bahamas
-        "GM",  # Gambia
-        "NL",  # Netherlands
-        "PH",  # Philippines
-        "AE",  # United Arab Emirates
-        "GB",  # United Kingdom
-        "US",  # United States
-        "CZ",  # Czech Republic
-        "DO",  # Dominican Republic
-        "CF",  # Central African Republic
-        "CG",  # Congo
-        "CD",  # Democratic Republic of the Congo
-        "MH",  # Marshall Islands
-        "SB",  # Solomon Islands
-        "MV",  # Maldives
-        "KM",  # Comoros
-        "FM",  # Federated States of Micronesia
-        "VI",  # United States Virgin Islands
-        "VG",  # British Virgin Islands
-    ]
+    try:
+        babel_locale = Locale.parse(locale)
+        country_name = babel_locale.territories.get(country_code)
+    except:
+        country_name = None
 
-    if not country:
-        return "Unknown"
-    elif country_code.upper() in countries_that_need_an_article:
-        return f"the {country.name}"
-    else:
-        return country.name
+    if not country_name:
+        country = pycountry.countries.get(alpha_2=country_code)
+        if not country:
+            return gettext("Unknown")
+        country_name = country.name
+
+    return country_name
 
 
 def country_for_coordinates(lat, lon):
@@ -117,7 +127,7 @@ def country_for_coordinates(lat, lon):
     try:
         lat = float(lat)
         lon = float(lon)
-        location = geolocator.reverse((lat, lon), language="en")
+        location = geolocator.reverse((lat, lon), language=str(get_locale))
         if location and "country_code" in location.raw["address"]:
             return location.raw["address"]["country_code"].upper()
     except Exception as e:
@@ -148,7 +158,7 @@ def user_search(term, limit=25):
         return [
             {
                 "name": f"{round(lat, 3)}, {round(lon, 3)}",
-                "state": "Your coordinates",
+                "state": gettext("Your coordinates"),
                 "country": country_code,
                 "lat": lat,
                 "lon": lon,
@@ -288,7 +298,7 @@ def weather_place(place_id):
         logging.warning(f"Error finding nearest places: {e}")
         place_data = {
             "name": f"{round(lat, 3)}, {round(lon, 3)}",
-            "state": "Unknown",
+            "state": gettext("Unknown"),
             "country": "globe",
             "lat": lat,
             "lon": lon,
@@ -300,7 +310,7 @@ def weather_place(place_id):
         country = country_for_coordinates(lat, lon)
 
         if country:
-            name = f"Somewhere in {full_country(country)}"
+            name = gettext("Somewhere in %(place)s", place=full_country(country))
             country_code = country
         else:
             name = f"{round(lat, 3)}, {round(lon, 3)}"
@@ -308,7 +318,7 @@ def weather_place(place_id):
 
         place_data = {
             "name": name,
-            "state": "Unknown",
+            "state": gettext("Unknown"),
             "country": country_code,
             "lat": lat,
             "lon": lon,
@@ -316,9 +326,12 @@ def weather_place(place_id):
             "distance": place_data.get("distance", 0),
         }
 
+
+    lang = str(get_locale())
+
     try:
         weather_data = requests.get(
-            f"https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_KEY}&lang=en&units=metric"
+            f"https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_KEY}&lang={lang}&units=metric"
         ).json()
     except Exception as e:
         logging.warning(f"Error fetching weather data: {e}")
@@ -339,12 +352,12 @@ def weather_place(place_id):
 
         if today_fmt:
             today_overview = requests.get(
-                f"https://api.openweathermap.org/data/3.0/onecall/overview?lat={lat}&lon={lon}&appid={API_KEY}&date={today_fmt}&units=metric"
+                f"https://api.openweathermap.org/data/3.0/onecall/overview?lat={lat}&lon={lon}&appid={API_KEY}&date={today_fmt}&units=metric&lang={lang}"
             ).json()
 
         if tomorrow_fmt:
             tomorrow_overview = requests.get(
-                f"https://api.openweathermap.org/data/3.0/onecall/overview?lat={lat}&lon={lon}&appid={API_KEY}&date={tomorrow_fmt}&units=metric"
+                f"https://api.openweathermap.org/data/3.0/onecall/overview?lat={lat}&lon={lon}&appid={API_KEY}&date={tomorrow_fmt}&units=metric&lang={lang}"
             ).json()
     except Exception as e:
         logging.warning(f"Error fetching overview data: {e}")

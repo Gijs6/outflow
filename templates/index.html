@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Index{% endblock %}
+{% block title %}{{ gettext("Index") }}{% endblock %}
 
 {% block extra_headers %}
     <style>
@@ -39,7 +39,7 @@
 {% block content %}
     <div class="searchcontainer" id="searchbar-big">
         <form action="/search" method="GET" class="searchbar">
-            <input type="text" name="q" placeholder="Search for a place..." required />
+            <input type="text" name="q" placeholder="{{ gettext('Search for a place...') }}" required />
             <button type="submit"><i class="fa-solid fa-arrow-right"></i></button>
         </form>
         <div class="search-results"></div>

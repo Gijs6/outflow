@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Server Error{% endblock %}
+{% block title %}{{ gettext("Server Error") }}{% endblock %}
 
 {% block extra_headers %}
     <style>
@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block content %}
-    <h1>500 - Server Error</h1>
-    <p>Oops! Something went wrong on our end.</p>
-    <a href="/">Return to homepage</a>
+    <h1>{{ gettext("500 - Server Error") }}</h1>
+    <p>{{ gettext("Oops! Something went wrong on our end.") }}</p>
+    <a href="/">{{ gettext("Return to home") }}</a>
 {% endblock %}

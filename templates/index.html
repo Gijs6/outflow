@@ -18,7 +18,7 @@
         }
 
         #searchbar-big {
-            font-size: 0.8em;
+            font-size: 0.5em;
         }
 
         #searchbar-big input {
@@ -39,8 +39,11 @@
 
 {% block content %}
     <strong>Between subtle shading and the absence of light lies the nuance of iqlusion</strong>
-    <form action="/search" method="GET" class="searchbar" id="searchbar-big">
-        <input type="text" name="q" placeholder="Search for a place..." required />
-        <button type="submit"><i class="fa-solid fa-arrow-right"></i></button>
-    </form>
+    <div class="searchcontainer" id="searchbar-big">
+        <form action="/search" method="GET" class="searchbar">
+            <input type="text" name="q" placeholder="Search for a place..." required />
+            <button type="submit"><i class="fa-solid fa-arrow-right"></i></button>
+        </form>
+        <div class="search-results"></div>
+    </div>
 {% endblock %}

@@ -33,11 +33,6 @@ def to_bft(speed_ms):
     return min(bft, 12)
 
 
-@app.route("/")
-def index():
-    return render_template("index.html")
-
-
 BASE62 = string.digits + string.ascii_lowercase + string.ascii_uppercase
 
 
@@ -103,35 +98,52 @@ def set_place_data(id, data):
     place_data[id] = data
 
 
+def fetch_places(term, min_km=3):
+    if term:
+        data = requests.get(
+            f"http://api.openweathermap.org/geo/1.0/direct?q={term}&limit=1000&appid={API_KEY}"
+        ).json()
+
+        used_coords, filtered = [], []
+        for opt in data:
+            if all(
+                distance((opt["lat"], opt["lon"]), (lat, lon)).km >= min_km
+                for lat, lon in used_coords
+            ):
+                used_coords.append((opt["lat"], opt["lon"]))
+                filtered.append(opt)
+        return filtered
+    return []
+
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+
 @app.route("/search")
 def search():
     term = request.args.get("q")
-    url = f"http://api.openweathermap.org/geo/1.0/direct?q={term}&limit=1000&appid={API_KEY}"
-
-    response = requests.get(url)
-    data = response.json()
-
-    used_coords = []
-    data_to_use = []
-
-    for opt in data:
-        keep = True
-        for lat2, lon2 in used_coords:
-            if (
-                distance((opt["lat"], opt["lon"]), (lat2, lon2)).km < 3
-            ):  # If the distance is less than 3 km, it is just the same place
-                keep = False
-                break
-        if keep:
-            used_coords.append((opt["lat"], opt["lon"]))
-            data_to_use.append(opt)
-
+    places = fetch_places(term)
     return render_template(
         "search.html",
-        opt_list=data_to_use,
+        opt_list=places,
+        term=term,
         encode_place_id=encode_place_id,
         full_country=full_country,
+    )
+
+
+@app.route("/search_list")
+def search_list():
+    term = request.args.get("q")
+    places = fetch_places(term)
+    return render_template(
+        "list_search_options.html",
+        opt_list=places,
         term=term,
+        encode_place_id=encode_place_id,
+        full_country=full_country,
     )
 
 

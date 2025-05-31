@@ -382,3 +382,7 @@ main > div {
 .daily-item details {
     grid-area: details;
 }
+
+.hourly-details-row details {
+    padding-left: 1em;
+}

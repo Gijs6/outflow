@@ -1,0 +1,16 @@
+<div class="search-opts">
+    {% if opt_list %}
+        {% for opt in opt_list %}
+            <a href="/weather/{{ encode_place_id(opt.lat, opt.lon, opt) }}" class="opt">
+                <img src="/static/flags/{{ opt.country | lower }}.svg" />
+                <span class="opt-name">{{ opt.name }}</span>
+                <span class="opt-country-region">{{ opt.state }} - {{ full_country(opt.country) }}</span>
+                <span class="opt-coords">{{ opt.lat }}, {{ opt.lon }}</span>
+            </a>
+        {% endfor %}
+    {% else %}
+        {% if term %}
+            <div class="opt unav">No result found for '{{ term }}'</div>
+        {% endif %}
+    {% endif %}
+</div>

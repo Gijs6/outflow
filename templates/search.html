@@ -3,25 +3,15 @@
 {% block title %}Places found for '{{ term }}'{% endblock %}
 
 {% block extra_headers %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/search.css') }}" />
+    <style>
+        h1 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
     <h1>Places found for '{{ term }}'</h1>
-    <div id="search-opts">
-        {% if opt_list %}
-            {% for opt in opt_list %}
-                <a href="/weather/{{ encode_place_id(opt.lat, opt.lon, opt) }}" class="opt">
-                    <img src="/static/flags/{{ opt.country | lower }}.svg" />
-                    <span class="opt-name">{{ opt.name }}</span>
-                    <span class="opt-country-region">{{ opt.state }} - {{ full_country(opt.country) }}</span>
-                    <span class="opt-coords">{{ opt.lat }}, {{ opt.lon }}</span>
-                </a>
-            {% endfor %}
-        {% else %}
-                <div class="opt unav">
-                    No result found for '{{ term }}'
-                </div>
-        {% endif %}
-    </div>
+    {% include "search_results.html" %}
 {% endblock %}

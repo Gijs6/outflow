@@ -7,8 +7,8 @@ import pycountry
 import requests
 import pytz
 import string
+import sqlite3
 import math
-
 
 dotenv.load_dotenv()
 
@@ -16,6 +16,8 @@ app = Flask(__name__)
 
 
 API_KEY = os.getenv("api_key")
+
+DB_PATH = "data/cities.sqlite3"
 
 
 @app.template_filter("fmt_dt")
@@ -98,11 +100,40 @@ def set_place_data(id, data):
     place_data[id] = data
 
 
-def fetch_places(term, min_km=3):
+def search_city(term, limit=25):
+    con = sqlite3.connect(DB_PATH)
+    cur = con.cursor()
+    query = """
+        SELECT id, name, state_code, country_code, latitude, longitude
+        FROM cities
+        WHERE name LIKE ?
+        ORDER BY 
+          CASE 
+            WHEN name = ? THEN 0
+            WHEN name LIKE ? THEN 1
+            ELSE 2
+          END,
+          name
+        LIMIT ?
+    """
+    rows = cur.execute(query, (f"%{term}%", term, f"{term}%", limit)).fetchall()
+    con.close()
+    return [
+        {
+            "stupid_id": row[0],
+            "name": row[1],
+            "state": row[2],
+            "country": row[3],
+            "lat": float(row[4]),
+            "lon": float(row[5]),
+        }
+        for row in rows
+    ]
+
+
+def fetch_places(term, limit=25, min_km=3):
     if term:
-        data = requests.get(
-            f"http://api.openweathermap.org/geo/1.0/direct?q={term}&limit=1000&appid={API_KEY}"
-        ).json()
+        data = search_city(term, limit)
 
         used_coords, filtered = [], []
         for opt in data:
@@ -137,9 +168,9 @@ def search():
 @app.route("/search_list")
 def search_list():
     term = request.args.get("q")
-    places = fetch_places(term)
+    places = fetch_places(term, limit=5)
     return render_template(
-        "list_search_options.html",
+        "search_results.html",
         opt_list=places,
         term=term,
         encode_place_id=encode_place_id,

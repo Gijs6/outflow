@@ -22,7 +22,7 @@
             <span>{% block page_title %}{% endblock %}</span>
             <div class="searchcontainer">
                 <form action="/search" method="GET" class="searchbar">
-                    <input type="text" name="q" placeholder="Search for a place..." required />
+                    <input type="search" name="q" placeholder="Search for a place..." spellcheck="false" autocomplete="off" required  />
                     <button type="submit"><i class="fa-solid fa-arrow-right"></i></button>
                 </form>
                 <div class="search-results"></div>

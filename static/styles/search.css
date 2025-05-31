@@ -1,7 +1,6 @@
 .search-opts {
     display: flex;
     flex-direction: column;
-    width: fit-content;
     margin: auto;
     width: 100%;
 }

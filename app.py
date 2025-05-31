@@ -9,6 +9,7 @@ import requests
 import pytz
 import string
 import sqlite3
+import re
 import math
 
 dotenv.load_dotenv()
@@ -93,6 +94,39 @@ def country_for_coordinates(lat, lon):
     return None
 
 
+def valid_coords(input_str):
+    match = re.match(r"^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$", input_str)
+    if not match:
+        return False
+    lat, lon = float(match.group(1)), float(match.group(2))
+    if -90 <= lat <= 90 and -180 <= lon <= 180:
+        return [lat, lon]
+    return False
+
+
+def user_search(term, limit=25):
+    coords_test = valid_coords(term)
+    if valid_coords(term):
+        lat, lon = coords_test[0], coords_test[1]
+        country = country_for_coordinates(lat, lon)
+
+        if country:
+            country_code = country
+        else:
+            country_code = "globe"
+        return [
+            {
+                "name": f"{round(lat, 3)}, {round(lon, 3)}",
+                "state": "Your coordinates",
+                "country": country_code,
+                "lat": lat,
+                "lon": lon,
+                "cool_id": encode_place_id(lat, lon),
+            }
+        ] + find_nearest_places(coords_test[0], coords_test[1])
+    return search_city(term, limit)
+
+
 def search_city(term, limit=25):
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
@@ -164,7 +198,7 @@ def index():
 @app.route("/search")
 def search():
     term = request.args.get("q")
-    places = search_city(term)
+    places = user_search(term)
     return render_template(
         "search.html",
         opt_list=places,
@@ -176,7 +210,7 @@ def search():
 @app.route("/search_list")
 def search_list():
     term = request.args.get("q")
-    places = search_city(term, limit=5)
+    places = user_search(term, limit=5)
     return render_template(
         "search_results.html",
         opt_list=places,

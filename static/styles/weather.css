@@ -239,13 +239,15 @@ main > div {
 
 #today-and-tomorrow > div {
     flex-grow: 1;
-    min-width: 200px;
+    min-width: 300px;
     width: min-content;
 }
 
 #minute-precipitation-container {
     display: flex;
     overflow: scroll;
+    max-height: 500px;
+    min-height: 50px;
 }
 
 .minute-precipitation-item {
@@ -282,7 +284,7 @@ main > div {
     opacity: 1 !important;
 }
 
-#minute-precipitation-container:has(.minute-precipitation-item > *:hover) .minute-precipitation-amount {
+.minute-precipitation-item:has(*:hover) .minute-precipitation-amount {
     font-weight: 900;
 }
 
@@ -386,4 +388,26 @@ main > div {
 
 .hourly-details-row details {
     padding-left: 1em;
+}
+
+#maps-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px 10px;
+}
+
+.map-box > div {
+    height: 300px;
+}
+
+.map-header {
+    text-transform: capitalize;
+    font-size: 1.4em;
+    font-weight: 500;
+}
+
+.map-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }

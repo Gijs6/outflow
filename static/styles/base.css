@@ -36,6 +36,8 @@ header {
     align-items: center;
     gap: 30px;
     flex-wrap: wrap;
+    position: relative;
+    z-index: 10000;
 }
 
 header > a {
@@ -100,7 +102,7 @@ footer a {
 main {
     padding: 30px;
     flex-grow: 1;
-    max-width: 900px;
+    max-width: 1200px;
     margin: auto;
     width: 100%;
 }

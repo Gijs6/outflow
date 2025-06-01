@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, jsonify, redirect
 from datetime import datetime, timedelta
 from geopy.geocoders import Nominatim
+import unicodedata
 import dotenv
 import os
 import pycountry
@@ -158,24 +159,50 @@ def user_search(term, limit=25):
     return search_city(term, limit)
 
 
+def strip_diacritics(s):
+    return "".join(
+        c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn"
+    ).lower()
+
+
+def make_col(con, column_name):
+    cur = con.cursor()
+    cur.execute("PRAGMA table_info(cities)")
+    columns = [row[1] for row in cur.fetchall()]
+    if column_name not in columns:
+        cur.execute(f"ALTER TABLE cities ADD COLUMN {column_name} TEXT")
+        return True
+    return False
+
+def normalize_city_names(con):
+    if make_col(con, "search_name"):
+        cur = con.cursor()
+        cur.execute("SELECT id, name FROM cities")
+        rows = cur.fetchall()
+
+        for city_id, name in rows:
+            normalized = strip_diacritics(name)
+            cur.execute("UPDATE cities SET search_name = ? WHERE id = ?", (normalized, city_id))
+
+        con.commit()
+
+
+
 def search_city(term, limit=25):
     try:
         con = sqlite3.connect(DB_PATH)
+
+        normalize_city_names(con)
+
         cur = con.cursor()
         query = """
             SELECT id, name, state_code, country_code, latitude, longitude
             FROM cities
-            WHERE name LIKE ?
-            ORDER BY 
-              CASE 
-                WHEN name = ? THEN 0
-                WHEN name LIKE ? THEN 1
-                ELSE 2
-              END,
-              name
+            WHERE search_name LIKE ?
             LIMIT ?
         """
-        rows = cur.execute(query, (f"%{term}%", term, f"{term}%", limit)).fetchall()
+        norm_term = strip_diacritics(term)
+        rows = cur.execute(query, (f"%{norm_term}%", limit)).fetchall()
         con.close()
         return [
             {
@@ -356,6 +383,8 @@ def weather_place(place_id):
 
     return render_template(
         "weather.html",
+        lat=lat,
+        lon=lon,
         weather_data=weather_data,
         place_data=place_data,
         today_overview=today_overview,
@@ -387,6 +416,14 @@ def decode_place_id_route():
         return jsonify({"error": "Invalid place ID"}), 400
 
     return jsonify({"lat": lat, "lon": lon})
+
+
+@app.route("/map_api/<layer>/<z>/<x>/<y>.png")
+def mapapi(layer, z, x, y):
+    response = requests.get(
+        f"https://tile.openweathermap.org/map/{layer}/{z}/{x}/{y}.png?appid={API_KEY}"
+    )
+    return response.content
 
 
 @app.errorhandler(404)

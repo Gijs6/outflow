@@ -411,3 +411,67 @@ main > div {
     flex-direction: column;
     gap: 10px;
 }
+
+#icon-map {
+    width: 500px;
+    height: 500px;
+}
+
+.leaflet-marker-icon[src*="icon_api"] {
+    background: var(--oc-orange-3);
+    border-radius: 100px;
+}
+
+main:has(#spinner) {
+    align-items: center;
+    justify-content: center;
+}
+
+#spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#spinner svg {
+    width: 150px;
+    height: 150px;
+    color: var(--oc-yellow-6);
+    animation: spin 5s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 1s forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-out {
+    animation: fadeOut 1s forwards;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}

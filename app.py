@@ -174,6 +174,7 @@ def make_col(con, column_name):
         return True
     return False
 
+
 def normalize_city_names(con):
     if make_col(con, "search_name"):
         cur = con.cursor()
@@ -182,10 +183,11 @@ def normalize_city_names(con):
 
         for city_id, name in rows:
             normalized = strip_diacritics(name)
-            cur.execute("UPDATE cities SET search_name = ? WHERE id = ?", (normalized, city_id))
+            cur.execute(
+                "UPDATE cities SET search_name = ? WHERE id = ?", (normalized, city_id)
+            )
 
         con.commit()
-
 
 
 def search_city(term, limit=25):
@@ -298,13 +300,34 @@ def search_list():
     )
 
 
+def get_icon_url(id):
+    return f"https://openweathermap.org/img/wn/{id}@2x.png"
+
 @app.route("/weather/<string:place_id>")
-def weather_place(place_id):
+def weather_page(place_id):
     try:
         lat, lon = decode_place_id(place_id)
     except Exception as e:
         logging.warning(f"Error decoding place_id {place_id}: {e}")
         return "Invalid place ID", 400
+    
+
+    try:
+        place_data_list = find_nearest_places(lat, lon)
+        if not place_data_list:
+            raise ValueError("No nearby places found")
+        place_data = place_data_list[0]
+    except Exception as e:
+        logging.warning(f"Error finding nearest places: {e}")
+        place_data = {
+            "name": f"{round(lat, 3)}, {round(lon, 3)}",
+            "state": "Unknown",
+            "country": "globe",
+            "lat": lat,
+            "lon": lon,
+            "cool_id": place_id,
+            "distance": 0,
+        }
 
     try:
         place_data_list = find_nearest_places(lat, lon)
@@ -343,6 +366,19 @@ def weather_place(place_id):
             "distance": place_data.get("distance", 0),
         }
 
+    informative_data = {"lat": lat, "lon": lon, "place_data": place_data}
+
+    return render_template("weather.html", place_id=place_id, lat=lat, lon=lon, place_data=place_data, informative_data=informative_data)
+
+
+@app.route("/weather_content", methods=["POST"])
+def weather_content():
+    data = request.json
+
+    lat = data["lat"]
+    lon = data["lon"]
+    place_data = data["place_data"]
+
     try:
         weather_data = requests.get(
             f"https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_KEY}&lang=en&units=metric"
@@ -378,18 +414,24 @@ def weather_place(place_id):
         today_overview = {}
         tomorrow_overview = {}
 
-    def get_icon(id):
-        return f"https://openweathermap.org/img/wn/{id}@2x.png"
+    # map_coords = [
+    #     {"lat": lat, "lon": lon},
+    #     {"lat": lat - 10, "lon": lon},
+    #     {"lat": lat + 10, "lon": lon},
+    #     {"lat": lat, "lon": lon - 10},
+    #     {"lat": lat, "lon": lon + 10},
+    # ]
 
     return render_template(
-        "weather.html",
+        "weather_content.html",
         lat=lat,
         lon=lon,
         weather_data=weather_data,
         place_data=place_data,
         today_overview=today_overview,
         tomorrow_overview=tomorrow_overview,
-        get_icon=get_icon,
+        get_icon_url=get_icon_url,
+        # map_coords=map_coords
     )
 
 
@@ -424,6 +466,24 @@ def mapapi(layer, z, x, y):
         f"https://tile.openweathermap.org/map/{layer}/{z}/{x}/{y}.png?appid={API_KEY}"
     )
     return response.content
+
+
+# @app.route("/icon_api/<id>")
+# def iconapi(id):
+#     response = requests.get(get_icon_url(id))
+#     return response.content
+
+
+# @app.route("/weather_api/current")
+# def currentapi():
+#     lat = request.args.get("lat")
+#     lon = request.args.get("lon")
+
+#     data = requests.get(
+#         f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API_KEY}"
+#     ).json()
+
+#     return data
 
 
 @app.errorhandler(404)

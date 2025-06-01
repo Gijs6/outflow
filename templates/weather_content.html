@@ -1,0 +1,415 @@
+<div id="main-info-container">
+    <div id="place-info">
+        <img src="/static/flags/{{ place_data.country | lower }}.svg" />
+        <h1 id="place-info-name">{{ place_data.name }}</h1>
+        <span id="place-info-coords"><i class="fa-solid fa-map-marker-alt"></i> {{ lat }}, {{ lon }}</span>
+    </div>
+
+    <div id="current-weather-summary">
+        <img id="current-icon" src="{{ get_icon_url(weather_data.current.weather.0.icon) }}" />
+        <span id="current-temp">{{ weather_data.current.temp }} °C</span>
+        <span id="current-feels-like">Feels like {{ weather_data.current.feels_like }} °C</span>
+        <span id="current-weather-title">{{ weather_data.current.weather | map(attribute="description") | join(", ") | capitalize }}</span>
+    </div>
+</div>
+
+{% if weather_data.alerts %}
+    <div id="alerts">
+        {% for alert in weather_data.alerts %}
+            <div class="alert {% if 'moderate' in alert.event.lower() %}alert-yellow{% elif 'severe' in alert.event.lower() %}alert-orange{% elif 'extreme' in alert.event.lower() %}alert-red{% else %}alert-basic{% endif %}">
+                <span class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+                <span class="alert-event">{{ alert.event }}</span>
+                <span class="alert-dt">{{ alert.start | fmt_dt("%d-%m-%Y %H:%M", weather_data.timezone) }} - {{ alert.end | fmt_dt("%d-%m-%Y %H:%M", weather_data.timezone) }}</span>
+                <details class="alert-description">
+                    <summary>More info</summary>
+                    {{ alert.description }}
+                </details>
+                <span class="alert-tags">{{ alert.tags | join(", ") }}</span>
+                <span class="alert-sender">{{ alert.sender_name }}</span>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div id="current-weather">
+    <h2>Current weather</h2>
+    <div class="weather-tiles">
+        <div class="weather-tile weather-tile-datetime">
+            <span class="weather-tile-title"><span>Observation time</span><i class="fa-solid fa-clock"></i></span>
+            <span class="weather-tile-title-result">{{ weather_data.current.dt | fmt_dt("%d-%m-%Y %H:%M:%S", weather_data.timezone) }}</span>
+        </div>
+        {% if weather_data.current.sunrise %}
+            <div class="weather-tile weather-tile-sunrise">
+                <span class="weather-tile-title"><span>Sunrise</span><i class="fa-solid fa-sun"></i></span>
+                <span class="weather-tile-title-result">{{ weather_data.current.sunrise | fmt_dt("%H:%M:%S", weather_data.timezone) }}</span>
+            </div>
+        {% endif %}
+        {% if weather_data.current.sunset %}
+            <div class="weather-tile weather-tile-sunset">
+                <span class="weather-tile-title"><span>Sunset</span><i class="fa-solid fa-moon"></i></span>
+                <span class="weather-tile-title-result">{{ weather_data.current.sunset | fmt_dt("%H:%M:%S", weather_data.timezone) }}</span>
+            </div>
+        {% endif %}
+        <div class="weather-tile weather-tile-pressure">
+            <span class="weather-tile-title"><span>Pressure</span><i class="fa-solid fa-tachometer-alt"></i></span>
+            <span class="weather-tile-title-result">{{ weather_data.current.pressure }} hPa</span>
+        </div>
+        <div class="weather-tile weather-tile-dewpoint">
+            <span class="weather-tile-title"><span>Dew point</span><i class="fa-solid fa-water"></i></span>
+            <span class="weather-tile-title-result">{{ weather_data.current.dew_point }} °C</span>
+        </div>
+        <div class="weather-tile weather-tile-humidity">
+            <span class="weather-tile-title"><span>Humidity</span><i class="fa-solid fa-droplet"></i></span>
+            <span class="weather-tile-title-result">{{ weather_data.current.humidity }} %</span>
+        </div>
+        <div class="weather-tile weather-tile-clouds">
+            <span class="weather-tile-title"><span>Clouds</span><i class="fa-solid fa-cloud"></i></span>
+            <span class="weather-tile-title-result">{{ weather_data.current.clouds }}%</span>
+        </div>
+        <div class="weather-tile weather-tile-uv">
+            <span class="weather-tile-title"><span>UV index</span><i class="fa-solid fa-sun"></i></span>
+            <span class="weather-tile-title-result">{{ weather_data.current.uvi }}</span>
+        </div>
+        {% if weather_data.current.visibility and weather_data.current.visibility != 10000 %}
+            <div class="weather-tile weather-tile-visibility">
+                <span class="weather-tile-title"><span>Average visibility</span><i class="fa-solid fa-smog"></i></span>
+                <span class="weather-tile-title-result">{{ weather_data.current.visibility }} m</span>
+            </div>
+        {% endif %}
+        <div class="weather-tile weather-tile-wind">
+            <span class="weather-tile-title"><span>Wind</span><i class="fa-solid fa-wind"></i></span>
+            <span class="weather-tile-title-result">{{ weather_data.current.wind_speed | to_bft }} bft <img src="/static/imgs/arrow.svg" style="width: 20px; height: 20px; transform: rotate({{ weather_data.current.wind_deg }}deg)" alt="Wind Direction Arrow" /></span>
+            {% if weather_data.current.wind_gust %}<span class="weather-tile-title-result">Gusts: {{ weather_data.current.wind_gust | to_bft }} bft</span>{% endif %}
+        </div>
+        {% if weather_data.current.rain and weather_data.current.rain["1h"] %}
+            <div class="weather-tile weather-tile-rain">
+                <span class="weather-tile-title"><span>Rain (last hour)</span><i class="fa-solid fa-cloud-showers-heavy"></i></span>
+                <span class="weather-tile-title-result">{{ weather_data.current.rain["1h"] }} mm</span>
+            </div>
+        {% endif %}
+        {% if weather_data.current.snow and weather_data.current.snow["1h"] %}
+            <div class="weather-tile weather-tile-snow">
+                <span class="weather-tile-title"><span>Snow (last hour)</span><i class="fa-solid fa-snowflake"></i></span>
+                <span class="weather-tile-title-result">{{ weather_data.current.snow["1h"] }} mm</span>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 
+<div id="icon-map"></div>
+
+<script>
+    let iconMap = L.map("icon-map").setView([{{ lat }}, {{ lon }}], 4);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(iconMap);
+
+    {{ map_coords | safe }}.forEach((point) => {
+        fetch(`/weather_api/current?lat=${point.lat}&lon=${point.lon}`)
+            .then((response) => response.json())
+            .then((data) => {
+
+                let icon_url = data["weather"][0]["icon"]
+                
+                let icon = L.icon({
+                    iconUrl: `/icon_api/${icon_url}`,
+                    iconSize: [50, 50],
+                    iconAnchor: [25, 25]
+                });
+
+
+                let iconMarker = L.marker([point.lat, point.lon], {icon: icon}).addTo(iconMap);
+            })
+            .catch((error) => {
+                console.error("Error icons map:", error);
+            });
+    })
+
+    let initial_icon_url = "{{ weather_data.current.weather.0.icon }}"
+    
+    let icon = L.icon({
+        iconUrl: `/icon_api/${initial_icon_url}`,
+        iconSize: [50, 50],
+        iconAnchor: [25, 25]
+    });
+
+    let lastFetchTime = 0;
+    let lastLatLng = null;
+
+    const FETCH_INTERVAL_MS = 500;
+    const COORD_CHANGE_THRESHOLD = 0.1;
+
+    const cursorMarker = L.marker([0, 0], { interactive: false, icon: icon }).addTo(iconMap);
+
+    iconMap.on('mousemove', function (e) {
+        const now = Date.now();
+        const { lat, lng } = e.latlng;
+
+        const timeElapsed = now - lastFetchTime;
+        const coordsChanged = !lastLatLng ||
+            Math.abs(lat - lastLatLng.lat) > COORD_CHANGE_THRESHOLD ||
+            Math.abs(lng - lastLatLng.lng) > COORD_CHANGE_THRESHOLD;
+
+        cursorMarker.setLatLng(e.latlng);
+
+        if (timeElapsed >= FETCH_INTERVAL_MS && coordsChanged) {
+            lastFetchTime = now;
+            lastLatLng = { lat, lng };
+
+            fetch(`/weather_api/current?lat=${lat}&lon=${lng}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log("Updated");
+
+                    let icon_url = data["weather"][0]["icon"];
+
+                    let icon = L.icon({
+                        iconUrl: `/icon_api/${icon_url}`,
+                        iconSize: [50, 50],
+                        iconAnchor: [25, 25]
+                    });
+
+                    cursorMarker.setIcon(icon);
+                })
+                .catch((error) => {
+                    console.error("Error icons map:", error);
+                });
+        }
+    });
+</script> -->
+
+<div id="today-and-tomorrow">
+    <div id="today-container">
+        <h2>Today</h2>
+        <p>{{ today_overview.weather_overview }}</p>
+    </div>
+    <div id="tomorrow-container">
+        <h2>Tomorrow</h2>
+        <p>{{ tomorrow_overview.weather_overview }}</p>
+    </div>
+</div>
+
+
+<div id="weather-maps">
+    <h2>Current weather maps</h2>
+    <div id="maps-container"></div>
+</div>
+
+<script>
+    const layers = ["precipitation_new", "temp_new", "wind_new", "pressure_new", "clouds_new"]
+    const container = document.getElementById("maps-container")
+
+    layers.forEach((layer) => {
+        const mapContainer = document.createElement("div")
+        mapContainer.className = "map-box"
+
+        const mapHeader = document.createElement("span")
+        mapHeader.className = "map-header"
+        mapHeader.innerText = layer.split("_")[0]
+    
+        const mapElement = document.createElement("div")
+        const id = `map-${layer}`
+        mapElement.id = id;
+
+        mapContainer.append(mapHeader)
+        mapContainer.append(mapElement)
+        container.appendChild(mapContainer);
+
+
+        let map = L.map(id).setView([{{ lat }}, {{ lon }}], 4);
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        L.tileLayer(`/map_api/${layer}/{z}/{x}/{y}.png`, {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+
+        let marker = L.marker([{{ lat }}, {{ lon }}]).addTo(map);
+    })
+    
+</script>
+
+{% if weather_data.minutely %}
+    {% set max_preci = weather_data.minutely | map(attribute="precipitation") | max %}
+    <div id="minute-precipitation">
+        <h2>Precipitation per minute (mm/h)</h2>
+        <div id="minute-precipitation-container" {% if max_preci %}style="height: {{ max_preci * 20 }}px;"{% endif %}>
+            {% for entry in weather_data.minutely %}
+                <div class="minute-precipitation-item">
+                    <span class="minute-precipitation-amount">{{ entry.precipitation | round(1) }}</span>
+                    <div class="minute-precipitation-bar" style="height: {{ entry.precipitation / (max_preci + 0.1) * 100 }}%"></div>
+                    <span class="minute-precipitation-dt">{{ entry.dt | fmt_dt("%H:%M", weather_data.timezone) }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+{% if weather_data.hourly %}
+    <div id="hourly">
+        <h2>Hourly Forecast</h2>
+        <table id="hourly-container">
+            {% for entry in weather_data.hourly %}
+                <tr class="hourly-overview">
+                    <td class="hourly-time">{{ entry.dt | fmt_dt("%H:%M", weather_data.timezone) }}</td>
+                    <td class="hourly-icon"><img src="{{ get_icon_url(entry.weather.0.icon) }}" alt="{{ entry.weather.0.description }}" /></td>
+                    <td class="hourly-temp">{{ entry.temp }} °C</td>
+                    <td class="hourly-feels-like">Feels like {{ entry.feels_like }} °C</td>
+                    <td class="hourly-description">{{ entry.weather | map(attribute="description") | join(", ") | capitalize }}</td>
+                    {% if entry.rain and entry.rain["1h"] %}
+                        <td class="hourly-rain">{{ entry.rain["1h"] }} mm</td>
+                    {% else %}
+                        <td class="hourly-rain">0 mm</td>
+                    {% endif %}
+                    <td class="hourly-wind">
+                        {{ entry.wind_speed | to_bft }} bft
+                        <img src="/static/imgs/arrow.svg" style="width: 16px; height: 16px; transform: rotate({{ entry.wind_deg }}deg)" alt="Wind Direction" />
+                    </td>
+                </tr>
+                <tr class="hourly-details-row">
+                    <td colspan="7">
+                        <details>
+                            <summary>More</summary>
+                            <div class="weather-tiles">
+                                <div class="weather-tile weather-tile-pressure">
+                                    <span class="weather-tile-title"><span>Pressure</span><i class="fa-solid fa-tachometer-alt"></i></span>
+                                    <span class="weather-tile-title-result">{{ entry.pressure }} hPa</span>
+                                </div>
+                                <div class="weather-tile weather-tile-dewpoint">
+                                    <span class="weather-tile-title"><span>Dew point</span><i class="fa-solid fa-water"></i></span>
+                                    <span class="weather-tile-title-result">{{ entry.dew_point }} °C</span>
+                                </div>
+                                <div class="weather-tile weather-tile-humidity">
+                                    <span class="weather-tile-title"><span>Humidity</span><i class="fa-solid fa-droplet"></i></span>
+                                    <span class="weather-tile-title-result">{{ entry.humidity }} %</span>
+                                </div>
+                                <div class="weather-tile weather-tile-clouds">
+                                    <span class="weather-tile-title"><span>Clouds</span><i class="fa-solid fa-cloud"></i></span>
+                                    <span class="weather-tile-title-result">{{ entry.clouds }}%</span>
+                                </div>
+                                <div class="weather-tile weather-tile-uv">
+                                    <span class="weather-tile-title"><span>UV index</span><i class="fa-solid fa-sun"></i></span>
+                                    <span class="weather-tile-title-result">{{ entry.uvi }}</span>
+                                </div>
+                                {% if entry.visibility and entry.visibility != 10000 %}
+                                    <div class="weather-tile weather-tile-visibility">
+                                        <span class="weather-tile-title"><span>Average visibility</span><i class="fa-solid fa-smog"></i></span>
+                                        <span class="weather-tile-title-result">{{ entry.visibility }} m</span>
+                                    </div>
+                                {% endif %}
+                                <div class="weather-tile weather-tile-wind">
+                                    <span class="weather-tile-title"><span>Wind</span><i class="fa-solid fa-wind"></i></span>
+                                    <span class="weather-tile-title-result">{{ entry.wind_speed | to_bft }} bft <img src="/static/imgs/arrow.svg" style="width: 20px; height: 20px; transform: rotate({{ entry.wind_deg }}deg)" alt="Wind Direction Arrow" /></span>
+                                    {% if entry.wind_gust %}<span class="weather-tile-title-result">Gusts: {{ entry.wind_gust | to_bft }} bft</span>{% endif %}
+                                </div>
+                                {% if entry.rain and entry.rain["1h"] %}
+                                    <div class="weather-tile weather-tile-rain">
+                                        <span class="weather-tile-title"><span>Rain</span><i class="fa-solid fa-cloud-showers-heavy"></i></span>
+                                        <span class="weather-tile-title-result">{{ entry.rain["1h"] }} mm</span>
+                                        <span class="weather-tile-title-result">{{ (entry["pop"] * 100) | round | int }} %</span>
+                                    </div>
+                                {% endif %}
+                                {% if entry.snow and entry.snow["1h"] %}
+                                    <div class="weather-tile weather-tile-snow">
+                                        <span class="weather-tile-title"><span>Snow</span><i class="fa-solid fa-snowflake"></i></span>
+                                        <span class="weather-tile-title-result">{{ entry.snow["1h"] }} mm</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </details>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endif %}
+
+{% if weather_data.daily %}
+    <div id="daily">
+        <h2>This week</h2>
+        <div id="daily-container">
+            {% for entry in weather_data.daily %}
+                <div class="daily-item">
+                    <span class="daily-date">{{ entry.dt | fmt_dt("%a", weather_data.timezone) }}</span>
+                    <img class="daily-icon" src="{{ get_icon_url(entry.weather.0.icon) }}" />
+                    <span class="daily-temp">{{ entry.temp.day }} °C</span>
+                    <span class="daily-feels-like">Feels like {{ entry.feels_like.day }} °C</span>
+                    <span class="daily-max-min">{{ entry.temp.min }} °C - {{ entry.temp.max }} °C</span>
+                    <span class="daily-weather-title">{{ entry.weather | map(attribute="description") | join(", ") | capitalize }}</span>
+                    <span class="daily-weather-summary">{{ entry.summary }}</span>
+                    <details>
+                        <summary>More</summary>
+                        <div class="weather-tiles">
+                            <div class="weather-tile weather-tile-sunrise">
+                                <span class="weather-tile-title"><span>Sunrise</span><i class="fa-solid fa-sun"></i></span>
+                                <span class="weather-tile-title-result">{{ entry.sunrise | fmt_dt("%H:%M:%S", weather_data.timezone) }}</span>
+                            </div>
+                            <div class="weather-tile weather-tile-sunset">
+                                <span class="weather-tile-title"><span>Sunset</span><i class="fa-solid fa-moon"></i></span>
+                                <span class="weather-tile-title-result">{{ entry.sunset | fmt_dt("%H:%M:%S", weather_data.timezone) }}</span>
+                            </div>
+                            <div class="weather-tile weather-tile-moonrise">
+                                <span class="weather-tile-title"><span>Moonrise</span><i class="fa-solid fa-moon"></i></span>
+                                <span class="weather-tile-title-result">{{ entry.moonrise | fmt_dt("%H:%M:%S", weather_data.timezone) }}</span>
+                            </div>
+                            <div class="weather-tile weather-tile-moonset">
+                                <span class="weather-tile-title"><span>Moonset</span><i class="fa-solid fa-moon"></i></span>
+                                <span class="weather-tile-title-result">{{ entry.moonset | fmt_dt("%H:%M:%S", weather_data.timezone) }}</span>
+                            </div>
+                            <div class="weather-tile weather-tile-moon-phase">
+                                <span class="weather-tile-title"><span>Moon phase</span><i class="fa-solid fa-circle"></i></span>
+                                <span class="weather-tile-title-result">{{ entry.moon_phase }}</span>
+                            </div>
+                            <div class="weather-tile weather-tile-pressure">
+                                <span class="weather-tile-title"><span>Pressure</span><i class="fa-solid fa-tachometer-alt"></i></span>
+                                <span class="weather-tile-title-result">{{ entry.pressure }} hPa</span>
+                            </div>
+                            <div class="weather-tile weather-tile-dewpoint">
+                                <span class="weather-tile-title"><span>Dew point</span><i class="fa-solid fa-water"></i></span>
+                                <span class="weather-tile-title-result">{{ entry.dew_point }} °C</span>
+                            </div>
+                            <div class="weather-tile weather-tile-humidity">
+                                <span class="weather-tile-title"><span>Humidity</span><i class="fa-solid fa-droplet"></i></span>
+                                <span class="weather-tile-title-result">{{ entry.humidity }} %</span>
+                            </div>
+                            <div class="weather-tile weather-tile-clouds">
+                                <span class="weather-tile-title"><span>Clouds</span><i class="fa-solid fa-cloud"></i></span>
+                                <span class="weather-tile-title-result">{{ entry.clouds }}%</span>
+                            </div>
+                            <div class="weather-tile weather-tile-uv">
+                                <span class="weather-tile-title"><span>UV index</span><i class="fa-solid fa-sun"></i></span>
+                                <span class="weather-tile-title-result">{{ entry.uvi }}</span>
+                            </div>
+                            <div class="weather-tile weather-tile-wind">
+                                <span class="weather-tile-title"><span>Wind</span><i class="fa-solid fa-wind"></i></span>
+                                <span class="weather-tile-title-result">{{ entry.wind_speed | to_bft }} bft <img src="/static/imgs/arrow.svg" style="width: 20px; height: 20px; transform: rotate({{ entry.wind_deg }}deg)" alt="Wind Direction Arrow" /></span>
+                                {% if entry.wind_gust %}<span class="weather-tile-title-result">Gusts: {{ entry.wind_gust | to_bft }} bft</span>{% endif %}
+                            </div>
+                            {% if entry.rain %}
+                                <div class="weather-tile weather-tile-rain">
+                                    <span class="weather-tile-title"><span>Rain</span><i class="fa-solid fa-cloud-showers-heavy"></i></span>
+                                    <span class="weather-tile-title-result">{{ entry.rain }} mm</span>
+                                    <span class="weather-tile-title-result">{{ (entry["pop"] * 100) | round | int }} %</span>
+                                </div>
+                            {% endif %}
+                            {% if entry.snow %}
+                                <div class="weather-tile weather-tile-snow">
+                                    <span class="weather-tile-title"><span>Snow</span><i class="fa-solid fa-snowflake"></i></span>
+                                    <span class="weather-tile-title-result">{{ entry.snow }} mm</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </details>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %} 

@@ -9,26 +9,50 @@
 {% endblock %}
 
 {% block content %}
-    {% for key, value in table_data.items() %}
-        {% if value is iterable and value is not string and key != "current" %}
-            <h2>{{ key }}</h2>
+
+    {% for section, rows in table_data.items() %}
+        {% if rows is iterable and rows is not string and section != "current" %}
+            <h2>{{ section }}</h2>
             <table>
                 <tr>
-                    {% for key, value in value[0].items() %}
-                        <th>{{ key }}</th>
+                    {# Collect all header keys for the first row (assumes all rows share structure) #}
+                    {% for key, value in rows[0].items() %}
+                        {% if value is mapping %}
+                            {% for subkey in value.keys() %}
+                                <th>{{ key }}.{{ subkey }}</th>
+                            {% endfor %}
+                        {% else %}
+                            <th>{{ key }}</th>
+                        {% endif %}
                     {% endfor %}
                 </tr>
 
-                {% for row in value %}
-                    {% if row is iterable and row is not string %}
-                        <tr>
-                            {% for key, value in row.items() %}
-                                <td>{{ value }}</td>
-                            {% endfor %}
-                        </tr>
-                    {% else %}
-                        <span>Bleh: {{ row }}</span>
-                    {% endif %}
+                {% for row in rows %}
+                    <tr>
+                        {% for key, value in row.items() %}
+                            {% if value is mapping %}
+                                {% for subvalue in value.values() %}
+                                    <td>{{ value_output(subvalue) }}</td>
+                                {% endfor %}
+                            {% elif value is iterable and value is not string %}
+                                {% set joined = [] %}
+                                {% for item in value %}
+                                    {% if item is mapping %}
+                                        {% set subjoined = [] %}
+                                        {% for subval in item.values() %}
+                                            {% set _ = subjoined.append(subval) %}
+                                        {% endfor %}
+                                        {% set _ = joined.append(subjoined | join(", ")) %}
+                                    {% else %}
+                                        {% set _ = joined.append(item) %}
+                                    {% endif %}
+                                {% endfor %}
+                                <td>{{ joined | join("; ") }}</td>
+                            {% else %}
+                                <td>{{ value_output(value) }}</td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
                 {% endfor %}
             </table>
         {% endif %}

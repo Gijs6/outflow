@@ -1,16 +1,40 @@
 table {
-    border-collapse: collapse;
-    max-width: 100%;
-    width: 100%;
+    border-collapse: separate;
+    font-size: 0.85em;
+    table-layout: auto;
+}
+
+tr:has(th) {
+    position: sticky;
+    top: 0;
+}
+
+th {
+    border-bottom: 2px solid var(--oc-gray-9);
+    background: var(--oc-gray-0);
+}
+
+td {
+    border-bottom: 1px var(--oc-gray-7) solid;
 }
 
 td,
 th {
-    padding: 0.2em;
-    text-align: left;
+    border-right: 1px var(--oc-gray-6) dotted;
+    padding: 10px;
+    vertical-align: middle;
+    text-align: center;
 }
 
-tr {
-    border-bottom: 1px solid;
-    border-color: inherit;
+td:last-child,
+th:last-child {
+    border-right: 0;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+.text-left {
+    text-align: left;
 }

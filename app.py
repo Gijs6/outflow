@@ -440,7 +440,37 @@ def weather_tables(place_id):
             "distance": place_data.get("distance", 0),
         }
 
-    return render_template("tables.html", table_data=weather_data, place_data=place_data)
+    for section_value in weather_data.values():
+        if isinstance(section_value, list):
+            all_keys = set()
+            for item in section_value:
+                if isinstance(item, dict):
+                    all_keys.update(item.keys())
+
+            for item in section_value:
+                if isinstance(item, dict):
+                    for key in all_keys:
+                        if key not in item:
+                            item[key] = ""
+
+    def value_output(value):
+        if isinstance(value, int):
+            tz_name = weather_data["timezone"]
+            tz = pytz.timezone(tz_name)
+            dt = datetime.fromtimestamp(int(value), tz)
+
+            now = datetime.now(tz)
+            lower_bound = now - timedelta(days=365)
+            upper_bound = now + timedelta(days=365)
+
+            if lower_bound <= dt <= upper_bound:
+                return dt.strftime("%Y-%m-%d %H:%M:%S")
+
+        return value
+
+    return render_template(
+        "tables.html", table_data=weather_data, place_data=place_data, value_output=value_output
+    )
 
 
 @app.route("/weather_content", methods=["POST"])

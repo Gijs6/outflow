@@ -303,6 +303,7 @@ def search_list():
 def get_icon_url(id):
     return f"https://openweathermap.org/img/wn/{id}@2x.png"
 
+
 @app.route("/weather/<string:place_id>")
 def weather_page(place_id):
     try:
@@ -310,7 +311,6 @@ def weather_page(place_id):
     except Exception as e:
         logging.warning(f"Error decoding place_id {place_id}: {e}")
         return "Invalid place ID", 400
-    
 
     try:
         place_data_list = find_nearest_places(lat, lon)
@@ -368,7 +368,79 @@ def weather_page(place_id):
 
     informative_data = {"lat": lat, "lon": lon, "place_data": place_data}
 
-    return render_template("weather.html", place_id=place_id, lat=lat, lon=lon, place_data=place_data, informative_data=informative_data)
+    return render_template(
+        "weather.html",
+        place_id=place_id,
+        lat=lat,
+        lon=lon,
+        place_data=place_data,
+        informative_data=informative_data,
+    )
+
+
+@app.route("/tables/<string:place_id>")
+def weather_tables(place_id):
+    lat, lon = decode_place_id(place_id)
+
+    weather_data = requests.get(
+        f"https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_KEY}&lang=en&units=metric"
+    ).json()
+
+    try:
+        place_data_list = find_nearest_places(lat, lon)
+        if not place_data_list:
+            raise ValueError("No nearby places found")
+        place_data = place_data_list[0]
+    except Exception as e:
+        logging.warning(f"Error finding nearest places: {e}")
+        place_data = {
+            "name": f"{round(lat, 3)}, {round(lon, 3)}",
+            "state": "Unknown",
+            "country": "globe",
+            "lat": lat,
+            "lon": lon,
+            "cool_id": place_id,
+            "distance": 0,
+        }
+
+    try:
+        place_data_list = find_nearest_places(lat, lon)
+        if not place_data_list:
+            raise ValueError("No nearby places found")
+        place_data = place_data_list[0]
+    except Exception as e:
+        logging.warning(f"Error finding nearest places: {e}")
+        place_data = {
+            "name": f"{round(lat, 3)}, {round(lon, 3)}",
+            "state": "Unknown",
+            "country": "globe",
+            "lat": lat,
+            "lon": lon,
+            "cool_id": place_id,
+            "distance": 0,
+        }
+
+    if place_data["distance"] > 5:
+        country = country_for_coordinates(lat, lon)
+
+        if country:
+            name = f"Somewhere in {full_country(country)}"
+            country_code = country
+        else:
+            name = f"{round(lat, 3)}, {round(lon, 3)}"
+            country_code = "globe"
+
+        place_data = {
+            "name": name,
+            "state": "Unknown",
+            "country": country_code,
+            "lat": lat,
+            "lon": lon,
+            "cool_id": place_id,
+            "distance": place_data.get("distance", 0),
+        }
+
+    return render_template("tables.html", table_data=weather_data, place_data=place_data)
 
 
 @app.route("/weather_content", methods=["POST"])
@@ -498,4 +570,4 @@ def internal_server_error(e):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=8000)

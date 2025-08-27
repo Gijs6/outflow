@@ -9,8 +9,6 @@
             </a>
         {% endfor %}
     {% else %}
-        {% if term %}
-            <div class="opt unav">No result found for '{{ term }}'</div>
-        {% endif %}
+        {% if term %}<div class="opt unav">No result found for '{{ term }}'</div>{% endif %}
     {% endif %}
 </div>

@@ -3,37 +3,54 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-        <title>{% block title %}{% endblock %} - Outflow</title>
-
-        <link rel="stylesheet" href="{{ url_for('static', filename='styles/base.css') }}" />
-        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='imgs/fav.ico') }}" />
-
-        <link rel="stylesheet" href="{{ url_for('static', filename='styles/search.css') }}" />
-
+        <title>
+            {% block title %}{% endblock %}
+        - Outflow</title>
+        <link rel="stylesheet"
+              href="{{ url_for('static', filename='styles/base.css') }}" />
+        <link rel="icon"
+              type="image/x-icon"
+              href="{{ url_for('static', filename='imgs/fav.ico') }}" />
+        <link rel="stylesheet"
+              href="{{ url_for('static', filename='styles/search.css') }}" />
         <script src="{{ url_for('static', filename='scripts/search.js') }}"></script>
-        <script src="https://kit.fontawesome.com/4a94c21782.js" crossorigin="anonymous"></script>
-
+        <script src="https://kit.fontawesome.com/4a94c21782.js"
+                crossorigin="anonymous"></script>
         {% block extra_headers %}{% endblock %}
     </head>
     <body>
         <header>
-            <a href="/">Outflow<img src="/static/imgs/logo.png" /></a>
-            <span>{% block page_title %}{% endblock %}</span>
+            <a href="/">Outflow
+                <img src="/static/imgs/logo.png" />
+            </a>
+            <span>
+                {% block page_title %}{% endblock %}
+            </span>
             <div class="searchcontainer">
                 <form action="/search" method="GET" class="searchbar">
-                    <input type="search" name="q" placeholder="Search for a place..." spellcheck="false" autocomplete="off" required  />
-                    <button type="submit"><i class="fa-solid fa-arrow-right"></i></button>
+                    <input type="search"
+                           name="q"
+                           placeholder="Search for a place..."
+                           spellcheck="false"
+                           autocomplete="off"
+                           required />
+                    <button type="submit">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
                 </form>
                 <div class="search-results"></div>
             </div>
         </header>
-
-        <main>{% block content %}{% endblock %}</main>
-
+        <main>
+            {% block content %}{% endblock %}
+        </main>
         <footer>
-            <p>Made by <a href="https://gijs6.nl">Gijs6</a></p>
-            <p>Data from <a href="https://openweathermap.org">OpenWeatherMap</a></p>
+            <p>
+                Made by <a href="https://gijs6.nl">Gijs6</a>
+            </p>
+            <p>
+                Data from <a href="https://openweathermap.org">OpenWeatherMap</a>
+            </p>
         </footer>
     </body>
 </html>

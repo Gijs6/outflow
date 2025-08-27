@@ -1,7 +1,5 @@
 {% extends "base.html" %}
-
 {% block title %}Places found for '{{ term }}'{% endblock %}
-
 {% block extra_headers %}
     <style>
         h1 {
@@ -14,7 +12,6 @@
         }
     </style>
 {% endblock %}
-
 {% block content %}
     <h1>Places found for '{{ term }}'</h1>
     {% include "search_results.html" %}

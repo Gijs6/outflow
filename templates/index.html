@@ -1,7 +1,5 @@
 {% extends "base.html" %}
-
 {% block title %}Index{% endblock %}
-
 {% block extra_headers %}
     <style>
         main {
@@ -35,12 +33,18 @@
         }
     </style>
 {% endblock %}
-
 {% block content %}
     <div class="searchcontainer" id="searchbar-big">
         <form action="/search" method="GET" class="searchbar">
-            <input type="search" name="q" placeholder="Search for a place..." spellcheck="false" autocomplete="off" required  />
-            <button type="submit"><i class="fa-solid fa-arrow-right"></i></button>
+            <input type="search"
+                   name="q"
+                   placeholder="Search for a place..."
+                   spellcheck="false"
+                   autocomplete="off"
+                   required />
+            <button type="submit">
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
         </form>
         <div class="search-results"></div>
     </div>

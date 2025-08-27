@@ -1,15 +1,16 @@
 {% extends "base.html" %}
-
 {% block title %}Weather for {{ place_data.name }}{% endblock %}
-
 {% block page_title %}Weather for <strong>{{ place_data.name }}</strong>{% endblock %}
-
 {% block extra_headers %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/weather.css') }}" />
-
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles/weather.css') }}" />
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const main = document.querySelector("main")
@@ -50,11 +51,13 @@
         });
     </script>
 {% endblock %}
-
 {% block content %}
-
     <div id="spinner">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke-width="1.5"
+             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
         </svg>
         <h1>Crunching the latest data for {{ lat }}, {{ lon }}...</h1>

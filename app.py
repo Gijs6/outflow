@@ -469,7 +469,10 @@ def weather_tables(place_id):
         return value
 
     return render_template(
-        "tables.html", table_data=weather_data, place_data=place_data, value_output=value_output
+        "tables.html",
+        table_data=weather_data,
+        place_data=place_data,
+        value_output=value_output,
     )
 
 

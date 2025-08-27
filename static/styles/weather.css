@@ -276,7 +276,8 @@ main > div {
     font-weight: 300;
 }
 
-#minute-precipitation-container:has(.minute-precipitation-item > *:hover) .minute-precipitation-item {
+#minute-precipitation-container:has(.minute-precipitation-item > *:hover)
+    .minute-precipitation-item {
     opacity: 0.75;
 }
 
@@ -320,7 +321,9 @@ main > div {
 
 .daily-item {
     display: grid;
-    box-shadow: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;
+    box-shadow:
+        0 1px 3px 0 #0000001a,
+        0 1px 2px -1px #0000001a;
     border: 1px solid var(--oc-gray-1);
     padding: 15px;
     border-radius: 10px;

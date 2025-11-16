@@ -21,7 +21,7 @@ app = Flask(__name__)
 
 logging.basicConfig(level=logging.WARNING)
 
-API_KEY = os.getenv("api_key")
+API_KEY = os.getenv("OWM_API_KEY")
 
 DB_PATH = "data/cities.sqlite3"
 

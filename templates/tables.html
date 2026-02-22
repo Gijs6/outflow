@@ -10,41 +10,45 @@
         {% if rows is iterable and rows is not string and section != "current" %}
             <h2>{{ section }}</h2>
             <table>
-                <tr>
-                    {# Collect all header keys for the first row (assumes all rows share structure) #}
-                    {% for key, value in rows[0].items() %}
-                        {% if value is mapping %}
-                            {% for subkey in value.keys() %}<th>{{ key }}.{{ subkey }}</th>{% endfor %}
-                        {% else %}
-                            <th>{{ key }}</th>
-                        {% endif %}
-                    {% endfor %}
-                </tr>
-                {% for row in rows %}
+                <thead>
                     <tr>
-                        {% for key, value in row.items() %}
+                        {# Collect all header keys for the first row (assumes all rows share structure) #}
+                        {% for key, value in rows[0].items() %}
                             {% if value is mapping %}
-                                {% for subvalue in value.values() %}<td>{{ value_output(subvalue) }}</td>{% endfor %}
-                            {% elif value is iterable and value is not string %}
-                                {% set joined = [] %}
-                                {% for item in value %}
-                                    {% if item is mapping %}
-                                        {% set subjoined = [] %}
-                                        {% for subval in item.values() %}
-                                            {% set _ = subjoined.append(subval) %}
-                                        {% endfor %}
-                                        {% set _ = joined.append(subjoined | join(", ")) %}
-                                    {% else %}
-                                        {% set _ = joined.append(item) %}
-                                    {% endif %}
-                                {% endfor %}
-                                <td>{{ joined | join("; ") }}</td>
+                                {% for subkey in value.keys() %}<th scope="col">{{ key }}.{{ subkey }}</th>{% endfor %}
                             {% else %}
-                                <td>{{ value_output(value) }}</td>
+                                <th scope="col">{{ key }}</th>
                             {% endif %}
                         {% endfor %}
                     </tr>
-                {% endfor %}
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            {% for key, value in row.items() %}
+                                {% if value is mapping %}
+                                    {% for subvalue in value.values() %}<td>{{ value_output(subvalue) }}</td>{% endfor %}
+                                {% elif value is iterable and value is not string %}
+                                    {% set joined = [] %}
+                                    {% for item in value %}
+                                        {% if item is mapping %}
+                                            {% set subjoined = [] %}
+                                            {% for subval in item.values() %}
+                                                {% set _ = subjoined.append(subval) %}
+                                            {% endfor %}
+                                            {% set _ = joined.append(subjoined | join(", ")) %}
+                                        {% else %}
+                                            {% set _ = joined.append(item) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    <td>{{ joined | join("; ") }}</td>
+                                {% else %}
+                                    <td>{{ value_output(value) }}</td>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
             </table>
         {% endif %}
     {% endfor %}

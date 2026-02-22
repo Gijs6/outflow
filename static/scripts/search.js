@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         function update() {
             if (input.value) {
-                fetch(`/search_list?q=${input.value}`)
+                fetch(`/search_list?q=${encodeURIComponent(input.value)}`)
                     .then((response) => response.text())
                     .then((html) => {
                         result.style.display = "unset";

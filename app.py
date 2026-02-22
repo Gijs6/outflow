@@ -329,23 +329,6 @@ def weather_page(place_id):
             "distance": 0,
         }
 
-    try:
-        place_data_list = find_nearest_places(lat, lon)
-        if not place_data_list:
-            raise ValueError("No nearby places found")
-        place_data = place_data_list[0]
-    except Exception as e:
-        logging.warning(f"Error finding nearest places: {e}")
-        place_data = {
-            "name": f"{round(lat, 3)}, {round(lon, 3)}",
-            "state": "Unknown",
-            "country": "globe",
-            "lat": lat,
-            "lon": lon,
-            "cool_id": place_id,
-            "distance": 0,
-        }
-
     if place_data["distance"] > 5:
         country = country_for_coordinates(lat, lon)
 
@@ -366,7 +349,40 @@ def weather_page(place_id):
             "distance": place_data.get("distance", 0),
         }
 
-    informative_data = {"lat": lat, "lon": lon, "place_data": place_data}
+    try:
+        weather_data = requests.get(
+            f"https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_KEY}&lang=en&units=metric"
+        ).json()
+    except Exception as e:
+        logging.warning(f"Error fetching weather data: {e}")
+        weather_data = {}
+
+    try:
+        today = datetime.now(pytz.timezone(weather_data.get("timezone", "UTC")))
+        today_fmt = today.strftime("%Y-%m-%d")
+        tomorrow = today + timedelta(days=1)
+        tomorrow_fmt = tomorrow.strftime("%Y-%m-%d")
+    except Exception as e:
+        logging.warning(f"Error processing dates: {e}")
+        today_fmt = tomorrow_fmt = None
+
+    try:
+        today_overview = {}
+        tomorrow_overview = {}
+
+        if today_fmt:
+            today_overview = requests.get(
+                f"https://api.openweathermap.org/data/3.0/onecall/overview?lat={lat}&lon={lon}&appid={API_KEY}&date={today_fmt}&units=metric"
+            ).json()
+
+        if tomorrow_fmt:
+            tomorrow_overview = requests.get(
+                f"https://api.openweathermap.org/data/3.0/onecall/overview?lat={lat}&lon={lon}&appid={API_KEY}&date={tomorrow_fmt}&units=metric"
+            ).json()
+    except Exception as e:
+        logging.warning(f"Error fetching overview data: {e}")
+        today_overview = {}
+        tomorrow_overview = {}
 
     return render_template(
         "weather.html",
@@ -374,7 +390,10 @@ def weather_page(place_id):
         lat=lat,
         lon=lon,
         place_data=place_data,
-        informative_data=informative_data,
+        weather_data=weather_data,
+        today_overview=today_overview,
+        tomorrow_overview=tomorrow_overview,
+        get_icon_url=get_icon_url,
     )
 
 
@@ -385,23 +404,6 @@ def weather_tables(place_id):
     weather_data = requests.get(
         f"https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_KEY}&lang=en&units=metric"
     ).json()
-
-    try:
-        place_data_list = find_nearest_places(lat, lon)
-        if not place_data_list:
-            raise ValueError("No nearby places found")
-        place_data = place_data_list[0]
-    except Exception as e:
-        logging.warning(f"Error finding nearest places: {e}")
-        place_data = {
-            "name": f"{round(lat, 3)}, {round(lon, 3)}",
-            "state": "Unknown",
-            "country": "globe",
-            "lat": lat,
-            "lon": lon,
-            "cool_id": place_id,
-            "distance": 0,
-        }
 
     try:
         place_data_list = find_nearest_places(lat, lon)
@@ -476,70 +478,6 @@ def weather_tables(place_id):
     )
 
 
-@app.route("/weather_content", methods=["POST"])
-def weather_content():
-    data = request.json
-
-    lat = data["lat"]
-    lon = data["lon"]
-    place_data = data["place_data"]
-
-    try:
-        weather_data = requests.get(
-            f"https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_KEY}&lang=en&units=metric"
-        ).json()
-    except Exception as e:
-        logging.warning(f"Error fetching weather data: {e}")
-        weather_data = {}
-
-    try:
-        today = datetime.now(pytz.timezone(weather_data.get("timezone", "UTC")))
-        today_fmt = today.strftime("%Y-%m-%d")
-        tomorrow = today + timedelta(days=1)
-        tomorrow_fmt = tomorrow.strftime("%Y-%m-%d")
-    except Exception as e:
-        logging.warning(f"Error processing dates: {e}")
-        today_fmt = tomorrow_fmt = None
-
-    try:
-        today_overview = {}
-        tomorrow_overview = {}
-
-        if today_fmt:
-            today_overview = requests.get(
-                f"https://api.openweathermap.org/data/3.0/onecall/overview?lat={lat}&lon={lon}&appid={API_KEY}&date={today_fmt}&units=metric"
-            ).json()
-
-        if tomorrow_fmt:
-            tomorrow_overview = requests.get(
-                f"https://api.openweathermap.org/data/3.0/onecall/overview?lat={lat}&lon={lon}&appid={API_KEY}&date={tomorrow_fmt}&units=metric"
-            ).json()
-    except Exception as e:
-        logging.warning(f"Error fetching overview data: {e}")
-        today_overview = {}
-        tomorrow_overview = {}
-
-    # map_coords = [
-    #     {"lat": lat, "lon": lon},
-    #     {"lat": lat - 10, "lon": lon},
-    #     {"lat": lat + 10, "lon": lon},
-    #     {"lat": lat, "lon": lon - 10},
-    #     {"lat": lat, "lon": lon + 10},
-    # ]
-
-    return render_template(
-        "weather_content.html",
-        lat=lat,
-        lon=lon,
-        weather_data=weather_data,
-        place_data=place_data,
-        today_overview=today_overview,
-        tomorrow_overview=tomorrow_overview,
-        get_icon_url=get_icon_url,
-        # map_coords=map_coords
-    )
-
-
 @app.route("/encode_place_id")
 def encode_place_id_route():
     try:
@@ -571,24 +509,6 @@ def mapapi(layer, z, x, y):
         f"https://tile.openweathermap.org/map/{layer}/{z}/{x}/{y}.png?appid={API_KEY}"
     )
     return response.content
-
-
-# @app.route("/icon_api/<id>")
-# def iconapi(id):
-#     response = requests.get(get_icon_url(id))
-#     return response.content
-
-
-# @app.route("/weather_api/current")
-# def currentapi():
-#     lat = request.args.get("lat")
-#     lon = request.args.get("lon")
-
-#     data = requests.get(
-#         f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API_KEY}"
-#     ).json()
-
-#     return data
 
 
 @app.errorhandler(404)

@@ -1,14 +1,16 @@
-<div class="search-opts">
+<ul class="search-opts">
     {% if opt_list %}
         {% for opt in opt_list %}
-            <a href="/weather/{{ opt.cool_id }}" class="opt">
-                <img src="/static/flags/{{ opt.country | lower }}.svg" />
-                <span class="opt-name">{{ opt.name }}</span>
-                <span class="opt-country-region">{{ opt.state }} - {{ full_country(opt.country) }}</span>
-                <span class="opt-coords">{{ opt.lat }}, {{ opt.lon }}</span>
-            </a>
+            <li>
+                <a href="/weather/{{ opt.cool_id }}" class="opt">
+                    <img src="/static/flags/{{ opt.country | lower }}.svg" alt="{{ full_country(opt.country) }} flag" />
+                    <span class="opt-name">{{ opt.name }}</span>
+                    <span class="opt-country-region">{{ opt.state }} - {{ full_country(opt.country) }}</span>
+                    <span class="opt-coords">{{ opt.lat }}, {{ opt.lon }}</span>
+                </a>
+            </li>
         {% endfor %}
     {% else %}
-        {% if term %}<div class="opt unav">No result found for '{{ term }}'</div>{% endif %}
+        {% if term %}<li class="opt unav">No result found for '{{ term }}'</li>{% endif %}
     {% endif %}
-</div>
+</ul>

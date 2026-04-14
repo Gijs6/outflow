@@ -1,0 +1,86 @@
+<div class="island-content">
+    <hgroup class="content-header">
+        <h1>{{ location.name }}, {{ location.country }}</h1>
+        <p>
+            <time datetime="{{ weather.current.dt | to_iso }}">{{ weather.current.dt | strftime("%A, %-d %B %Y at %H:%M") }}</time>
+        </p>
+    </hgroup>
+
+    <article class="current">
+        <div class="current-overview">
+            <img class="current-icon"
+                 src="{{ url_for('static', filename='images/cloud.png') }}"
+                 alt="{{ weather.current.weather | map(attribute='description') | join(', ') }}">
+            <div class="current-temp-group">
+                <div class="current-temperature">
+                    <data value="{{ weather.current.temp }}">{{ weather.current.temp }} &#8451;</data>
+                </div>
+                <div class="current-description">{{ weather.current.weather | map(attribute='description') | join(', ') | ucfirst }}</div>
+                <div class="current-feels-like">
+                    Feels like <data value="{{ weather.current.feels_like }}">{{ weather.current.feels_like }} &#8451;</data>
+                </div>
+            </div>
+        </div>
+
+        <dl class="current-stats">
+            <div class="current-stat">
+                <dt>Sunrise</dt>
+                <dd>
+                    <time datetime="{{ weather.current.sunrise | to_iso }}">{{ weather.current.sunrise | strftime("%H:%M") }}</time>
+                </dd>
+            </div>
+            <div class="current-stat">
+                <dt>Sunset</dt>
+                <dd>
+                    <time datetime="{{ weather.current.sunset | to_iso }}">{{ weather.current.sunset | strftime("%H:%M") }}</time>
+                </dd>
+            </div>
+            <div class="current-stat">
+                <dt>Wind</dt>
+                <dd>
+                    <data value="{{ weather.current.wind_speed }}">{{ weather.current.wind_speed | to_bft }} bft ({{ weather.current.wind_speed | to_kmh }} km/h)</data>
+                </dd>
+            </div>
+            <div class="current-stat">
+                <dt>Clouds</dt>
+                <dd>
+                    <data value="{{ weather.current.clouds }}">{{ weather.current.clouds }}%</data>
+                </dd>
+            </div>
+            <div class="current-stat">
+                <dt>Humidity</dt>
+                <dd>
+                    <data value="{{ weather.current.humidity }}">{{ weather.current.humidity }}%</data>
+                </dd>
+            </div>
+            <div class="current-stat">
+                <dt>Pressure</dt>
+                <dd>
+                    <data value="{{ weather.current.pressure }}">{{ weather.current.pressure }} hPa</data>
+                </dd>
+            </div>
+            <div class="current-stat">
+                <dt>Visibility</dt>
+                <dd>
+                    <data value="{{ weather.current.visibility }}">{{ weather.current.visibility }} m</data>
+                </dd>
+            </div>
+            {% if weather.current.rain %}
+                <div class="current-stat">
+                    <dt>Rain</dt>
+                    <dd>
+                        <data value="{{ weather.current.rain['1h'] }}">{{ weather.current.rain['1h'] }} mm/h</data>
+                    </dd>
+                </div>
+            {% endif %}
+            {% if weather.current.snow %}
+                <div class="current-stat">
+                    <dt>Snow</dt>
+                    <dd>
+                        <data value="{{ weather.current.snow['1h'] }}">{{ weather.current.snow['1h'] }} mm/h</data>
+                    </dd>
+                </div>
+            {% endif %}
+        </dl>
+    </article>
+</div>

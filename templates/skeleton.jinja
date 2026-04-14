@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>{%- block title -%}{%- endblock %} - Outlow</title>
+        <meta name="description" content="A simple weather app" />
+
+        <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+
+        <link rel="license" href="https://unlicense.org/" />
+        <link rel="robots" href="/robots.txt" />
+        <link rel="security" href="/.well-known/security.txt" />
+
+        {# <link rel="manifest"
+       href="{{ url_for('static', filename='manifest.json') }}" /> #}
+
+        {% if config.DEBUG %}
+            <link rel="stylesheet"
+                  href="{{ url_for('static', filename='styles/skeleton.css') }}" />
+            <link rel="stylesheet"
+                  href="{{ url_for('static', filename='styles/colors.css') }}" />
+            <link rel="stylesheet"
+                  href="{{ url_for('static', filename='styles/theming.css') }}" />
+            <link rel="stylesheet"
+                  href="{{ url_for('static', filename='styles/base.css') }}" />
+            <link rel="stylesheet"
+                  href="{{ url_for('static', filename='styles/islands.css') }}" />
+            <link rel="stylesheet"
+                  href="{{ url_for('static', filename='styles/weather.css') }}" />
+        {% else %}
+            <link rel="stylesheet"
+                  href="{{ url_for('static', filename='styles/main.min.css') }}" />
+        {% endif %}
+
+        <script src="https://kit.fontawesome.com/4a94c21782.js"
+                crossorigin="anonymous"></script>
+        <script src="{{ url_for('static', filename='vendor/htmx.min.js') }}" defer></script>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap"
+              rel="stylesheet" />
+
+        {% block extra_headers %}{% endblock %}
+    </head>
+
+    <body>
+        <header class="page-header">
+            <a href="{{ url_for('index') }}" class="wordmark">
+                <img src="{{ url_for('static', filename='images/logo-white.svg') }}"
+                     alt=""
+                     class="wordmark-logo" />
+                <span class="wordmark-text">Outflow</span>
+            </a>
+        </nav>
+    </header>
+
+    <main class="page-main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        document.addEventListener("htmx:beforeSwap", function(e) {
+            var status = e.detail.xhr.status;
+            if (status >= 400 && status < 500) {
+                e.detail.shouldSwap = true;
+                e.detail.isError = false;
+            }
+        });
+
+        function handleIslandError(target) {
+            if (!target.classList.contains("island") && !target.classList.contains("island-loading")) return;
+            target.classList.remove("island", "island-loading");
+            target.classList.add("island-error");
+            target.innerHTML =
+                '<p class="island-error-message"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Er is iets misgegaan bij het laden.</p><button type="button" class="button" onclick="window.location.reload()"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Opnieuw proberen</button>';
+        }
+
+        document.addEventListener("htmx:responseError", (e) => handleIslandError(e.detail.target));
+        document.addEventListener("htmx:sendError", (e) => handleIslandError(e.detail.target));
+
+        document.addEventListener("htmx:afterSwap", (e) => {
+            const id = e.detail.target.id;
+            if (!id) return;
+            const newEl = document.getElementById(id);
+            if (newEl?.dataset.title) document.title = newEl.dataset.title + " - Outflow";
+        });
+    </script>
+</body>
+</html>

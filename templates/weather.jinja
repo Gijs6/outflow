@@ -1,0 +1,11 @@
+{% extends "skeleton.jinja" %}
+
+{% block title %}Weather{% endblock %}
+
+{% block content %}
+    <div id="weather-island"
+         class="island"
+         hx-get="{{ island_url }}"
+         hx-trigger="load"
+         hx-swap="innerHTML"></div>
+{% endblock %}

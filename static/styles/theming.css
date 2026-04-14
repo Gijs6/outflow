@@ -1,0 +1,51 @@
+:root {
+    --spacing-3xs: 0.125rem;
+    --spacing-2xs: 0.25rem;
+    --spacing-xs: 0.375rem;
+    --spacing-sm: 0.625rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.25rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    --spacing-3xl: 4rem;
+    --spacing-4xl: 6rem;
+    --spacing-5xl: 8rem;
+
+    --radius: 5px;
+
+    --font-family-sans: "IBM Plex Sans", sans-serif;
+    --font-family-mono: "IBM Plex Mono", monospace;
+
+    --font-size-sm: 0.875em;
+    --font-size-md: 1em;
+    --font-size-lg: 1.25em;
+    --font-size-xl: 2em;
+    --font-size-4xl: 3em;
+    --font-size-5xl: 4em;
+
+    --font-weight-light: 300;
+    --font-weight-regular: 400;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 800;
+
+    --color-accent-light: var(--color-orange-3);
+    --color-accent: var(--color-orange-5);
+    --color-accent-dark: var(--color-orange-7);
+}
+
+button,
+.button {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: none;
+    color: var(--color-white);
+    font-weight: var(--font-weight-semibold);
+    text-decoration: none;
+    border-radius: var(--radius);
+    background: var(--color-accent);
+    cursor: pointer;
+
+    &:hover {
+        background: var(--color-accent-dark);
+    }
+}

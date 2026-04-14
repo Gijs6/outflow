@@ -1,0 +1,104 @@
+:root {
+    box-sizing: border-box;
+}
+
+*,
+:after,
+:before {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100vh;
+    -webkit-text-size-adjust: none;
+    -moz-text-size-adjust: none;
+    text-size-adjust: none;
+    scrollbar-gutter: stable;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    margin: 0;
+}
+
+img {
+    background-repeat: no-repeat;
+    background-size: cover;
+    font-style: italic;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    shape-margin: 0.75em;
+}
+
+audio,
+canvas,
+img,
+picture,
+svg,
+video {
+    height: auto;
+    max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    text-wrap: auto;
+}
+
+p {
+    text-wrap: pretty;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+    overflow-wrap: break-word;
+}
+
+code,
+kbd,
+pre,
+samp {
+    font-family: var(--font-family-mono);
+}
+
+pre {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+    font-size: inherit;
+}
+
+textarea {
+    margin: 0;
+    resize: vertical;
+}
+
+textarea:not([rows]) {
+    min-height: 10em;
+}
+
+:target {
+    scroll-margin-block: 5ex;
+}

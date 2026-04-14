@@ -1,0 +1,36 @@
+:root {
+    --header-height: 3.5rem;
+}
+
+body {
+    font-family: var(--font-family-sans);
+    color: var(--color-fg);
+    background: var(--color-bg);
+
+    .page-header {
+        background: var(--color-accent);
+        padding: var(--spacing-md);
+
+        .wordmark {
+            display: flex;
+            flex-direction: row;
+            gap: var(--spacing-sm);
+            align-items: center;
+            color: white;
+            text-decoration: none;
+
+            .wordmark-logo {
+                height: var(--spacing-2xl);
+            }
+
+            .wordmark-text {
+                font-size: var(--font-size-xl);
+                font-weight: var(--font-weight-bold);
+            }
+        }
+    }
+
+    .page-main {
+        padding: var(--spacing-xl);
+    }
+}

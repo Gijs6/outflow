@@ -1,0 +1,28 @@
+#!/bin/bash
+
+setup() {
+  python3 -m venv .venv
+  .venv/bin/pip install -r requirements.txt
+  npm install
+  mkdir -p static/vendor
+  cp node_modules/htmx.org/dist/htmx.min.js static/vendor/htmx.min.js
+}
+
+serve() {
+  .venv/bin/python app.py
+}
+
+build() {
+  npm run build:css
+}
+
+deploy() {
+  build
+  lift deploy
+}
+
+format() {
+  ruff format .
+  prettier --write "**/*.{css,js}"
+  djlint . --reformat
+}

@@ -1,4 +1,0 @@
-name: outflow
-image: gijs6/outflow
-registry: ghcr.io
-host: dec

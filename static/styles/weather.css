@@ -34,31 +34,31 @@
             &.fa-cloud-sun {
                 color: var(--color-orange-3);
             }
-            
+
             &.fa-cloud-moon {
                 color: var(--color-indigo-3);
             }
-            
+
             &.fa-cloud {
                 color: var(--color-blue-2);
             }
-            
+
             &.fa-cloud-rain {
                 color: var(--color-blue-3);
             }
-            
+
             &.fa-cloud-showers-heavy {
                 color: var(--color-blue-4);
             }
-            
+
             &.fa-cloud-bolt {
                 color: var(--color-yellow-3);
             }
-            
+
             &.fa-snowflake {
                 color: var(--color-cyan-3);
             }
-            
+
             &.fa-smog {
                 color: var(--color-gray-4);
             }

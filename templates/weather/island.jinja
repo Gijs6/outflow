@@ -83,4 +83,16 @@
             {% endif %}
         </dl>
     </article>
+
+    <article class="minutely">
+        <ol class="minutely-list">
+            {% for minute in weather.minutely %}
+                <li class="minutely-entry">
+                    <span class="minutely-precipitation"
+                          style="--precipitation-amount: {{ minute.precipitation }}"><span class="minutely-precipitation-label">{{ minute.precipitation | round(1) }}</span></span>
+                    <time class="minutely-time" datetime="{{ minute.dt | to_iso }}">{{ minute.dt | strftime("%H:%M") }}</time>
+                </li>
+            {% endfor %}
+        </ol>
+    </article>
 </div>

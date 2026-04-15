@@ -18,6 +18,7 @@ body {
             align-items: center;
             color: white;
             text-decoration: none;
+            width: fit-content;
 
             .wordmark-logo {
                 height: var(--spacing-2xl);

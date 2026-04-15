@@ -2,6 +2,10 @@
     --header-height: 3.5rem;
 }
 
+body, html {
+        background: var(--color-accent);
+}
+
 body {
     font-family: var(--font-family-sans);
     color: var(--color-fg);
@@ -29,6 +33,10 @@ body {
                 font-weight: var(--font-weight-bold);
             }
         }
+    }
+
+    > :not(.page-header) {
+        background: var(--color-white)
     }
 
     .page-main {

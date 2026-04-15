@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, redirect
 
 import os
 
@@ -7,6 +7,7 @@ import pycountry
 
 from utils.filters import register_filters
 from utils.owm import get_weather, get_location
+from utils.places import decode_place_id, encode_place_id
 
 
 load_dotenv(override=True)
@@ -23,15 +24,23 @@ def index():
     return render_template("index.jinja")
 
 
-@app.route("/weather/<coords>")
-def weather(coords):
-    island_url = url_for("weather_island", coords=coords)
+@app.route("/goto/<coords>")
+def weather_coords_redirect(coords):
+    lat, lon = coords.split(",")
+    return redirect(
+        url_for("weather", place_id=encode_place_id(float(lat), float(lon))), 301
+    )
+
+
+@app.route("/weather/<place_id>")
+def weather(place_id):
+    island_url = url_for("weather_island", place_id=place_id)
     return render_template("weather.jinja", island_url=island_url)
 
 
-@app.route("/weather/<coords>/island")
-def weather_island(coords):
-    lat, lon = coords.split(",")
+@app.route("/weather/<place_id>/island")
+def weather_island(place_id):
+    lat, lon = decode_place_id(place_id)
 
     data = get_weather(lat, lon)
     location = get_location(lat, lon)

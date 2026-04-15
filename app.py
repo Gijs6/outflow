@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect
+from flask import Flask, render_template, url_for, redirect, session
 
 import os
 
@@ -21,7 +21,9 @@ register_filters(app)
 
 @app.route("/")
 def index():
-    return render_template("index.jinja")
+    return render_template(
+        "index.jinja", recent_places=session.get("recent_places", [])
+    )
 
 
 @app.route("/goto/<coords>")
@@ -46,6 +48,17 @@ def weather_island(place_id):
     location = get_location(lat, lon)
 
     country = pycountry.countries.get(alpha_2=location["country"])
+
+    recent = session.get("recent_places", [])
+    entry = {
+        "place_id": place_id,
+        "name": location["name"],
+        "state": location.get("state"),
+        "country": country.name,
+    }
+    recent = [p for p in recent if p["place_id"] != place_id]
+    recent.insert(0, entry)
+    session["recent_places"] = recent[:5]
 
     return render_template(
         "weather/island.jinja", weather=data, location=location, country=country

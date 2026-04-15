@@ -32,6 +32,9 @@ body {
 
     .page-main {
         padding: var(--spacing-xl);
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-xl);
     }
 }
 

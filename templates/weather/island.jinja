@@ -7,10 +7,29 @@
     </hgroup>
 
     <article class="current">
+        {% set icons = {
+            '01d': 'fa-sun',
+            '01n': 'fa-moon',
+            '02d': 'fa-cloud-sun',
+            '02n': 'fa-cloud-moon',
+            '03d': 'fa-cloud',
+            '03n': 'fa-cloud',
+            '04d': 'fa-cloud',
+            '04n': 'fa-cloud',
+            '09d': 'fa-cloud-showers-heavy',
+            '09n': 'fa-cloud-showers-heavy',
+            '10d': 'fa-cloud-rain',
+            '10n': 'fa-cloud-rain',
+            '11d': 'fa-cloud-bolt',
+            '11n': 'fa-cloud-bolt',
+            '13d': 'fa-snowflake',
+            '13n': 'fa-snowflake',
+            '50d': 'fa-smog',
+            '50n': 'fa-smog',
+        } %}
         <div class="current-overview">
-            <img class="current-icon"
-                 src="{{ url_for('static', filename='images/cloud.png') }}"
-                 alt="{{ weather.current.weather | map(attribute='description') | join(', ') }}">
+            <i class="fa-solid {{ icons.get(weather.current.weather[0].icon, 'fa-cloud') }} current-icon"
+               aria-label="{{ weather.current.weather | map(attribute='description') | join(', ') }}"></i>
             <div class="current-temp-group">
                 <div class="current-temperature">
                     <data value="{{ weather.current.temp }}">{{ weather.current.temp }} &#8451;</data>

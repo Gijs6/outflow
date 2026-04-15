@@ -22,7 +22,7 @@
         margin-bottom: var(--spacing-md);
 
         .current-icon {
-            height: var(--spacing-4xl);
+            font-size: var(--spacing-4xl);
             flex-shrink: 0;
         }
 

@@ -3,6 +3,7 @@ from flask import Flask, render_template, url_for
 import os
 
 from dotenv import load_dotenv
+import pycountry
 
 from utils.filters import register_filters
 from utils.owm import get_weather, get_location
@@ -31,9 +32,15 @@ def weather(coords):
 @app.route("/weather/<coords>/island")
 def weather_island(coords):
     lat, lon = coords.split(",")
+
     data = get_weather(lat, lon)
     location = get_location(lat, lon)
-    return render_template("weather/island.jinja", weather=data, location=location)
+
+    country = pycountry.countries.get(alpha_2=location["country"])
+
+    return render_template(
+        "weather/island.jinja", weather=data, location=location, country=country
+    )
 
 
 @app.errorhandler(404)

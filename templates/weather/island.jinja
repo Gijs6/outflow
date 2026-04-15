@@ -1,6 +1,6 @@
 <div class="island-content">
     <hgroup class="content-header">
-        <h1>{{ location.name }}, {{ location.country }}</h1>
+        <h1>{{ location.name }}, {{ country.name }}</h1>
         <p>
             <time datetime="{{ weather.current.dt | to_iso }}">{{ weather.current.dt | strftime("%A, %-d %B %Y at %H:%M") }}</time>
         </p>

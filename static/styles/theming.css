@@ -16,6 +16,7 @@
     --font-family-sans: "IBM Plex Sans", sans-serif;
     --font-family-mono: "IBM Plex Mono", monospace;
 
+    --font-size-xs: 0.75em;
     --font-size-sm: 0.875em;
     --font-size-md: 1em;
     --font-size-lg: 1.25em;
@@ -28,12 +29,14 @@
     --font-weight-semibold: 600;
     --font-weight-bold: 800;
 
+    --color-bg: var(--color-white);
+    --color-fg: var(--color-gray-9);
+
     --color-accent-light: var(--color-orange-3);
     --color-accent: var(--color-orange-5);
     --color-accent-dark: var(--color-orange-7);
 }
 
-button,
 .button {
     display: inline-block;
     padding: var(--spacing-xs) var(--spacing-sm);

@@ -3,14 +3,42 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
+    <div class="city-search">
+        <label for="city-search-input" class="city-search__label">Search for a city</label>
+        <div class="city-search__field">
+            <i class="fa-solid fa-magnifying-glass city-search__icon"
+               aria-hidden="true"></i>
+            <form action="{{ url_for('search') }}"
+                  method="get"
+                  class="city-search__form">
+                <input id="city-search-input"
+                       class="city-search__input"
+                       type="search"
+                       name="q"
+                       placeholder="Amsterdam, London, New York…"
+                       autocomplete="off"
+                       aria-autocomplete="list"
+                       aria-controls="city-search-results"
+                       hx-get="{{ url_for('search') }}"
+                       hx-trigger="input changed delay:300ms"
+                       hx-target="#city-search-results"
+                       hx-indicator="#city-search-spinner" />
+            </form>
+            <span id="city-search-spinner"
+                  class="city-search__spinner htmx-indicator"
+                  aria-hidden="true"></span>
+        </div>
+        <div id="city-search-results" class="city-search__dropdown" role="listbox"></div>
+    </div>
+
     {% if recent_places %}
-        <nav class="recent-places">
-            <p class="recent-places-label">Recent</p>
-            <ol class="recent-places-list">
+        <nav class="recent-places" aria-label="Recent places">
+            <p class="recent-places__label" aria-hidden="true">Recent</p>
+            <ol class="recent-places__list">
                 {% for place in recent_places %}
-                    <li class="recent-place-item">
+                    <li class="recent-places__item">
                         <a href="{{ url_for('weather', place_id=place.place_id) }}"
-                           class="recent-place">{{ place.name }}{%- if place.state -%}, {{ place.state }}{%- endif -%}, {{ place.country }}</a>
+                           class="recent-places__link">{{ place.name }}{%- if place.state -%}, {{ place.state }}{%- endif -%}{%- if place.country -%}, {{ place.country }}{%- endif -%}</a>
                     </li>
                 {% endfor %}
             </ol>

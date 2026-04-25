@@ -51,42 +51,62 @@
             <a href="{{ url_for('index') }}" class="wordmark">
                 <img src="{{ url_for('static', filename='images/logo-white.svg') }}"
                      alt=""
-                     class="wordmark-logo" />
-                <span class="wordmark-text">Outflow</span>
+                     class="wordmark__logo" />
+                <span class="wordmark__text">Outflow</span>
             </a>
-        </nav>
-    </header>
+            <div class="header-search">
+                <form action="{{ url_for('search') }}"
+                      method="get"
+                      class="header-search__form">
+                    <i class="fa-solid fa-magnifying-glass header-search__icon"
+                       aria-hidden="true"></i>
+                    <input class="header-search__input"
+                           type="search"
+                           name="q"
+                           placeholder="Search…"
+                           autocomplete="off"
+                           hx-get="{{ url_for('search') }}"
+                           hx-trigger="input changed delay:300ms"
+                           hx-target="#header-search-results"
+                           hx-indicator="#header-search-spinner" />
+                    <span id="header-search-spinner"
+                          class="header-search__spinner htmx-indicator"
+                          aria-hidden="true"></span>
+                </form>
+                <div id="header-search-results" class="header-search__dropdown"></div>
+            </div>
+        </header>
 
-    <main class="page-main">
-        {% block content %}{% endblock %}
-    </main>
+        <main class="page-main">
+            {% block content %}{% endblock %}
+        </main>
 
-    <script>
-        document.addEventListener("htmx:beforeSwap", function(e) {
-            var status = e.detail.xhr.status;
-            if (status >= 400 && status < 500) {
-                e.detail.shouldSwap = true;
-                e.detail.isError = false;
+        <script>
+            document.addEventListener("htmx:beforeSwap", function(e) {
+                var status = e.detail.xhr.status;
+                if (status >= 400 && status < 500) {
+                    e.detail.shouldSwap = true;
+                    e.detail.isError = false;
+                }
+            });
+
+            function handleIslandError(target) {
+                if (!target.classList.contains("island") && !target.classList.contains("island-loading")) return;
+                target.classList.remove("island-loading");
+                target.classList.add("island--error");
+                target.innerHTML =
+                    '<p class="island__error-message"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Something went wrong while loading.</p><button type="button" class="button" onclick="window.location.reload()"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Try again</button>';
             }
-        });
 
-        function handleIslandError(target) {
-            if (!target.classList.contains("island") && !target.classList.contains("island-loading")) return;
-            target.classList.remove("island", "island-loading");
-            target.classList.add("island-error");
-            target.innerHTML =
-                '<p class="island-error-message"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Er is iets misgegaan bij het laden.</p><button type="button" class="button" onclick="window.location.reload()"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Opnieuw proberen</button>';
-        }
+            document.addEventListener("htmx:responseError", (e) => handleIslandError(e.detail.target));
+            document.addEventListener("htmx:sendError", (e) => handleIslandError(e.detail.target));
 
-        document.addEventListener("htmx:responseError", (e) => handleIslandError(e.detail.target));
-        document.addEventListener("htmx:sendError", (e) => handleIslandError(e.detail.target));
-
-        document.addEventListener("htmx:afterSwap", (e) => {
-            const id = e.detail.target.id;
-            if (!id) return;
-            const newEl = document.getElementById(id);
-            if (newEl?.dataset.title) document.title = newEl.dataset.title + " - Outflow";
-        });
-    </script>
-</body>
+            document.addEventListener("htmx:afterSwap", (e) => {
+                const id = e.detail.target.id;
+                if (!id) return;
+                const newEl = document.getElementById(id);
+                if (newEl?.dataset.title) document.title = newEl.dataset.title + " - Outflow";
+            });
+        </script>
+    </body>
 </html>

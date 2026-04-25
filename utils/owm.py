@@ -37,3 +37,15 @@ def get_location(lat, lon):
     response.raise_for_status()
     results = response.json()
     return results[0] if results else {}
+
+
+def search_cities(query, limit=5):
+    url = f"{OWM_BASE}/geo/1.0/direct"
+    params = {
+        "q": query,
+        "limit": limit,
+        "appid": api_key(),
+    }
+    response = requests.get(url, params=params, timeout=10)
+    response.raise_for_status()
+    return response.json()

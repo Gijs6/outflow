@@ -3,11 +3,11 @@
 {% block title %}Page not found{% endblock %}
 
 {% block content %}
-    <div class="error-page">
-        <i class="fa-solid fa-circle-question error-page-icon"
+    <section class="error-page" aria-labelledby="error-title">
+        <i class="fa-solid fa-circle-question error-page__icon"
            aria-hidden="true"></i>
-        <h1>Page not found</h1>
-        <p>The page you're looking for doesn't exist.</p>
+        <h1 class="error-page__title" id="error-title">Page not found</h1>
+        <p class="error-page__message">The page you're looking for doesn't exist.</p>
         <a href="{{ url_for('index') }}" class="button">Go home</a>
-    </div>
+    </section>
 {% endblock %}

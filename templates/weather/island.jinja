@@ -1,98 +1,242 @@
-<div class="island-content">
-    <hgroup class="content-header">
-        <h1>{{ location.name }}, {{ country.name }}</h1>
-        <p>
-            <time datetime="{{ weather.current.dt | to_iso }}">{{ weather.current.dt | strftime("%A, %-d %B %Y at %H:%M") }}</time>
+<div class="island__content">
+    {% set icons = {"01d": "fa-sun", "01n": "fa-moon", "02d": "fa-cloud-sun", "02n": "fa-cloud-moon", "03d": "fa-cloud", "03n": "fa-cloud", "04d": "fa-cloud", "04n": "fa-cloud", "09d": "fa-cloud-showers-heavy", "09n": "fa-cloud-showers-heavy", "10d": "fa-cloud-rain", "10n": "fa-cloud-rain", "11d": "fa-cloud-bolt", "11n": "fa-cloud-bolt", "13d": "fa-snowflake", "13n": "fa-snowflake", "50d": "fa-smog", "50n": "fa-smog"} %}
+
+    <hgroup class="location-header">
+        <h1 class="location-header__name">{{ location.name or "%.4f, %.4f"|format(lat, lon) }}{%- if location.state -%}, {{ location.state }}{%- endif -%}{%- if country -%}, {{ country.name }}{%- endif -%}</h1>
+        <p class="location-header__datetime">
+            <time class="location-header__time"
+                  datetime="{{ weather.current.dt | to_iso }}">{{ weather.current.dt | strftime("%A, %-d %B %Y at %H:%M") }}</time>
         </p>
     </hgroup>
 
     <article class="current">
-        {% set icons = {"01d": "fa-sun", "01n": "fa-moon", "02d": "fa-cloud-sun", "02n": "fa-cloud-moon", "03d": "fa-cloud", "03n": "fa-cloud", "04d": "fa-cloud", "04n": "fa-cloud", "09d": "fa-cloud-showers-heavy", "09n": "fa-cloud-showers-heavy", "10d": "fa-cloud-rain", "10n": "fa-cloud-rain", "11d": "fa-cloud-bolt", "11n": "fa-cloud-bolt", "13d": "fa-snowflake", "13n": "fa-snowflake", "50d": "fa-smog", "50n": "fa-smog"} %}
-        <div class="current-overview">
-            <i class="fa-solid {{ icons.get(weather.current.weather[0].icon, 'fa-cloud') }} current-icon"
+        <div class="current__overview">
+            <i class="fa-solid {{ icons.get(weather.current.weather[0].icon, 'fa-cloud') }} current__icon"
+               role="img"
                aria-label="{{ weather.current.weather | map(attribute='description') | join(', ') }}"></i>
-            <div class="current-temp-group">
-                <div class="current-temperature">
-                    <data value="{{ weather.current.temp }}">{{ weather.current.temp }} &#8451;</data>
-                </div>
-                <div class="current-description">{{ weather.current.weather | map(attribute='description') | join(', ') | ucfirst }}</div>
-                <div class="current-feels-like">
-                    Feels like <data value="{{ weather.current.feels_like }}">{{ weather.current.feels_like }} &#8451;</data>
-                </div>
+            <div class="current__temp-group">
+                <p class="current__temperature">
+                    <data class="current__temperature-value" value="{{ weather.current.temp }}">{{ weather.current.temp }} &#8451;</data>
+                </p>
+                <p class="current__description">{{ weather.current.weather | map(attribute='description') | join(', ') | ucfirst }}</p>
+                <p class="current__feels-like">
+                    Feels like <data class="current__feels-like-value"
+       value="{{ weather.current.feels_like }}">{{ weather.current.feels_like }} &#8451;</data>
+                </p>
             </div>
         </div>
 
-        <dl class="current-stats">
-            <div class="current-stat">
-                <dt>Sunrise</dt>
-                <dd>
-                    <time datetime="{{ weather.current.sunrise | to_iso }}">{{ weather.current.sunrise | strftime("%H:%M") }}</time>
+        <dl class="current__stats">
+            <div class="current__stat">
+                <dt class="current__stat-label">Sunrise</dt>
+                <dd class="current__stat-value">
+                    <time class="current__stat-time"
+                          datetime="{{ weather.current.sunrise | to_iso }}">{{ weather.current.sunrise | strftime("%H:%M") }}</time>
                 </dd>
             </div>
-            <div class="current-stat">
-                <dt>Sunset</dt>
-                <dd>
-                    <time datetime="{{ weather.current.sunset | to_iso }}">{{ weather.current.sunset | strftime("%H:%M") }}</time>
+            <div class="current__stat">
+                <dt class="current__stat-label">Sunset</dt>
+                <dd class="current__stat-value">
+                    <time class="current__stat-time"
+                          datetime="{{ weather.current.sunset | to_iso }}">{{ weather.current.sunset | strftime("%H:%M") }}</time>
                 </dd>
             </div>
-            <div class="current-stat">
-                <dt>Wind</dt>
-                <dd>
-                    <data value="{{ weather.current.wind_speed }}">{{ weather.current.wind_speed | to_bft }} bft ({{ weather.current.wind_speed | to_kmh }} km/h)</data>
+            <div class="current__stat">
+                <dt class="current__stat-label">Wind</dt>
+                <dd class="current__stat-value">
+                    <data class="current__stat-data" value="{{ weather.current.wind_speed }}">{{ weather.current.wind_speed | to_bft }} bft ({{ weather.current.wind_speed | to_kmh }} km/h)</data>
                 </dd>
             </div>
-            <div class="current-stat">
-                <dt>Clouds</dt>
-                <dd>
-                    <data value="{{ weather.current.clouds }}">{{ weather.current.clouds }}%</data>
+            <div class="current__stat">
+                <dt class="current__stat-label">Clouds</dt>
+                <dd class="current__stat-value">
+                    <data class="current__stat-data" value="{{ weather.current.clouds }}">{{ weather.current.clouds }}%</data>
                 </dd>
             </div>
-            <div class="current-stat">
-                <dt>Humidity</dt>
-                <dd>
-                    <data value="{{ weather.current.humidity }}">{{ weather.current.humidity }}%</data>
+            <div class="current__stat">
+                <dt class="current__stat-label">Humidity</dt>
+                <dd class="current__stat-value">
+                    <data class="current__stat-data" value="{{ weather.current.humidity }}">{{ weather.current.humidity }}%</data>
                 </dd>
             </div>
-            <div class="current-stat">
-                <dt>Pressure</dt>
-                <dd>
-                    <data value="{{ weather.current.pressure }}">{{ weather.current.pressure }} hPa</data>
+            <div class="current__stat">
+                <dt class="current__stat-label">Pressure</dt>
+                <dd class="current__stat-value">
+                    <data class="current__stat-data" value="{{ weather.current.pressure }}">{{ weather.current.pressure }} hPa</data>
                 </dd>
             </div>
-            <div class="current-stat">
-                <dt>Visibility</dt>
-                <dd>
-                    <data value="{{ weather.current.visibility }}">{{ weather.current.visibility }} m</data>
+            <div class="current__stat">
+                <dt class="current__stat-label">Visibility</dt>
+                <dd class="current__stat-value">
+                    <data class="current__stat-data" value="{{ weather.current.visibility }}">{{ weather.current.visibility }} m</data>
                 </dd>
             </div>
             {% if weather.current.rain %}
-                <div class="current-stat">
-                    <dt>Rain</dt>
-                    <dd>
-                        <data value="{{ weather.current.rain['1h'] }}">{{ weather.current.rain['1h'] }} mm/h</data>
+                <div class="current__stat">
+                    <dt class="current__stat-label">Rain</dt>
+                    <dd class="current__stat-value">
+                        <data class="current__stat-data" value="{{ weather.current.rain['1h'] }}">{{ weather.current.rain['1h'] }} mm/h</data>
                     </dd>
                 </div>
             {% endif %}
             {% if weather.current.snow %}
-                <div class="current-stat">
-                    <dt>Snow</dt>
-                    <dd>
-                        <data value="{{ weather.current.snow['1h'] }}">{{ weather.current.snow['1h'] }} mm/h</data>
+                <div class="current__stat">
+                    <dt class="current__stat-label">Snow</dt>
+                    <dd class="current__stat-value">
+                        <data class="current__stat-data" value="{{ weather.current.snow['1h'] }}">{{ weather.current.snow['1h'] }} mm/h</data>
                     </dd>
                 </div>
             {% endif %}
         </dl>
     </article>
 
-    <article class="minutely">
-        <ol class="minutely-list">
-            {% for minute in weather.minutely %}
-                <li class="minutely-entry">
-                    <span class="minutely-precipitation"
-                          style="--precipitation-amount: {{ minute.precipitation }}"><span class="minutely-precipitation-label">{{ minute.precipitation | round(1) }}</span></span>
-                    <time class="minutely-time" datetime="{{ minute.dt | to_iso }}">{{ minute.dt | strftime("%H:%M") }}</time>
-                </li>
-            {% endfor %}
-        </ol>
-    </article>
+    {% if weather.minutely %}
+        <article class="minutely">
+            <h2 class="section-heading">Next hour</h2>
+            <div class="minutely__chart">
+                <span class="minutely__unit">mm</span>
+                <ol class="minutely__list">
+                    {% for minute in weather.minutely %}
+                        <li class="minutely__entry">
+                            <span class="minutely__precipitation"
+                                  style="--precipitation-amount: {{ minute.precipitation }}">
+                                {% if minute.precipitation %}<span class="minutely__precipitation-label">{{ minute.precipitation | round(1) }}</span>{% endif %}
+                            </span>
+                            <time class="minutely__time" datetime="{{ minute.dt | to_iso }}">{{ minute.dt | strftime("%H:%M") }}</time>
+                        </li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </article>
+    {% endif %}
+
+    {% if weather.hourly %}
+        <article class="hourly">
+            <h2 class="section-heading">Hourly forecast</h2>
+            <ol class="hourly__list">
+                {% for hour in weather.hourly %}
+                    <li class="hourly__hour">
+                        <time class="hourly__hour-time" datetime="{{ hour.dt | to_iso }}">
+                            <span class="hourly__hour-clock">{{ hour.dt | strftime("%H:%M") }}</span>
+                            <span class="hourly__hour-date">{{ hour.dt | strftime("%-d %b") }}</span>
+                        </time>
+                        <i class="fa-solid {{ icons.get(hour.weather[0].icon, 'fa-cloud') }} hourly__hour-icon"
+                           role="img"
+                           aria-label="{{ hour.weather | map(attribute='description') | join(', ') }}"></i>
+                        <data class="hourly__hour-temp" value="{{ hour.temp }}">{{ hour.temp }} &#8451;</data>
+                        <dl class="hourly__hour-stats">
+                            <div class="hourly__hour-stat">
+                                <dt>Feels like</dt>
+                                <dd>
+                                    <data value="{{ hour.feels_like }}">{{ hour.feels_like }} &#8451;</data>
+                                </dd>
+                            </div>
+                            <div class="hourly__hour-stat">
+                                <dt>Wind</dt>
+                                <dd>
+                                    <data value="{{ hour.wind_speed }}">{{ hour.wind_speed | to_bft }} bft</data>
+                                </dd>
+                            </div>
+                            <div class="hourly__hour-stat">
+                                <dt>Humidity</dt>
+                                <dd>
+                                    <data value="{{ hour.humidity }}">{{ hour.humidity }}%</data>
+                                </dd>
+                            </div>
+                            <div class="hourly__hour-stat">
+                                <dt>Clouds</dt>
+                                <dd>
+                                    <data value="{{ hour.clouds }}">{{ hour.clouds }}%</data>
+                                </dd>
+                            </div>
+                        </dl>
+                    </li>
+                {% endfor %}
+            </ol>
+        </article>
+    {% endif %}
+
+    {% if weather.daily %}
+        <article class="daily">
+            <h2 class="section-heading">Daily forecast</h2>
+            <div class="daily__list">
+                {% for day in weather.daily %}
+                    <details class="daily__card">
+                        <summary class="daily__card__summary">
+                            <time class="daily__date" datetime="{{ day.dt | to_iso }}">
+                                <span class="daily__date-weekday">{{ day.dt | strftime("%a") }}</span>
+                                <span class="daily__date-day">{{ day.dt | strftime("%-d %b") }}</span>
+                            </time>
+                            <i class="fa-solid {{ icons.get(day.weather[0].icon, 'fa-cloud') }} daily__icon"
+                               role="img"
+                               aria-label="{{ day.weather | map(attribute='description') | join(', ') }}"></i>
+                            <span class="daily__card__desc">{{ day.weather | map(attribute='description') | join(', ') | ucfirst }}</span>
+                            <span class="daily__card__temp">
+                                <data class="daily__temp-max" value="{{ day.temp.max }}">{{ day.temp.max }} &#8451;</data>
+                                <span class="daily__temp-sep">/</span>
+                                <data class="daily__temp-min" value="{{ day.temp.min }}">{{ day.temp.min }} &#8451;</data>
+                            </span>
+                            <data class="daily__card__pop" value="{{ day['pop'] }}">{{ (day['pop'] * 100) | round | int }}%</data>
+                        </summary>
+                        <dl class="daily__card__details">
+                            <div class="daily__card__stat">
+                                <dt class="daily__card__stat-label">Wind</dt>
+                                <dd class="daily__card__stat-value">
+                                    <data value="{{ day.wind_speed }}">{{ day.wind_speed | to_bft }} bft
+                                        {% if day.wind_gust %}<span class="daily__wind-gust">({{ day.wind_gust | to_bft }})</span>{% endif %}
+                                    </data>
+                                </dd>
+                            </div>
+                            <div class="daily__card__stat">
+                                <dt class="daily__card__stat-label">Humidity</dt>
+                                <dd class="daily__card__stat-value">
+                                    <data value="{{ day.humidity }}">{{ day.humidity }}%</data>
+                                </dd>
+                            </div>
+                            <div class="daily__card__stat">
+                                <dt class="daily__card__stat-label">Clouds</dt>
+                                <dd class="daily__card__stat-value">
+                                    <data value="{{ day.clouds }}">{{ day.clouds }}%</data>
+                                </dd>
+                            </div>
+                            <div class="daily__card__stat">
+                                <dt class="daily__card__stat-label">UV index</dt>
+                                <dd class="daily__card__stat-value">
+                                    <data class="daily__uvi" value="{{ day.uvi }}">{{ "%.1f"|format(day.uvi) }}</data>
+                                </dd>
+                            </div>
+                            <div class="daily__card__stat">
+                                <dt class="daily__card__stat-label">Pressure</dt>
+                                <dd class="daily__card__stat-value">
+                                    <data value="{{ day.pressure }}">{{ day.pressure }} hPa</data>
+                                </dd>
+                            </div>
+                            <div class="daily__card__stat">
+                                <dt class="daily__card__stat-label">Dew point</dt>
+                                <dd class="daily__card__stat-value">
+                                    <data value="{{ day.dew_point }}">{{ day.dew_point }} &#8451;</data>
+                                </dd>
+                            </div>
+                            {% if day.rain %}
+                                <div class="daily__card__stat">
+                                    <dt class="daily__card__stat-label">Rain</dt>
+                                    <dd class="daily__card__stat-value">
+                                        <data value="{{ day.rain }}">{{ day.rain | round(1) }} mm</data>
+                                    </dd>
+                                </div>
+                            {% elif day.snow %}
+                                <div class="daily__card__stat">
+                                    <dt class="daily__card__stat-label">Snow</dt>
+                                    <dd class="daily__card__stat-value">
+                                        <data value="{{ day.snow }}">{{ day.snow | round(1) }} mm</data>
+                                    </dd>
+                                </div>
+                            {% endif %}
+                        </dl>
+                    </details>
+                {% endfor %}
+            </div>
+        </article>
+    {% endif %}
+
 </div>

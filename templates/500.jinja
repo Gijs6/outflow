@@ -3,11 +3,11 @@
 {% block title %}Server error{% endblock %}
 
 {% block content %}
-    <div class="error-page">
-        <i class="fa-solid fa-triangle-exclamation error-page-icon"
+    <section class="error-page" aria-labelledby="error-title">
+        <i class="fa-solid fa-triangle-exclamation error-page__icon"
            aria-hidden="true"></i>
-        <h1>Something went wrong</h1>
-        <p>An unexpected error occurred. Please try again later.</p>
+        <h1 class="error-page__title" id="error-title">Something went wrong</h1>
+        <p class="error-page__message">An unexpected error occurred. Please try again later.</p>
         <a href="{{ url_for('index') }}" class="button">Go home</a>
-    </div>
+    </section>
 {% endblock %}

@@ -1,11 +1,12 @@
 <div class="island__content">
     {% set icons = {"01d": "fa-sun", "01n": "fa-moon", "02d": "fa-cloud-sun", "02n": "fa-cloud-moon", "03d": "fa-cloud", "03n": "fa-cloud", "04d": "fa-cloud", "04n": "fa-cloud", "09d": "fa-cloud-showers-heavy", "09n": "fa-cloud-showers-heavy", "10d": "fa-cloud-rain", "10n": "fa-cloud-rain", "11d": "fa-cloud-bolt", "11n": "fa-cloud-bolt", "13d": "fa-snowflake", "13n": "fa-snowflake", "50d": "fa-smog", "50n": "fa-smog"} %}
+    {% set tz = weather.timezone %}
 
     <hgroup class="location-header">
         <h1 class="location-header__name">{{ location.name or "%.4f, %.4f"|format(lat, lon) }}{%- if location.state -%}, {{ location.state }}{%- endif -%}{%- if country -%}, {{ country.name }}{%- endif -%}</h1>
         <p class="location-header__datetime">
             <time class="location-header__time"
-                  datetime="{{ weather.current.dt | to_iso }}">{{ weather.current.dt | strftime("%A, %-d %B %Y at %H:%M") }}</time>
+                  datetime="{{ weather.current.dt | to_iso(tz) }}">{{ weather.current.dt | strftime("%A, %-d %B %Y at %H:%M", tz) }}</time>
         </p>
     </hgroup>
 
@@ -31,14 +32,14 @@
                 <dt class="current__stat-label">Sunrise</dt>
                 <dd class="current__stat-value">
                     <time class="current__stat-time"
-                          datetime="{{ weather.current.sunrise | to_iso }}">{{ weather.current.sunrise | strftime("%H:%M") }}</time>
+                          datetime="{{ weather.current.sunrise | to_iso(tz) }}">{{ weather.current.sunrise | strftime("%H:%M", tz) }}</time>
                 </dd>
             </div>
             <div class="current__stat">
                 <dt class="current__stat-label">Sunset</dt>
                 <dd class="current__stat-value">
                     <time class="current__stat-time"
-                          datetime="{{ weather.current.sunset | to_iso }}">{{ weather.current.sunset | strftime("%H:%M") }}</time>
+                          datetime="{{ weather.current.sunset | to_iso(tz) }}">{{ weather.current.sunset | strftime("%H:%M", tz) }}</time>
                 </dd>
             </div>
             <div class="current__stat">
@@ -102,7 +103,7 @@
                                   style="--precipitation-amount: {{ minute.precipitation }}">
                                 {% if minute.precipitation %}<span class="minutely__precipitation-label">{{ minute.precipitation | round(1) }}</span>{% endif %}
                             </span>
-                            <time class="minutely__time" datetime="{{ minute.dt | to_iso }}">{{ minute.dt | strftime("%H:%M") }}</time>
+                            <time class="minutely__time" datetime="{{ minute.dt | to_iso(tz) }}">{{ minute.dt | strftime("%H:%M", tz) }}</time>
                         </li>
                     {% endfor %}
                 </ol>
@@ -116,9 +117,9 @@
             <ol class="hourly__list">
                 {% for hour in weather.hourly %}
                     <li class="hourly__hour">
-                        <time class="hourly__hour-time" datetime="{{ hour.dt | to_iso }}">
-                            <span class="hourly__hour-clock">{{ hour.dt | strftime("%H:%M") }}</span>
-                            <span class="hourly__hour-date">{{ hour.dt | strftime("%-d %b") }}</span>
+                        <time class="hourly__hour-time" datetime="{{ hour.dt | to_iso(tz) }}">
+                            <span class="hourly__hour-clock">{{ hour.dt | strftime("%H:%M", tz) }}</span>
+                            <span class="hourly__hour-date">{{ hour.dt | strftime("%-d %b", tz) }}</span>
                         </time>
                         <i class="fa-solid {{ icons.get(hour.weather[0].icon, 'fa-cloud') }} hourly__hour-icon"
                            role="img"
@@ -163,9 +164,9 @@
                 {% for day in weather.daily %}
                     <details class="daily__card">
                         <summary class="daily__card__summary">
-                            <time class="daily__date" datetime="{{ day.dt | to_iso }}">
-                                <span class="daily__date-weekday">{{ day.dt | strftime("%a") }}</span>
-                                <span class="daily__date-day">{{ day.dt | strftime("%-d %b") }}</span>
+                            <time class="daily__date" datetime="{{ day.dt | to_iso(tz) }}">
+                                <span class="daily__date-weekday">{{ day.dt | strftime("%a", tz) }}</span>
+                                <span class="daily__date-day">{{ day.dt | strftime("%-d %b", tz) }}</span>
                             </time>
                             <i class="fa-solid {{ icons.get(day.weather[0].icon, 'fa-cloud') }} daily__icon"
                                role="img"

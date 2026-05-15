@@ -1,14 +1,16 @@
 import json
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from urllib.parse import quote
 import math
 
 
-def to_datetime(value):
+def to_datetime(value, tz=None):
+    zone = ZoneInfo(tz) if tz else None
     if isinstance(value, str):
         return datetime.fromisoformat(value)
     if isinstance(value, (int, float)):
-        return datetime.fromtimestamp(value)
+        return datetime.fromtimestamp(value, tz=zone)
     return value
 
 
@@ -21,12 +23,12 @@ def ucfirst_filter(value):
         return value
 
 
-def strftime_filter(value, fmt="%d-%m-%Y"):
-    return ucfirst_filter(to_datetime(value).strftime(fmt))
+def strftime_filter(value, fmt="%d-%m-%Y", tz=None):
+    return ucfirst_filter(to_datetime(value, tz).strftime(fmt))
 
 
-def to_iso_filter(value):
-    return to_datetime(value).isoformat()
+def to_iso_filter(value, tz=None):
+    return to_datetime(value, tz).isoformat()
 
 
 def urlescape_filter(value):

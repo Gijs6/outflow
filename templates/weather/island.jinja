@@ -372,9 +372,14 @@
             const dayGroups = [];
             let lastDay = '';
             data.forEach(d => {
-                const dayStr = fmtTime(d.date, { weekday: 'long' });
+                const dayStr = fmtTime(d.date, {
+                    weekday: 'long'
+                });
                 if (dayStr !== lastDay) {
-                    dayGroups.push({ date: d.date, label: dayStr });
+                    dayGroups.push({
+                        date: d.date,
+                        label: dayStr
+                    });
                     lastDay = dayStr;
                 }
             });
@@ -459,7 +464,10 @@
                         x: 'date',
                         frameAnchor: 'bottom',
                         dy: 40,
-                        text: d => fmtTime(d.date, { hour: '2-digit', minute: '2-digit' }),
+                        text: d => fmtTime(d.date, {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }),
                         fontSize: 9,
                         fill: '#adb5bd',
                         textAnchor: 'start',

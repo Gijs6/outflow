@@ -6,7 +6,7 @@
     <div class="city-search">
         <label for="city-search-input" class="city-search__label">Search for a city</label>
         <div class="city-search__field">
-            <i class="fa-solid fa-magnifying-glass city-search__icon"
+            <i class="fa-solid fa-fw fa-magnifying-glass city-search__icon"
                aria-hidden="true"></i>
             <form action="{{ url_for('search') }}"
                   method="get"
@@ -28,13 +28,15 @@
             <span id="city-search-spinner"
                   class="city-search__spinner htmx-indicator"
                   aria-hidden="true"></span>
+            <div id="city-search-results" class="city-search__dropdown" role="listbox"></div>
         </div>
-        <div id="city-search-results" class="city-search__dropdown" role="listbox"></div>
     </div>
 
     <div class="search-results">
         {% if query %}
-            {% if places %}
+            {% if error %}
+                <p class="search-results__error">Search unavailable: {{ error }}</p>
+            {% elif places %}
                 <p class="search-results__count">{{ places|length }} result{{ 's' if places|length != 1 }}</p>
                 <ul class="search-results__list">
                     {% for place in places %}
@@ -44,7 +46,7 @@
                                 <span class="search-results__result-name">{{ place.name }}</span>
                                 <span class="search-results__result-meta{% if place.is_direct %} search-results__result-meta--direct{% endif %}">
                                     {%- if place.is_direct -%}
-                                        <i class="fa-solid fa-location-dot" aria-hidden="true"></i> Coordinates
+                                        <i class="fa-solid fa-fw fa-location-dot" aria-hidden="true"></i> Coordinates
                                     {%- elif place.state -%}
                                         {{ place.state }}, {{ place.country }}
                                     {%- else -%}

@@ -1,4 +1,12 @@
-from flask import Flask, render_template, url_for, redirect, request, session
+from flask import (
+    Flask,
+    render_template,
+    url_for,
+    redirect,
+    request,
+    session,
+    send_from_directory,
+)
 
 import os
 
@@ -19,10 +27,17 @@ app.secret_key = os.getenv("SECRET_KEY", os.urandom(100).hex())
 register_filters(app)
 
 
+@app.route("/sw.js")
+def service_worker():
+    return send_from_directory("static", "sw.js", mimetype="application/javascript")
+
+
 @app.route("/")
 def index():
     return render_template(
-        "index.jinja", recent_places=session.get("recent_places", [])
+        "index.jinja",
+        recent_places=session.get("recent_places", []),
+        favourite_places=session.get("favourite_places", []),
     )
 
 
@@ -35,6 +50,7 @@ def search():
         return ""
 
     places = []
+    error = None
 
     location = parse_as_location(query)
     if location:
@@ -50,21 +66,26 @@ def search():
         )
 
     if len(query) >= 2:
-        results = search_cities(query)
-        for result in results:
-            places.append(
-                {
-                    "place_id": encode_place_id(result["lat"], result["lon"]),
-                    "name": result["name"],
-                    "state": result.get("state"),
-                    "country": result.get("country"),
-                }
-            )
+        try:
+            results = search_cities(query, limit=5 if is_htmx else None)
+            for result in results:
+                places.append(
+                    {
+                        "place_id": encode_place_id(result["lat"], result["lon"]),
+                        "name": result["name"],
+                        "state": result.get("state"),
+                        "country": result.get("country"),
+                    }
+                )
+        except Exception as e:
+            error = str(e)
 
     if is_htmx:
-        return render_template("search_results.jinja", places=places, query=query)
+        return render_template(
+            "search_results.jinja", places=places, query=query, error=error
+        )
 
-    return render_template("search.jinja", places=places, query=query)
+    return render_template("search.jinja", places=places, query=query, error=error)
 
 
 @app.route("/goto/<coords>")
@@ -92,7 +113,9 @@ def weather_island(place_id):
     country = pycountry.countries.get(alpha_2=country_code) if country_code else None
 
     name = location.get("name") or f"{lat}, {lon}"
-    country_name = country.name if country else ""
+    country_name = (
+        (getattr(country, "common_name", None) or country.name) if country else ""
+    )
     state = location.get("state") or ""
     entry = {
         "place_id": place_id,
@@ -112,6 +135,9 @@ def weather_island(place_id):
     recent.insert(0, entry)
     session["recent_places"] = recent[:5]
 
+    favourites = session.get("favourite_places", [])
+    is_favourite = any(p["place_id"] == place_id for p in favourites)
+
     return render_template(
         "weather/island.jinja",
         weather=data,
@@ -119,6 +145,39 @@ def weather_island(place_id):
         country=country,
         lat=lat,
         lon=lon,
+        place_id=place_id,
+        name=name,
+        state=state,
+        country_name=country_name,
+        is_favourite=is_favourite,
+    )
+
+
+@app.route("/weather/<place_id>/favourite", methods=["POST"])
+def toggle_favourite(place_id):
+    name = request.form.get("name", "")
+    state = request.form.get("state", "")
+    country = request.form.get("country", "")
+
+    favourites = session.get("favourite_places", [])
+    is_favourite = any(p["place_id"] == place_id for p in favourites)
+
+    if is_favourite:
+        favourites = [p for p in favourites if p["place_id"] != place_id]
+    else:
+        favourites.append(
+            {"place_id": place_id, "name": name, "state": state, "country": country}
+        )
+
+    session["favourite_places"] = favourites
+
+    return render_template(
+        "weather/favourite_btn.jinja",
+        place_id=place_id,
+        is_favourite=not is_favourite,
+        name=name,
+        state=state,
+        country_name=country,
     )
 
 

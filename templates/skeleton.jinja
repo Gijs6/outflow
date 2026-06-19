@@ -6,6 +6,7 @@
 
         <title>{%- block title -%}{%- endblock %} - Outlow</title>
         <meta name="description" content="A simple weather app" />
+        <meta name="theme-color" content="#ff922b" />
 
         <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
 
@@ -13,8 +14,8 @@
         <link rel="robots" href="/robots.txt" />
         <link rel="security" href="/.well-known/security.txt" />
 
-        {# <link rel="manifest"
-       href="{{ url_for('static', filename='manifest.json') }}" /> #}
+        <link rel="manifest"
+              href="{{ url_for('static', filename='manifest.json') }}" />
 
         {% if config.DEBUG %}
             <link rel="stylesheet"
@@ -37,6 +38,8 @@
         <script src="https://kit.fontawesome.com/4a94c21782.js"
                 crossorigin="anonymous"></script>
         <script src="{{ url_for('static', filename='vendor/htmx.min.js') }}" defer></script>
+        <script src="{{ url_for('static', filename='vendor/d3.min.js') }}" defer></script>
+        <script src="{{ url_for('static', filename='vendor/plot.min.js') }}" defer></script>
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -58,7 +61,7 @@
                 <form action="{{ url_for('search') }}"
                       method="get"
                       class="header-search__form">
-                    <i class="fa-solid fa-magnifying-glass header-search__icon"
+                    <i class="fa-solid fa-fw fa-magnifying-glass header-search__icon"
                        aria-hidden="true"></i>
                     <input class="header-search__input"
                            type="search"
@@ -95,7 +98,7 @@
                 target.classList.remove("island-loading");
                 target.classList.add("island--error");
                 target.innerHTML =
-                    '<p class="island__error-message"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Something went wrong while loading.</p><button type="button" class="button" onclick="window.location.reload()"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Try again</button>';
+                    '<p class="island__error-message"><i class="fa-solid fa-fw fa-triangle-exclamation" aria-hidden="true"></i> Something went wrong while loading.</p><button type="button" class="button" onclick="window.location.reload()"><i class="fa-solid fa-fw fa-rotate-right" aria-hidden="true"></i> Try again</button>';
             }
 
             document.addEventListener("htmx:responseError", (e) => handleIslandError(e.detail.target));
@@ -105,8 +108,46 @@
                 const id = e.detail.target.id;
                 if (!id) return;
                 const newEl = document.getElementById(id);
-                if (newEl?.dataset.title) document.title = newEl.dataset.title + " - Outflow";
+                const titleEl = newEl?.dataset.title ? newEl : newEl?.querySelector('[data-title]');
+                if (titleEl?.dataset.title) document.title = titleEl.dataset.title + " - Outflow";
             });
+
+            const headerInput = document.querySelector(".header-search__input");
+            if (headerInput) {
+                const headerDropdown = document.querySelector(".header-search__dropdown");
+                headerInput.addEventListener("blur", () => setTimeout(() => {
+                    if (!headerInput.matches(":focus")) headerDropdown.hidden = true;
+                }, 150));
+                headerInput.addEventListener("focus", () => {
+                    headerDropdown.hidden = false;
+                });
+            }
+
+            document.addEventListener("htmx:afterSwap", (e) => {
+                const t = e.detail.target;
+                if (t.classList.contains("city-search__dropdown") || t.classList.contains("header-search__dropdown")) {
+                    t.hidden = false;
+                }
+            });
+
+            function setupSearchSubmit(formSelector, dropdownId) {
+                const form = document.querySelector(formSelector);
+                if (!form) return;
+                form.addEventListener("submit", (e) => {
+                    const items = document.getElementById(dropdownId)
+                        ?.querySelectorAll(".search-dropdown__item a");
+                    if (items?.length === 1) {
+                        e.preventDefault();
+                        window.location.href = items[0].href;
+                    }
+                });
+            }
+            setupSearchSubmit(".header-search__form", "header-search-results");
+            setupSearchSubmit(".city-search__form", "city-search-results");
+
+            if ("serviceWorker" in navigator) {
+                navigator.serviceWorker.register("/sw.js");
+            }
         </script>
     </body>
 </html>

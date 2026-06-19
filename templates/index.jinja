@@ -3,10 +3,36 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
+    {% if favourite_places %}
+        <nav class="favourite-places" aria-label="Favourite places">
+            <p class="favourite-places__label" aria-hidden="true">Favourites</p>
+            <ol class="favourite-places__list">
+                {% for place in favourite_places %}
+                    <li class="favourite-places__item">
+                        <a href="{{ url_for('weather', place_id=place.place_id) }}"
+                           class="favourite-places__link">{{ place.name }}{%- if place.state -%}, {{ place.state }}{%- endif -%}{%- if place.country -%}, {{ place.country }}{%- endif -%}</a>
+                    </li>
+                {% endfor %}
+            </ol>
+        </nav>
+    {% endif %}
+    {% if recent_places %}
+        <nav class="recent-places" aria-label="Recent places">
+            <p class="recent-places__label" aria-hidden="true">Recent</p>
+            <ol class="recent-places__list">
+                {% for place in recent_places %}
+                    <li class="recent-places__item">
+                        <a href="{{ url_for('weather', place_id=place.place_id) }}"
+                           class="recent-places__link">{{ place.name }}{%- if place.state -%}, {{ place.state }}{%- endif -%}{%- if place.country -%}, {{ place.country }}{%- endif -%}</a>
+                    </li>
+                {% endfor %}
+            </ol>
+        </nav>
+    {% endif %}
     <div class="city-search">
         <label for="city-search-input" class="city-search__label">Search for a city</label>
         <div class="city-search__field">
-            <i class="fa-solid fa-magnifying-glass city-search__icon"
+            <i class="fa-solid fa-fw fa-magnifying-glass city-search__icon"
                aria-hidden="true"></i>
             <form action="{{ url_for('search') }}"
                   method="get"
@@ -27,21 +53,8 @@
             <span id="city-search-spinner"
                   class="city-search__spinner htmx-indicator"
                   aria-hidden="true"></span>
+            <div id="city-search-results" class="city-search__dropdown" role="listbox"></div>
         </div>
-        <div id="city-search-results" class="city-search__dropdown" role="listbox"></div>
     </div>
 
-    {% if recent_places %}
-        <nav class="recent-places" aria-label="Recent places">
-            <p class="recent-places__label" aria-hidden="true">Recent</p>
-            <ol class="recent-places__list">
-                {% for place in recent_places %}
-                    <li class="recent-places__item">
-                        <a href="{{ url_for('weather', place_id=place.place_id) }}"
-                           class="recent-places__link">{{ place.name }}{%- if place.state -%}, {{ place.state }}{%- endif -%}{%- if place.country -%}, {{ place.country }}{%- endif -%}</a>
-                    </li>
-                {% endfor %}
-            </ol>
-        </nav>
-    {% endif %}
 {% endblock %}

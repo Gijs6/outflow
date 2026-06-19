@@ -1,0 +1,15 @@
+<form class="favourite-form"
+      method="post"
+      action="{{ url_for('toggle_favourite', place_id=place_id) }}"
+      hx-post="{{ url_for('toggle_favourite', place_id=place_id) }}"
+      hx-swap="outerHTML">
+    <input type="hidden" name="name" value="{{ name }}">
+    <input type="hidden" name="state" value="{{ state }}">
+    <input type="hidden" name="country" value="{{ country_name }}">
+    <button type="submit"
+            class="favourite-btn{% if is_favourite %} favourite-btn--active{% endif %}"
+            aria-label="{{ 'Remove from favourites' if is_favourite else 'Add to favourites' }}">
+        <i class="fa-{{ 'solid' if is_favourite else 'regular' }} fa-star"
+           aria-hidden="true"></i>
+    </button>
+</form>

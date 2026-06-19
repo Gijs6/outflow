@@ -6,6 +6,7 @@ setup() {
   npm install
   mkdir -p static/vendor
   cp node_modules/htmx.org/dist/htmx.min.js static/vendor/htmx.min.js
+  .venv/bin/python scripts/import_geonames.py
 }
 
 serve() {

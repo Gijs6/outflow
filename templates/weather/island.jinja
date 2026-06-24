@@ -49,7 +49,7 @@
                        aria-label="{{ weather.current.weather | map(attribute='description') | join(', ') }}"></i>
                     <div class="wx-hero__temp-block">
                         <p class="wx-hero__temp">
-                            <data value="{{ weather.current.temp }}">{{ weather.current.temp | round | int }}°</data>
+                            <data value="{{ weather.current.temp }}">{{ weather.current.temp | round(1) }}°</data>
                         </p>
                         <p class="wx-hero__desc">{{ weather.current.weather | map(attribute='description') | join(', ') | ucfirst }}</p>
                         <p class="wx-hero__feels">

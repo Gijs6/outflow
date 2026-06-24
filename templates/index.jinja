@@ -3,58 +3,154 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    {% if favourite_places %}
-        <nav class="favourite-places" aria-label="Favourite places">
-            <p class="favourite-places__label" aria-hidden="true">Favourites</p>
-            <ol class="favourite-places__list">
-                {% for place in favourite_places %}
-                    <li class="favourite-places__item">
-                        <a href="{{ url_for('weather', place_id=place.place_id) }}"
-                           class="favourite-places__link">{{ place.name }}{%- if place.state -%}, {{ place.state }}{%- endif -%}{%- if place.country -%}, {{ place.country }}{%- endif -%}</a>
-                    </li>
-                {% endfor %}
-            </ol>
-        </nav>
-    {% endif %}
-    {% if recent_places %}
-        <nav class="recent-places" aria-label="Recent places">
-            <p class="recent-places__label" aria-hidden="true">Recent</p>
-            <ol class="recent-places__list">
-                {% for place in recent_places %}
-                    <li class="recent-places__item">
-                        <a href="{{ url_for('weather', place_id=place.place_id) }}"
-                           class="recent-places__link">{{ place.name }}{%- if place.state -%}, {{ place.state }}{%- endif -%}{%- if place.country -%}, {{ place.country }}{%- endif -%}</a>
-                    </li>
-                {% endfor %}
-            </ol>
-        </nav>
-    {% endif %}
-    <div class="city-search">
-        <label for="city-search-input" class="city-search__label">Search for a city</label>
-        <div class="city-search__field">
-            <i class="fa-solid fa-fw fa-magnifying-glass city-search__icon"
-               aria-hidden="true"></i>
-            <form action="{{ url_for('search') }}"
-                  method="get"
-                  class="city-search__form">
-                <input id="city-search-input"
-                       class="city-search__input"
-                       type="search"
-                       name="q"
-                       placeholder="Amsterdam, London, New York…"
-                       autocomplete="off"
-                       aria-autocomplete="list"
-                       aria-controls="city-search-results"
-                       hx-get="{{ url_for('search') }}"
-                       hx-trigger="input changed delay:300ms"
-                       hx-target="#city-search-results"
-                       hx-indicator="#city-search-spinner" />
-            </form>
-            <span id="city-search-spinner"
-                  class="city-search__spinner htmx-indicator"
-                  aria-hidden="true"></span>
-            <div id="city-search-results" class="city-search__dropdown" role="listbox"></div>
+    <div class="home">
+        <div class="home__search-area">
+            <h1 class="home__title">Weather</h1>
+            <p class="home__subtitle">Search for any city or enter coordinates.</p>
+            <div class="home__search">
+                <i class="fa-solid fa-fw fa-magnifying-glass home__search-icon"
+                   aria-hidden="true"></i>
+                <form action="{{ url_for('search') }}"
+                      method="get"
+                      role="search"
+                      aria-label="City search">
+                    <label for="city-search-input" class="sr-only">Search for a city</label>
+                    <input id="city-search-input"
+                           class="home__search-input"
+                           type="search"
+                           name="q"
+                           placeholder="Amsterdam, London, New York…"
+                           autocomplete="off"
+                           aria-autocomplete="list"
+                           aria-controls="city-search-results"
+                           hx-get="{{ url_for('search') }}"
+                           hx-trigger="input changed delay:300ms"
+                           hx-target="#city-search-results"
+                           hx-indicator="#city-search-spinner" />
+                </form>
+                <span id="city-search-spinner"
+                      class="home__search-spinner htmx-indicator"
+                      aria-hidden="true"></span>
+                <div id="city-search-results"
+                     class="home__search-dropdown"
+                     role="listbox"
+                     aria-label="Search suggestions"></div>
+            </div>
+            <div class="home__actions">
+                <button type="button" class="home__action-btn" id="home-geo-btn">
+                    <i class="fa-solid fa-fw fa-location-dot" aria-hidden="true"></i>
+                    Use my location
+                </button>
+                <a href="{{ url_for('lucky') }}" class="home__action-btn">
+                    <i class="fa-solid fa-fw fa-dice" aria-hidden="true"></i>
+                    Feeling lucky
+                </a>
+            </div>
         </div>
-    </div>
 
-{% endblock %}
+        {% if favourite_places %}
+            <nav class="home__places" aria-label="Favourite places">
+                <h2 class="home__places-label">
+                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                    Favourites
+                </h2>
+                <ol class="home__places-list home__places-list--favourites" role="list">
+                    {% for place in favourite_places %}
+                        <li>
+                            <a href="{{ url_for('weather', place_id=place.place_id) }}"
+                               class="home__place-card">
+                                <span class="home__place-card__info">
+                                    <span class="home__place-name">{{ place.name }}</span>
+                                    {% if place.state or place.country %}
+                                        <span class="home__place-meta">
+                                            {%- if place.state -%}{{ place.state }}{%- endif -%}
+                                                {%- if place.state and place.country -%}, {%- endif -%}
+                                                    {%- if place.country -%}{{ place.country }}{%- endif -%}
+                                                    </span>
+                                                {% endif %}
+                                            </span>
+                                            <span class="home__place-weather home__place-weather--loading"
+                                                  hx-get="{{ url_for('place_weather_mini', place_id=place.place_id) }}"
+                                                  hx-trigger="load"
+                                                  hx-swap="outerHTML"></span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ol>
+                        </nav>
+                    {% endif %}
+
+                    {% if recent_places %}
+                        <nav class="home__places"
+                             id="home-recents"
+                             aria-label="Recently viewed places">
+                            <h2 class="home__places-label">
+                                <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+                                Recent
+                                <button class="home__places-clear"
+                                        hx-post="{{ url_for('clear_recents') }}"
+                                        hx-target="#home-recents"
+                                        hx-swap="outerHTML">Clear</button>
+                            </h2>
+                            <ol class="home__places-list" role="list">
+                                {% for place in recent_places %}
+                                    <li>
+                                        <a href="{{ url_for('weather', place_id=place.place_id) }}"
+                                           class="home__place-chip">{{ place.name }}{%- if place.state -%}, {{ place.state }}{%- endif -%}{%- if place.country -%}, {{ place.country }}{%- endif -%}</a>
+                                    </li>
+                                {% endfor %}
+                            </ol>
+                        </nav>
+                    {% endif %}
+
+                    {% if suggested_cities %}
+                        <nav class="home__places" aria-label="Suggested places">
+                            <h2 class="home__places-label">
+                                <i class="fa-solid fa-compass" aria-hidden="true"></i>
+                                Discover
+                            </h2>
+                            <ol class="home__places-list" role="list">
+                                {% for place in suggested_cities %}
+                                    <li>
+                                        <a href="{{ url_for('weather', place_id=place.place_id) }}"
+                                           class="home__place-chip">{{ place.name }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ol>
+                        </nav>
+                    {% endif %}
+
+                    <p class="home__db-stats">
+                        <i class="fa-solid fa-database" aria-hidden="true"></i>
+                        {{ db_stats.city_count | thousands }} cities across {{ db_stats.country_count }} countries
+                    </p>
+                </div>
+            {% endblock %}
+
+            {% block extra_scripts %}
+                <script>
+                    (function() {
+                        const geoBtn = document.getElementById('home-geo-btn');
+                        if (geoBtn) {
+                            geoBtn.addEventListener('click', function() {
+                                if (!navigator.geolocation) return;
+                                geoBtn.disabled = true;
+                                geoBtn.querySelector('i').className = 'fa-solid fa-fw fa-spinner fa-spin';
+                                navigator.geolocation.getCurrentPosition(
+                                    pos => {
+                                        window.location.href = `/goto/${pos.coords.latitude},${pos.coords.longitude}`;
+                                    },
+                                    () => {
+                                        geoBtn.disabled = false;
+                                        geoBtn.querySelector('i').className = 'fa-solid fa-fw fa-location-dot';
+                                    }
+                                );
+                            });
+                        }
+
+                        if (window.matchMedia('(hover: hover)').matches) {
+                            document.getElementById('city-search-input')?.focus();
+                        }
+                    }());
+                </script>
+            {% endblock %}

@@ -48,6 +48,32 @@ def to_kmh_filter(speed_ms):
     return round(speed_ms * 3.6, 1)
 
 
+def wind_dir_filter(deg):
+    dirs = [
+        "N",
+        "NNE",
+        "NE",
+        "ENE",
+        "E",
+        "ESE",
+        "SE",
+        "SSE",
+        "S",
+        "SSW",
+        "SW",
+        "WSW",
+        "W",
+        "WNW",
+        "NW",
+        "NNW",
+    ]
+    return dirs[round(deg / 22.5) % 16]
+
+
+def thousands_filter(value):
+    return f"{int(value):,}"
+
+
 FILTERS = {
     "ucfirst": ucfirst_filter,
     "strftime": strftime_filter,
@@ -56,6 +82,8 @@ FILTERS = {
     "jsondump": jsondump_filter,
     "to_bft": to_bft_filter,
     "to_kmh": to_kmh_filter,
+    "wind_dir": wind_dir_filter,
+    "thousands": thousands_filter,
 }
 
 

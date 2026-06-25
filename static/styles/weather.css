@@ -455,7 +455,7 @@
     }
 
     &::after {
-        content: '';
+        content: "";
         position: absolute;
         right: 0;
         top: 0;
@@ -1368,7 +1368,6 @@
     }
 }
 
-
 .pollutant-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
@@ -1563,11 +1562,21 @@
     --alert-tag-bg: var(--color-red-9);
     --alert-tag-text: var(--color-red-1);
 
-    .alert-card__event { color: var(--color-white); }
-    .alert-card__source { color: var(--color-white-72); }
-    .alert-card__times div dt { color: var(--color-white-55); }
-    .alert-card__times div dd { color: var(--color-white); }
-    .alert-card__description { color: var(--color-white-85); }
+    .alert-card__event {
+        color: var(--color-white);
+    }
+    .alert-card__source {
+        color: var(--color-white-72);
+    }
+    .alert-card__times div dt {
+        color: var(--color-white-55);
+    }
+    .alert-card__times div dd {
+        color: var(--color-white);
+    }
+    .alert-card__description {
+        color: var(--color-white-85);
+    }
 }
 
 .favourite-form {

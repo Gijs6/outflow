@@ -182,11 +182,18 @@
                 {% set _ns = namespace(level='moderate') %}
                 {% for _a in alerts %}
                     {% set _ev = _a.event | lower | trim %}
-                    {% if _ev[:7] == 'extreme' %}{% set _ns.level = 'extreme' %}{% elif _ns.level != 'extreme' and _ev[:8] != 'moderate' %}{% set _ns.level = 'severe' %}{% endif %}
+                    {% if _ev[:7] == 'extreme' %}
+                        {% set _ns.level = "extreme" %}
+                    {% elif _ns.level != 'extreme' and _ev[:8] != 'moderate' %}
+                        {% set _ns.level = "severe" %}
+                    {% endif %}
                 {% endfor %}
-                <div class="weather-hero__alert-strip weather-hero__alert-strip--{{ _ns.level }}" role="alert">
+                <div class="weather-hero__alert-strip weather-hero__alert-strip--{{ _ns.level }}"
+                     role="alert">
                     <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-                    <span>{{ alerts[0].event }}{% if alerts | length > 1 %} + {{ alerts | length - 1 }} more{% endif %} - <a href="#" class="weather-hero__alert-link" data-tab-target="alerts">view alert{{ "s" if alerts | length > 1 else "" }}</a></span>
+                    <span>{{ alerts[0].event }}
+                        {% if alerts | length > 1 %}+ {{ alerts | length - 1 }} more{% endif %}
+                    - <a href="#" class="weather-hero__alert-link" data-tab-target="alerts">view alert{{ "s" if alerts | length > 1 else "" }}</a></span>
                 </div>
             {% endif %}
 
@@ -627,7 +634,13 @@
             <div class="alerts-list">
                 {% for alert in alerts %}
                     {% set _ev = alert.event | lower | trim %}
-                    {% if _ev[:8] == 'moderate' %}{% set _level = 'moderate' %}{% elif _ev[:7] == 'extreme' %}{% set _level = 'extreme' %}{% else %}{% set _level = 'severe' %}{% endif %}
+                    {% if _ev[:8] == 'moderate' %}
+                        {% set _level = "moderate" %}
+                    {% elif _ev[:7] == 'extreme' %}
+                        {% set _level = "extreme" %}
+                    {% else %}
+                        {% set _level = "severe" %}
+                    {% endif %}
                     <article class="alert-card alert-card--{{ _level }}">
                         <header class="alert-card__header">
                             <h2 class="alert-card__event">
@@ -883,7 +896,10 @@
                 const faClass = FA_CLASSES[h.icon] || 'fa-cloud';
                 const popPct = Math.round(h.pop * 100);
                 const isNow = i === 0;
-                const timeStr = fmtTime(h.date, { hour: '2-digit', minute: '2-digit' });
+                const timeStr = fmtTime(h.date, {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
                 const wetClass = popPct > 2 ? 'hourly-strip__pop--wet' : 'hourly-strip__pop--dry';
 
                 const item = document.createElement('div');

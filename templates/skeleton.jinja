@@ -82,7 +82,9 @@
             {% block content %}{% endblock %}
         </main>
 
-        <dialog class="shortcuts-modal" id="shortcuts-modal" aria-label="Keyboard shortcuts">
+        <dialog class="shortcuts-modal"
+                id="shortcuts-modal"
+                aria-label="Keyboard shortcuts">
             <div class="shortcuts-modal__inner">
                 <div class="shortcuts-modal__header">
                     <h2 class="shortcuts-modal__title">Keyboard shortcuts</h2>
@@ -92,16 +94,28 @@
                 </div>
                 <dl class="shortcuts-modal__list">
                     <div class="shortcuts-modal__item">
-                        <dt><kbd>/</kbd></dt>
-                        <dd>Focus search</dd>
+                        <dt>
+                            <kbd>/</kbd>
+                        </dt>
+                        <dd>
+                            Focus search
+                        </dd>
                     </div>
                     <div class="shortcuts-modal__item">
-                        <dt><kbd>←</kbd> <kbd>→</kbd></dt>
-                        <dd>Navigate weather tabs</dd>
+                        <dt>
+                            <kbd>←</kbd> <kbd>→</kbd>
+                        </dt>
+                        <dd>
+                            Navigate weather tabs
+                        </dd>
                     </div>
                     <div class="shortcuts-modal__item">
-                        <dt><kbd>?</kbd></dt>
-                        <dd>Show this help</dd>
+                        <dt>
+                            <kbd>?</kbd>
+                        </dt>
+                        <dd>
+                            Show this help
+                        </dd>
                     </div>
                 </dl>
             </div>
@@ -192,7 +206,9 @@
 
             const shortcutsModal = document.getElementById("shortcuts-modal");
             shortcutsModal.querySelector(".shortcuts-modal__close").addEventListener("click", () => shortcutsModal.close());
-            shortcutsModal.addEventListener("click", (e) => { if (e.target === shortcutsModal) shortcutsModal.close(); });
+            shortcutsModal.addEventListener("click", (e) => {
+                if (e.target === shortcutsModal) shortcutsModal.close();
+            });
 
             document.addEventListener("keydown", (e) => {
                 const tag = document.activeElement.tagName;

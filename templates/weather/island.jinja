@@ -27,14 +27,14 @@
     {% endif %}
 
 
-    <header class="wx-hero"
+    <header class="weather-hero"
             data-weather-code="{{ weather.current.weather[0].icon }}">
-        <div class="wx-hero__inner">
+        <div class="weather-hero__inner">
 
-            <div class="wx-hero__top">
-                <hgroup class="wx-hero__hgroup">
-                    <h1 class="wx-hero__name">{{ location.name or "%.4f, %.4f"|format(lat, lon) }}{%- if location.state -%}, {{ location.state }}{%- endif -%}{%- if country_name -%}, {{ country_name }}{%- endif -%}</h1>
-                    <p class="wx-hero__datetime">
+            <div class="weather-hero__top">
+                <hgroup class="weather-hero__hgroup">
+                    <h1 class="weather-hero__name">{{ location.name or "%.4f, %.4f"|format(lat, lon) }}{%- if location.state -%}, {{ location.state }}{%- endif -%}{%- if country_name -%}, {{ country_name }}{%- endif -%}</h1>
+                    <p class="weather-hero__datetime">
                         <time datetime="{{ weather.current.dt | to_iso(tz) }}">{{ weather.current.dt | strftime("%a %-d %b %Y, %H:%M", tz) }}</time>
                     </p>
                 </hgroup>
@@ -42,23 +42,23 @@
 
             </div>
 
-            <div class="wx-hero__current">
-                <div class="wx-hero__icon-temp">
-                    <i class="fa-solid fa-fw {{ icons.get(weather.current.weather[0].icon, 'fa-cloud') }} wx-hero__icon"
+            <div class="weather-hero__current">
+                <div class="weather-hero__icon-temp">
+                    <i class="fa-solid fa-fw {{ icons.get(weather.current.weather[0].icon, 'fa-cloud') }} weather-hero__icon"
                        role="img"
                        aria-label="{{ weather.current.weather | map(attribute='description') | join(', ') }}"></i>
-                    <div class="wx-hero__temp-block">
-                        <p class="wx-hero__temp">
+                    <div class="weather-hero__temp-block">
+                        <p class="weather-hero__temp">
                             <data value="{{ weather.current.temp }}">{{ weather.current.temp | round(1) }}°</data>
                         </p>
-                        <p class="wx-hero__desc">{{ weather.current.weather | map(attribute='description') | join(', ') | ucfirst }}</p>
-                        <p class="wx-hero__feels">
+                        <p class="weather-hero__desc">{{ weather.current.weather | map(attribute='description') | join(', ') | ucfirst }}</p>
+                        <p class="weather-hero__feels">
                             feels like <data value="{{ weather.current.feels_like }}">{{ weather.current.feels_like | round | int }}°</data>
                         </p>
                     </div>
                 </div>
 
-                <dl class="wx-hero__highlights">
+                <dl class="weather-hero__highlights">
                     {% if weather.current.uvi is defined %}
                         <div>
                             <dt>UV</dt>
@@ -91,38 +91,38 @@
                 </dl>
             </div>
 
-            <ul class="wx-hero__stats" aria-label="Current conditions">
-                <li class="wx-hero__stat">
-                    <span class="wx-hero__stat-label">Wind</span> <strong>{{ weather.current.wind_speed | to_bft }} bft {{ weather.current.wind_deg | wind_dir }}</strong>
+            <ul class="weather-hero__stats" aria-label="Current conditions">
+                <li class="weather-hero__stat">
+                    <span class="weather-hero__stat-label">Wind</span> <strong>{{ weather.current.wind_speed | to_bft }} bft {{ weather.current.wind_deg | wind_dir }}</strong>
                 </li>
                 {% if weather.current.wind_gust %}
-                    <li class="wx-hero__stat">
-                        <span class="wx-hero__stat-label">Gust</span> <strong>{{ weather.current.wind_gust | to_bft }} bft</strong>
+                    <li class="weather-hero__stat">
+                        <span class="weather-hero__stat-label">Gust</span> <strong>{{ weather.current.wind_gust | to_bft }} bft</strong>
                     </li>
                 {% endif %}
-                <li class="wx-hero__stat">
-                    <span class="wx-hero__stat-label">Humidity</span> <strong>{{ weather.current.humidity }}%</strong>
+                <li class="weather-hero__stat">
+                    <span class="weather-hero__stat-label">Humidity</span> <strong>{{ weather.current.humidity }}%</strong>
                 </li>
-                <li class="wx-hero__stat">
-                    <span class="wx-hero__stat-label">Dew point</span> <strong>{{ weather.current.dew_point | round | int }}°</strong>
+                <li class="weather-hero__stat">
+                    <span class="weather-hero__stat-label">Dew point</span> <strong>{{ weather.current.dew_point | round | int }}°</strong>
                 </li>
-                <li class="wx-hero__stat">
-                    <span class="wx-hero__stat-label">Pressure</span> <strong>{{ weather.current.pressure }} hPa</strong>
+                <li class="weather-hero__stat">
+                    <span class="weather-hero__stat-label">Pressure</span> <strong>{{ weather.current.pressure }} hPa</strong>
                 </li>
-                <li class="wx-hero__stat">
-                    <span class="wx-hero__stat-label">Visibility</span> <strong>{{ (weather.current.visibility / 1000) | round(1) }} km</strong>
+                <li class="weather-hero__stat">
+                    <span class="weather-hero__stat-label">Visibility</span> <strong>{{ (weather.current.visibility / 1000) | round(1) }} km</strong>
                 </li>
-                <li class="wx-hero__stat">
-                    <span class="wx-hero__stat-label">Clouds</span> <strong>{{ weather.current.clouds }}%</strong>
+                <li class="weather-hero__stat">
+                    <span class="weather-hero__stat-label">Clouds</span> <strong>{{ weather.current.clouds }}%</strong>
                 </li>
                 {% if weather.current.rain %}
-                    <li class="wx-hero__stat">
-                        <span class="wx-hero__stat-label">Rain</span> <strong>{{ weather.current.rain['1h'] }} mm/h</strong>
+                    <li class="weather-hero__stat">
+                        <span class="weather-hero__stat-label">Rain</span> <strong>{{ weather.current.rain['1h'] }} mm/h</strong>
                     </li>
                 {% endif %}
                 {% if weather.current.snow %}
-                    <li class="wx-hero__stat">
-                        <span class="wx-hero__stat-label">Snow</span> <strong>{{ weather.current.snow['1h'] }} mm/h</strong>
+                    <li class="weather-hero__stat">
+                        <span class="weather-hero__stat-label">Snow</span> <strong>{{ weather.current.snow['1h'] }} mm/h</strong>
                     </li>
                 {% endif %}
             </ul>
@@ -140,8 +140,8 @@
                         {% set ns.max_p = m.precipitation %}
                     {% endif %}
                 {% endfor %}
-                <div class="wx-hero__rain">
-                    <p class="wx-hero__rain-label">
+                <div class="weather-hero__rain">
+                    <p class="weather-hero__rain-label">
                         {% if ns.first == -1 %}
                             No rain in the next hour
                         {% elif ns.first == 0 and ns.last >= 58 %}
@@ -179,51 +179,55 @@
             {% endif %}
 
             {% if alerts %}
-                <div class="wx-hero__alert-strip" role="alert">
+                {% set _ns = namespace(level='moderate') %}
+                {% for _a in alerts %}
+                    {% set _ev = _a.event | lower | trim %}
+                    {% if _ev[:7] == 'extreme' %}{% set _ns.level = 'extreme' %}{% elif _ns.level != 'extreme' and _ev[:8] != 'moderate' %}{% set _ns.level = 'severe' %}{% endif %}
+                {% endfor %}
+                <div class="weather-hero__alert-strip weather-hero__alert-strip--{{ _ns.level }}" role="alert">
                     <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-                    {{ alerts | length }} active weather alert{{ "s" if alerts | length > 1 else "" }} -
-                    <a href="#" class="wx-hero__alert-link" data-tab-target="alerts">view alerts</a>
+                    <span>{{ alerts[0].event }}{% if alerts | length > 1 %} + {{ alerts | length - 1 }} more{% endif %} - <a href="#" class="weather-hero__alert-link" data-tab-target="alerts">view alert{{ "s" if alerts | length > 1 else "" }}</a></span>
                 </div>
             {% endif %}
 
         </div>
 
-        <nav class="wx-tabs" aria-label="Weather sections">
-            <div role="tablist" id="wx-tablist">
+        <nav class="weather-tabs" aria-label="Weather sections">
+            <div role="tablist" id="weather-tablist">
                 <button role="tab"
                         id="tab-btn-overview"
                         aria-selected="true"
                         aria-controls="tab-panel-overview"
                         tabindex="0"
-                        class="wx-tab wx-tab--active"
+                        class="weather-tab weather-tab--active"
                         data-tab="overview">Overview</button>
                 <button role="tab"
                         id="tab-btn-hourly"
                         aria-selected="false"
                         aria-controls="tab-panel-hourly"
                         tabindex="-1"
-                        class="wx-tab"
+                        class="weather-tab"
                         data-tab="hourly">Hourly</button>
                 <button role="tab"
                         id="tab-btn-daily"
                         aria-selected="false"
                         aria-controls="tab-panel-daily"
                         tabindex="-1"
-                        class="wx-tab"
+                        class="weather-tab"
                         data-tab="daily">{{ daily_data | length }}-day</button>
                 <button role="tab"
                         id="tab-btn-air"
                         aria-selected="false"
                         aria-controls="tab-panel-air"
                         tabindex="-1"
-                        class="wx-tab"
+                        class="weather-tab"
                         data-tab="air">Air quality</button>
                 <button role="tab"
                         id="tab-btn-map"
                         aria-selected="false"
                         aria-controls="tab-panel-map"
                         tabindex="-1"
-                        class="wx-tab"
+                        class="weather-tab"
                         data-tab="map">Map</button>
                 {% if alerts %}
                     <button role="tab"
@@ -231,10 +235,10 @@
                             aria-selected="false"
                             aria-controls="tab-panel-alerts"
                             tabindex="-1"
-                            class="wx-tab wx-tab--alert"
+                            class="weather-tab weather-tab--alert weather-tab--alert-{{ _ns.level }}"
                             data-tab="alerts">
                         Alerts
-                        <span class="wx-tab__badge" aria-label="{{ alerts | length }} alerts">{{ alerts | length }}</span>
+                        <span class="weather-tab__badge" aria-label="{{ alerts | length }} alerts">{{ alerts | length }}</span>
                     </button>
                 {% endif %}
             </div>
@@ -244,23 +248,24 @@
     <section role="tabpanel"
              id="tab-panel-overview"
              aria-labelledby="tab-btn-overview"
-             class="wx-panel">
+             class="weather-panel">
 
         {% if hourly_data %}
-            <section class="wx-section" aria-label="Today at a glance">
-                <h2 class="wx-section__heading">Today at a glance</h2>
-                <div class="period-cards"
-                     id="overview-period-cards"
-                     aria-label="Weather periods for today"></div>
+            <section class="weather-section" aria-label="Next 24 hours">
+                <h2 class="weather-section__heading">Next 24 hours</h2>
+                <div class="hourly-strip"
+                     id="overview-hourly-strip"
+                     aria-label="Hourly forecast"></div>
             </section>
+
         {% endif %}
 
         {% if daily_data %}
             {% set week_min = daily_data[:7] | map(attribute='temp.min') | min %}
             {% set week_max = daily_data[:7] | map(attribute='temp.max') | max %}
             {% set temp_range = (week_max - week_min) or 1 %}
-            <section class="wx-section">
-                <h2 class="wx-section__heading">Week ahead</h2>
+            <section class="weather-section">
+                <h2 class="weather-section__heading">Week ahead</h2>
                 <ul class="snap-list">
                     {% for day in daily_data[:7] %}
                         {% set bar_start = ((day.temp.min - week_min) / temp_range * 100) | round(1) %}
@@ -296,38 +301,20 @@
             </section>
         {% endif %}
 
-        {% if air_pollution %}
-            {% set aqi = air_pollution.list[0].main.aqi %}
-            <section class="wx-section">
-                <h2 class="wx-section__heading">Air quality</h2>
-                <div class="aqi-card">
-                    <div class="aqi-card__header">
-                        <data class="aqi-badge aqi-badge--large"
-                              value="{{ aqi }}"
-                              aria-label="Air Quality Index {{ aqi }}: {{ aqi_labels.get(aqi, 'Unknown') }}">
-                            {{ aqi_labels.get(aqi, "Unknown") }}
-                        </data>
-                        <p class="aqi-card__sub">
-                            AQI {{ aqi }}/5 - <a href="#" class="aqi-link" data-tab-target="air" class="aqi-link__cta">full breakdown</a>
-                        </p>
-                    </div>
-                </div>
-            </section>
-        {% endif %}
 
     </section>
 
     <section role="tabpanel"
              id="tab-panel-hourly"
              aria-labelledby="tab-btn-hourly"
-             class="wx-panel"
+             class="weather-panel"
              hidden>
         {% if hourly_data %}
             <div class="period-list"
                  id="hourly-period-list"
                  aria-label="96-hour forecast by period"></div>
         {% else %}
-            <p class="wx-unavailable">
+            <p class="weather-unavailable">
                 <i class="fa-solid fa-circle-info" aria-hidden="true"></i> Hourly data unavailable.
             </p>
         {% endif %}
@@ -336,7 +323,7 @@
     <section role="tabpanel"
              id="tab-panel-daily"
              aria-labelledby="tab-btn-daily"
-             class="wx-panel"
+             class="weather-panel"
              hidden>
         {% if daily_data %}
             {% set all_min = daily_data | map(attribute='temp.min') | min %}
@@ -516,7 +503,7 @@
                 {% endfor %}
             </div>
         {% else %}
-            <p class="wx-unavailable">
+            <p class="weather-unavailable">
                 <i class="fa-solid fa-circle-info" aria-hidden="true"></i> Daily forecast unavailable.
             </p>
         {% endif %}
@@ -525,7 +512,7 @@
     <section role="tabpanel"
              id="tab-panel-air"
              aria-labelledby="tab-btn-air"
-             class="wx-panel"
+             class="weather-panel"
              hidden>
         {% if air_pollution %}
             {% set aqi = air_pollution.list[0].main.aqi %}
@@ -540,8 +527,8 @@
                     <p class="aqi-card__sub">AQI {{ aqi }} out of 5</p>
                 </div>
             </div>
-            <section class="wx-section">
-                <h2 class="wx-section__heading">Pollutants</h2>
+            <section class="weather-section">
+                <h2 class="weather-section__heading">Pollutants</h2>
                 <dl class="pollutant-grid">
                     <div class="pollutant">
                         <dt class="pollutant__name">
@@ -606,7 +593,7 @@
                 </dl>
             </section>
         {% else %}
-            <p class="wx-unavailable">
+            <p class="weather-unavailable">
                 <i class="fa-solid fa-circle-info" aria-hidden="true"></i> Air quality data unavailable.
             </p>
         {% endif %}
@@ -615,7 +602,7 @@
     <section role="tabpanel"
              id="tab-panel-map"
              aria-labelledby="tab-btn-map"
-             class="wx-panel wx-panel--map"
+             class="weather-panel weather-panel--map"
              hidden>
         <div class="map-controls" role="group" aria-label="Map layer selector">
             <span class="map-controls__label">Layer:</span>
@@ -626,20 +613,27 @@
                         aria-pressed="{{ 'true' if loop.first else 'false' }}">{{ layer_label }}</button>
             {% endfor %}
         </div>
-        <div id="wx-map" class="wx-map" aria-label="Interactive weather map"></div>
+        <div id="weather-map"
+             class="weather-map"
+             aria-label="Interactive weather map"></div>
     </section>
 
     {% if alerts %}
         <section role="tabpanel"
                  id="tab-panel-alerts"
                  aria-labelledby="tab-btn-alerts"
-                 class="wx-panel"
+                 class="weather-panel"
                  hidden>
             <div class="alerts-list">
                 {% for alert in alerts %}
-                    <article class="alert-card">
+                    {% set _ev = alert.event | lower | trim %}
+                    {% if _ev[:8] == 'moderate' %}{% set _level = 'moderate' %}{% elif _ev[:7] == 'extreme' %}{% set _level = 'extreme' %}{% else %}{% set _level = 'severe' %}{% endif %}
+                    <article class="alert-card alert-card--{{ _level }}">
                         <header class="alert-card__header">
-                            <h2 class="alert-card__event">{{ alert.event }}</h2>
+                            <h2 class="alert-card__event">
+                                <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                                {{ alert.event }}
+                            </h2>
                             <p class="alert-card__source">Issued by {{ alert.sender_name }}</p>
                         </header>
                         <dl class="alert-card__times">
@@ -668,7 +662,7 @@
         </section>
     {% endif %}
 
-    <footer class="wx-attribution">
+    <footer class="weather-attribution">
         Weather data by <a href="https://openweathermap.org/"
     rel="noopener noreferrer"
     target="_blank">OpenWeatherMap</a>
@@ -733,7 +727,7 @@
             '50n': 'fa-smog',
         };
 
-        const tablist = document.getElementById('wx-tablist');
+        const tablist = document.getElementById('weather-tablist');
         let activateTabFromHash = () => {};
 
         if (tablist) {
@@ -743,11 +737,11 @@
                 tabs.forEach(t => {
                     t.setAttribute('aria-selected', 'false');
                     t.setAttribute('tabindex', '-1');
-                    t.classList.remove('wx-tab--active');
+                    t.classList.remove('weather-tab--active');
                 });
                 tab.setAttribute('aria-selected', 'true');
                 tab.setAttribute('tabindex', '0');
-                tab.classList.add('wx-tab--active');
+                tab.classList.add('weather-tab--active');
 
                 document.querySelectorAll('[role="tabpanel"]').forEach(p => {
                     p.hidden = true;
@@ -870,54 +864,32 @@
             return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
         }
 
-        function buildTodayCards(container) {
+        function buildHourlyStrip(container) {
             if (!container || !hourlyDataEl || container.childElementCount > 0) return;
 
             const raw = JSON.parse(hourlyDataEl.textContent);
-            const data = raw.map(d => ({
-                date: new Date(d.dt * 1000),
-                temp: Math.round(d.temp),
-                wind_speed: d.wind_speed || 0,
-                pop: d.pop || 0,
-                icon: d.weather[0].icon,
-            }));
-
             const now = new Date();
-            const todayKey = getDayKey(now);
-            const currentPeriod = getPeriod(now);
-            const groups = {};
+            const next24 = raw
+                .map(d => ({
+                    date: new Date(d.dt * 1000),
+                    temp: Math.round(d.temp),
+                    pop: d.pop || 0,
+                    icon: d.weather[0].icon,
+                }))
+                .filter(d => d.date >= now)
+                .slice(0, 24);
 
-            data.forEach(d => {
-                if (getDayKey(d.date) !== todayKey) return;
-                const period = getPeriod(d.date);
-                if (!groups[period.id]) groups[period.id] = {
-                    period,
-                    hours: []
-                };
-                groups[period.id].hours.push(d);
-            });
+            next24.forEach((h, i) => {
+                const faClass = FA_CLASSES[h.icon] || 'fa-cloud';
+                const popPct = Math.round(h.pop * 100);
+                const isNow = i === 0;
+                const timeStr = fmtTime(h.date, { hour: '2-digit', minute: '2-digit' });
+                const wetClass = popPct > 2 ? 'hourly-strip__pop--wet' : 'hourly-strip__pop--dry';
 
-            PERIODS.forEach(period => {
-                const group = groups[period.id];
-                if (!group) return;
-
-                const {
-                    hours
-                } = group;
-                const icon = dominantIcon(hours);
-                const minTemp = Math.min(...hours.map(h => h.temp));
-                const maxTemp = Math.max(...hours.map(h => h.temp));
-                const maxPop = Math.max(...hours.map(h => h.pop));
-                const avgWind = hours.reduce((a, h) => a + h.wind_speed, 0) / hours.length;
-                const faClass = FA_CLASSES[icon] || 'fa-cloud';
-                const isCurrent = period.id === currentPeriod.id;
-                const popPct = Math.round(maxPop * 100);
-
-                const card = document.createElement('article');
-                card.className = `period-card${isCurrent ? ' period-card--current' : ''}`;
-                const wetMeta = popPct > 2 ? ' period-card__meta--wet' : '';
-                card.innerHTML = `<h3 class="period-card__name">${period.label}</h3><i class="fa-solid fa-fw ${faClass} period-card__icon wx-icon--${icon}" aria-hidden="true"></i><data class="period-card__temp">${maxTemp}° / ${minTemp}°</data><p class="period-card__meta${wetMeta}"><i class="fa-solid fa-droplet" aria-hidden="true"></i>${popPct > 2 ? popPct + '%' : '-'}</p><p class="period-card__meta"><i class="fa-solid fa-wind" aria-hidden="true"></i>${toBft(avgWind)} bft</p>`;
-                container.appendChild(card);
+                const item = document.createElement('div');
+                item.className = `hourly-strip__item${isNow ? ' hourly-strip__item--now' : ''}`;
+                item.innerHTML = `<span class="hourly-strip__time">${isNow ? 'Now' : timeStr}</span><i class="fa-solid fa-fw ${faClass} hourly-strip__icon weather-icon--${h.icon}" aria-hidden="true"></i><span class="hourly-strip__temp">${h.temp}°</span><span class="hourly-strip__pop ${wetClass}"><i class="fa-solid fa-droplet" aria-hidden="true"></i>${popPct}%</span>`;
+                container.appendChild(item);
             });
         }
 
@@ -992,20 +964,20 @@
                         minute: '2-digit',
                         hour12: false
                     });
-                    return `<div class="hour-row"><time class="hour-row__time">${timeStr}</time><i class="fa-solid fa-fw ${faHour} hour-row__icon wx-icon--${h.icon}" aria-hidden="true"></i><data class="hour-row__temp">${h.temp}°</data><data class="hour-row__feel">feels ${h.feels_like}°</data><data class="hour-row__pop ${popPct > 1 ? 'hour-row__pop--wet' : 'hour-row__pop--dry'}" aria-label="${popPct}% precipitation chance">${popPct > 1 ? popPct + '%' : '-'}</data><data class="hour-row__wind">${toBft(h.wind_speed)} bft ${windDir(h.wind_deg)}</data><data class="hour-row__hum">${h.humidity}%</data></div>`;
+                    return `<div class="hour-row"><time class="hour-row__time">${timeStr}</time><i class="fa-solid fa-fw ${faHour} hour-row__icon weather-icon--${h.icon}" aria-hidden="true"></i><data class="hour-row__temp">${h.temp}°</data><data class="hour-row__feel">feels ${h.feels_like}°</data><data class="hour-row__pop ${popPct > 1 ? 'hour-row__pop--wet' : 'hour-row__pop--dry'}" aria-label="${popPct}% precipitation chance">${popPct > 1 ? popPct + '%' : '-'}</data><data class="hour-row__wind">${toBft(h.wind_speed)} bft ${windDir(h.wind_deg)}</data><data class="hour-row__hum">${h.humidity}%</data></div>`;
                 }).join('');
 
                 const details = document.createElement('details');
                 details.className = 'period-row';
                 if (isCurrentPeriod) details.open = true;
 
-                details.innerHTML = `<summary class="period-row__summary"><div class="period-row__label"><span class="period-row__name">${dayLabel} - ${period.label}</span><span class="period-row__time-range">${timeRange}</span></div><i class="fa-solid fa-fw ${faClass} period-row__icon wx-icon--${icon}" aria-hidden="true"></i><span class="period-row__temps"><data class="period-row__temp-max">${maxTemp}°</data><span class="period-row__temp-sep" aria-hidden="true">/</span><data class="period-row__temp-min">${minTemp}°</data></span><data class="period-row__pop" aria-label="${maxPop > 0.02 ? Math.round(maxPop*100)+'% precipitation chance' : 'no precipitation'}">${maxPop > 0.02 ? Math.round(maxPop * 100) + '%' : '-'}</data><data class="period-row__wind">${toBft(avgWind)} bft</data></summary><div class="period-row__hours">${hourRows}</div>`;
+                details.innerHTML = `<summary class="period-row__summary"><div class="period-row__label"><span class="period-row__name">${dayLabel} - ${period.label}</span><span class="period-row__time-range">${timeRange}</span></div><i class="fa-solid fa-fw ${faClass} period-row__icon weather-icon--${icon}" aria-hidden="true"></i><span class="period-row__temps"><data class="period-row__temp-max">${maxTemp}°</data><span class="period-row__temp-sep" aria-hidden="true">/</span><data class="period-row__temp-min">${minTemp}°</data></span><data class="period-row__pop" aria-label="${maxPop > 0.02 ? Math.round(maxPop*100)+'% precipitation chance' : 'no precipitation'}">${maxPop > 0.02 ? Math.round(maxPop * 100) + '%' : '-'}</data><data class="period-row__wind">${toBft(avgWind)} bft</data></summary><div class="period-row__hours">${hourRows}</div>`;
 
                 container.appendChild(details);
             });
         }
 
-        buildTodayCards(document.getElementById('overview-period-cards'));
+        buildHourlyStrip(document.getElementById('overview-hourly-strip'));
         activateTabFromHash();
 
         let mapInstance = null;
@@ -1031,10 +1003,10 @@
         }
 
         function buildMap() {
-            const mapEl = document.getElementById('wx-map');
+            const mapEl = document.getElementById('weather-map');
             if (!mapEl || mapInstance) return;
 
-            mapInstance = L.map('wx-map').setView([MAP_LAT, MAP_LON], 9);
+            mapInstance = L.map('weather-map').setView([MAP_LAT, MAP_LON], 9);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -1043,7 +1015,7 @@
 
             mapOverlayLayer = L.tileLayer(
                 `/tiles/${currentLayer}/{z}/{x}/{y}.png`, {
-                    opacity: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--wx-map-overlay-opacity')) || 0.6,
+                    opacity: 0.6,
                     attribution: '© <a href="https://openweathermap.org/">OpenWeatherMap</a>'
                 }
             ).addTo(mapInstance);
@@ -1062,7 +1034,7 @@
                     if (mapOverlayLayer) mapInstance.removeLayer(mapOverlayLayer);
                     mapOverlayLayer = L.tileLayer(
                         `/tiles/${currentLayer}/{z}/{x}/{y}.png`, {
-                            opacity: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--wx-map-overlay-opacity')) || 0.6,
+                            opacity: 0.6,
                             attribution: '© <a href="https://openweathermap.org/">OpenWeatherMap</a>'
                         }
                     ).addTo(mapInstance);

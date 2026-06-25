@@ -144,4 +144,15 @@
     --color-orange-7: #f76707;
     --color-orange-8: #e8590c;
     --color-orange-9: #d9480f;
+
+    --color-white-10: rgba(255, 255, 255, 0.1);
+    --color-white-15: rgba(255, 255, 255, 0.15);
+    --color-white-30: rgba(255, 255, 255, 0.3);
+    --color-white-55: rgba(255, 255, 255, 0.55);
+    --color-white-72: rgba(255, 255, 255, 0.72);
+    --color-white-80: rgba(255, 255, 255, 0.8);
+    --color-white-85: rgba(255, 255, 255, 0.85);
+    --color-white-95: rgba(255, 255, 255, 0.95);
+
+    --color-black-22: rgba(0, 0, 0, 0.22);
 }

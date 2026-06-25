@@ -130,6 +130,11 @@
             {% block extra_scripts %}
                 <script>
                     (function() {
+                        setupSearchDropdown(
+                            document.getElementById('city-search-input'),
+                            document.getElementById('city-search-results')
+                        );
+
                         const geoBtn = document.getElementById('home-geo-btn');
                         if (geoBtn) {
                             geoBtn.addEventListener('click', function() {

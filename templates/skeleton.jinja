@@ -82,6 +82,32 @@
             {% block content %}{% endblock %}
         </main>
 
+        <dialog class="shortcuts-modal" id="shortcuts-modal" aria-label="Keyboard shortcuts">
+            <div class="shortcuts-modal__inner">
+                <div class="shortcuts-modal__header">
+                    <h2 class="shortcuts-modal__title">Keyboard shortcuts</h2>
+                    <button class="shortcuts-modal__close" autofocus aria-label="Close">
+                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <dl class="shortcuts-modal__list">
+                    <div class="shortcuts-modal__item">
+                        <dt><kbd>/</kbd></dt>
+                        <dd>Focus search</dd>
+                    </div>
+                    <div class="shortcuts-modal__item">
+                        <dt><kbd>←</kbd> <kbd>→</kbd></dt>
+                        <dd>Navigate weather tabs</dd>
+                    </div>
+                    <div class="shortcuts-modal__item">
+                        <dt><kbd>?</kbd></dt>
+                        <dd>Show this help</dd>
+                    </div>
+                </dl>
+            </div>
+        </dialog>
+
+
         <script>
             document.addEventListener("htmx:beforeSwap", function(e) {
                 var status = e.detail.xhr.status;
@@ -110,20 +136,80 @@
                 if (titleEl?.dataset.title) document.title = titleEl.dataset.title + " - Outflow";
             });
 
-            const headerInput = document.querySelector(".header-search__input");
-            if (headerInput) {
-                const headerDropdown = document.querySelector(".header-search__dropdown");
-                headerInput.addEventListener("blur", () => setTimeout(() => {
-                    if (!headerInput.matches(":focus")) headerDropdown.hidden = true;
+            function setupSearchDropdown(inputEl, dropdownEl) {
+                if (!inputEl || !dropdownEl) return;
+
+                function getItems() {
+                    return Array.from(dropdownEl.querySelectorAll("a"));
+                }
+
+                inputEl.addEventListener("keydown", (e) => {
+                    const items = getItems();
+                    if (!items.length) return;
+                    if (e.key === "ArrowDown" || (e.key === "Tab" && !e.shiftKey)) {
+                        e.preventDefault();
+                        items[0].focus();
+                    } else if (e.key === "Escape") {
+                        dropdownEl.hidden = true;
+                        inputEl.focus();
+                    }
+                });
+
+                dropdownEl.addEventListener("keydown", (e) => {
+                    const items = getItems();
+                    const idx = items.indexOf(document.activeElement);
+                    if (idx === -1) return;
+                    if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        if (idx < items.length - 1) items[idx + 1].focus();
+                    } else if (e.key === "ArrowUp") {
+                        e.preventDefault();
+                        if (idx > 0) items[idx - 1].focus();
+                        else inputEl.focus();
+                    } else if (e.key === "Escape") {
+                        e.preventDefault();
+                        dropdownEl.hidden = true;
+                        inputEl.focus();
+                    }
+                });
+
+                inputEl.addEventListener("blur", () => setTimeout(() => {
+                    if (!inputEl.matches(":focus") && !dropdownEl.contains(document.activeElement)) {
+                        dropdownEl.hidden = true;
+                    }
                 }, 150));
-                headerInput.addEventListener("focus", () => {
-                    headerDropdown.hidden = false;
+
+                inputEl.addEventListener("focus", () => {
+                    if (getItems().length) dropdownEl.hidden = false;
                 });
             }
 
+            const headerInput = document.querySelector(".header-search__input");
+            if (headerInput) {
+                const headerDropdown = document.querySelector(".header-search__dropdown");
+                setupSearchDropdown(headerInput, headerDropdown);
+            }
+
+            const shortcutsModal = document.getElementById("shortcuts-modal");
+            shortcutsModal.querySelector(".shortcuts-modal__close").addEventListener("click", () => shortcutsModal.close());
+            shortcutsModal.addEventListener("click", (e) => { if (e.target === shortcutsModal) shortcutsModal.close(); });
+
+            document.addEventListener("keydown", (e) => {
+                const tag = document.activeElement.tagName;
+                const editable = tag === "INPUT" || tag === "TEXTAREA" || document.activeElement.isContentEditable;
+                if (e.ctrlKey || e.metaKey || e.altKey) return;
+                if (e.key === "/" && !editable) {
+                    e.preventDefault();
+                    headerInput?.focus();
+                } else if (e.key === "?" && !editable) {
+                    e.preventDefault();
+                    shortcutsModal.showModal();
+                }
+            });
+
             document.addEventListener("htmx:afterSwap", (e) => {
                 const t = e.detail.target;
-                if (t.classList.contains("city-search__dropdown") || t.classList.contains("header-search__dropdown")) {
+                if (t.classList.contains("city-search__dropdown") || t.classList.contains("header-search__dropdown") || t.classList.contains("home__search-dropdown")) {
                     t.hidden = false;
                 }
             });

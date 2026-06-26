@@ -220,6 +220,18 @@
                 } else if (e.key === "?" && !editable) {
                     e.preventDefault();
                     shortcutsModal.showModal();
+                } else if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && !editable) {
+                    const tablist = document.getElementById("weather-tablist");
+                    if (!tablist) return;
+                    const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+                    const activeIdx = tabs.findIndex(t => t.getAttribute("aria-selected") === "true");
+                    if (activeIdx === -1) return;
+                    e.preventDefault();
+                    const next = e.key === "ArrowRight"
+                        ? tabs[(activeIdx + 1) % tabs.length]
+                        : tabs[(activeIdx - 1 + tabs.length) % tabs.length];
+                    next.focus();
+                    next.click();
                 }
             });
 

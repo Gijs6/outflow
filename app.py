@@ -265,6 +265,7 @@ def weather_island(place_id):
     hourly_forecast = results["hourly_forecast"]
     daily_16 = results["daily_16"]
     minutely = (data or {}).get("minutely")
+
     def alert_sort_key(a):
         ev = (a.get("event") or "").lower().strip()
         if ev[:7] == "extreme":

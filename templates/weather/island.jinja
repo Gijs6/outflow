@@ -179,16 +179,15 @@
             {% endif %}
 
             {% if alerts %}
-                {% set _ns = namespace(level='moderate') %}
-                {% for _a in alerts %}
-                    {% set _ev = _a.event | lower | trim %}
-                    {% if _ev[:7] == 'extreme' %}
-                        {% set _ns.level = "extreme" %}
-                    {% elif _ns.level != 'extreme' and _ev[:8] != 'moderate' %}
-                        {% set _ns.level = "severe" %}
-                    {% endif %}
-                {% endfor %}
-                <div class="weather-hero__alert-strip weather-hero__alert-strip--{{ _ns.level }}"
+                {% set ev0 = alerts[0].event | lower | trim %}
+                {% if ev0[:7] == 'extreme' %}
+                    {% set strip_level = "extreme" %}
+                {% elif ev0[:8] == 'moderate' %}
+                    {% set strip_level = "moderate" %}
+                {% else %}
+                    {% set strip_level = "severe" %}
+                {% endif %}
+                <div class="weather-hero__alert-strip weather-hero__alert-strip--{{ strip_level }}"
                      role="alert">
                     <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
                     <span>{{ alerts[0].event }}
@@ -242,7 +241,7 @@
                             aria-selected="false"
                             aria-controls="tab-panel-alerts"
                             tabindex="-1"
-                            class="weather-tab weather-tab--alert weather-tab--alert-{{ _ns.level }}"
+                            class="weather-tab weather-tab--alert weather-tab--alert-{{ strip_level }}"
                             data-tab="alerts">
                         Alerts
                         <span class="weather-tab__badge" aria-label="{{ alerts | length }} alerts">{{ alerts | length }}</span>
@@ -633,15 +632,15 @@
                  hidden>
             <div class="alerts-list">
                 {% for alert in alerts %}
-                    {% set _ev = alert.event | lower | trim %}
-                    {% if _ev[:8] == 'moderate' %}
-                        {% set _level = "moderate" %}
-                    {% elif _ev[:7] == 'extreme' %}
-                        {% set _level = "extreme" %}
+                    {% set ev = alert.event | lower | trim %}
+                    {% if ev[:8] == 'moderate' %}
+                        {% set level = "moderate" %}
+                    {% elif ev[:7] == 'extreme' %}
+                        {% set level = "extreme" %}
                     {% else %}
-                        {% set _level = "severe" %}
+                        {% set level = "severe" %}
                     {% endif %}
-                    <article class="alert-card alert-card--{{ _level }}">
+                    <article class="alert-card alert-card--{{ level }}">
                         <header class="alert-card__header">
                             <h2 class="alert-card__event">
                                 <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>

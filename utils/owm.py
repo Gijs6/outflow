@@ -9,12 +9,12 @@ OWM_BASE = "https://api.openweathermap.org"
 OWM_PRO_BASE = "https://pro.openweathermap.org"
 
 
-def _debug_log(response, *args, **kwargs):
+def debug_log(response, *args, **kwargs):
     print(f"[OWM] {response.request.method} {response.url}", flush=True)
 
 
 session = requests.Session()
-session.hooks["response"].append(_debug_log)
+session.hooks["response"].append(debug_log)
 
 
 def api_key():

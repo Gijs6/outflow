@@ -41,7 +41,7 @@ load_dotenv(override=True)
 app = Flask(__name__)
 
 
-def _secret_key():
+def get_secret_key():
     if key := os.getenv("SECRET_KEY"):
         return key
     key_path = os.path.join(os.path.dirname(__file__), "data", ".secret_key")
@@ -55,7 +55,7 @@ def _secret_key():
     return key
 
 
-app.secret_key = _secret_key()
+app.secret_key = get_secret_key()
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=365)
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
@@ -64,15 +64,15 @@ owm_module.DEBUG = app.debug
 
 
 @app.before_request
-def _make_session_permanent():
+def make_session_permanent():
     session.permanent = True
 
 
-_OWM_TILE_LAYERS = frozenset(
+OWM_TILE_LAYERS = frozenset(
     {"precipitation_new", "temp_new", "clouds_new", "wind_new", "pressure_new"}
 )
 
-_SUGGESTED_CITIES = [
+SUGGESTED_CITIES = [
     {
         "name": "Amsterdam",
         "country": "Netherlands",
@@ -100,7 +100,7 @@ _SUGGESTED_CITIES = [
 
 @app.route("/tiles/<layer>/<int:z>/<int:x>/<int:y>.png")
 def weather_tile(layer, z, x, y):
-    if layer not in _OWM_TILE_LAYERS:
+    if layer not in OWM_TILE_LAYERS:
         abort(404)
     try:
         resp = owm_session.get(
@@ -129,7 +129,7 @@ def service_worker():
 def index():
     recent = session.get("recent_places", [])
     favs = session.get("favourite_places", [])
-    suggested = _SUGGESTED_CITIES if not recent and not favs else []
+    suggested = SUGGESTED_CITIES if not recent and not favs else []
     stats = db_stats()
     return render_template(
         "index.jinja",
@@ -205,6 +205,12 @@ def search():
         except Exception as e:
             error = str(e)
 
+    if not error and len(places) == 1:
+        target = url_for("weather", place_id=places[0]["place_id"])
+        if is_htmx:
+            return Response(status=204, headers={"HX-Redirect": target})
+        return redirect(target)
+
     if is_htmx:
         return render_template(
             "search_results.jinja", places=places, query=query, error=error
@@ -259,7 +265,17 @@ def weather_island(place_id):
     hourly_forecast = results["hourly_forecast"]
     daily_16 = results["daily_16"]
     minutely = (data or {}).get("minutely")
-    alerts = (data or {}).get("alerts") or []
+    def alert_sort_key(a):
+        ev = (a.get("event") or "").lower().strip()
+        if ev[:7] == "extreme":
+            level = 0
+        elif ev[:8] == "moderate":
+            level = 2
+        else:
+            level = 1
+        return (level, a.get("start") or 0)
+
+    alerts = sorted((data or {}).get("alerts") or [], key=alert_sort_key)
 
     country_code = location.get("country")
     country = pycountry.countries.get(alpha_2=country_code) if country_code else None

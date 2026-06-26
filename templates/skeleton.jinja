@@ -227,9 +227,9 @@
                     const activeIdx = tabs.findIndex(t => t.getAttribute("aria-selected") === "true");
                     if (activeIdx === -1) return;
                     e.preventDefault();
-                    const next = e.key === "ArrowRight"
-                        ? tabs[(activeIdx + 1) % tabs.length]
-                        : tabs[(activeIdx - 1 + tabs.length) % tabs.length];
+                    const next = e.key === "ArrowRight" ?
+                        tabs[(activeIdx + 1) % tabs.length] :
+                        tabs[(activeIdx - 1 + tabs.length) % tabs.length];
                     next.focus();
                     next.click();
                 }

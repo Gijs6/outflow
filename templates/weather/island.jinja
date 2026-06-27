@@ -654,7 +654,8 @@
                                 <div class="alert-timeline__row">
                                     <a class="alert-timeline__bar alert-timeline__bar--{{ seg_level }}"
                                        href="#alert-{{ alert.start }}"
-                                       style="left: {{ seg_left }}%; width: {{ seg_width }}%">
+                                       style="left: {{ seg_left }}%;
+                                              width: {{ seg_width }}%">
                                         <span class="alert-timeline__bar-inner">
                                             <span class="alert-timeline__bar-time">{{ alert.start | strftime('%H:%M', tz) }}</span>
                                             <span class="alert-timeline__bar-name">{{ alert.event }}</span>
@@ -667,7 +668,9 @@
                                     </a>
                                 </div>
                             {% endfor %}
-                            <div class="alert-timeline__now" style="left: {{ now_pct }}%" aria-hidden="true">
+                            <div class="alert-timeline__now"
+                                 style="left: {{ now_pct }}%"
+                                 aria-hidden="true">
                                 <span class="alert-timeline__now-label">Now</span>
                             </div>
                         </div>
@@ -686,7 +689,8 @@
                     {% else %}
                         {% set level = "severe" %}
                     {% endif %}
-                    <article class="alert-card alert-card--{{ level }}" id="alert-{{ alert.start }}">
+                    <article class="alert-card alert-card--{{ level }}"
+                             id="alert-{{ alert.start }}">
                         <header class="alert-card__header">
                             <h2 class="alert-card__event">
                                 <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>

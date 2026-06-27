@@ -1019,7 +1019,9 @@
 
     .hour-row__pop--wet {
         color: var(--color-blue-5);
-        i { font-size: 0.8em; }
+        i {
+            font-size: 0.8em;
+        }
     }
 
     .hour-row__pop--dry {
@@ -1032,7 +1034,9 @@
 
     .hour-row__hum {
         color: var(--color-gray-7);
-        i { font-size: 0.8em; }
+        i {
+            font-size: 0.8em;
+        }
     }
 }
 
@@ -1499,8 +1503,15 @@
 
     z-index: 0;
 
-    &:hover { filter: brightness(0.92); z-index: 2; }
-    &:focus-visible { outline: 2px solid var(--color-blue-5); outline-offset: 2px; z-index: 2; }
+    &:hover {
+        filter: brightness(0.92);
+        z-index: 2;
+    }
+    &:focus-visible {
+        outline: 2px solid var(--color-blue-5);
+        outline-offset: 2px;
+        z-index: 2;
+    }
 
     &:hover .alert-timeline__tooltip,
     &:focus .alert-timeline__tooltip {
@@ -1563,7 +1574,6 @@
     flex: 1;
     text-align: center;
 }
-
 
 .alert-timeline__now {
     position: absolute;

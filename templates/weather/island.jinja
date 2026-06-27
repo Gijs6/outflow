@@ -631,6 +631,52 @@
                  class="weather-panel"
                  hidden>
             <div class="alerts-list">
+                {% set now_ts = weather.current.dt %}
+                {% set win_start = [alerts | map(attribute='start') | min, now_ts] | min %}
+                {% set win_end = [alerts | map(attribute='end') | max, now_ts] | max %}
+                {% set win_dur = win_end - win_start %}
+                {% if win_dur > 0 %}
+                    {% set now_pct = ((now_ts - win_start) / win_dur * 100) | round(1) %}
+                    <div class="alert-timeline" aria-label="Alert schedule">
+                        <div class="alert-timeline__tracks">
+                            {% for alert in alerts | sort(attribute='start') %}
+                                {% set ev2 = alert.event | lower | trim %}
+                                {% if ev2[:8] == 'moderate' %}
+                                    {% set seg_level = "moderate" %}
+                                {% elif ev2[:7] == 'extreme' %}
+                                    {% set seg_level = "extreme" %}
+                                {% else %}
+                                    {% set seg_level = "severe" %}
+                                {% endif %}
+                                {% set seg_left = ((alert.start - win_start) / win_dur * 100) | round(1) %}
+                                {% set seg_width = ((alert.end - alert.start) / win_dur * 100) | round(1) %}
+                                {% set seg_right = (seg_left + seg_width) | round(1) %}
+                                <div class="alert-timeline__row">
+                                    <a class="alert-timeline__bar alert-timeline__bar--{{ seg_level }}"
+                                       href="#alert-{{ alert.start }}"
+                                       style="left: {{ seg_left }}%; width: {{ seg_width }}%">
+                                        <span class="alert-timeline__bar-inner">
+                                            <span class="alert-timeline__bar-time">{{ alert.start | strftime('%H:%M', tz) }}</span>
+                                            <span class="alert-timeline__bar-name">{{ alert.event }}</span>
+                                            <span class="alert-timeline__bar-time">{{ alert.end | strftime('%H:%M', tz) }}</span>
+                                        </span>
+                                        <span class="alert-timeline__tooltip" aria-hidden="true">
+                                            <strong>{{ alert.event }}</strong>
+                                            <span>{{ alert.start | strftime('%a %-d %b %H:%M', tz) }} – {{ alert.end | strftime('%a %-d %b %H:%M', tz) }}</span>
+                                        </span>
+                                    </a>
+                                </div>
+                            {% endfor %}
+                            <div class="alert-timeline__now" style="left: {{ now_pct }}%" aria-hidden="true">
+                                <span class="alert-timeline__now-label">Now</span>
+                            </div>
+                        </div>
+                        <div class="alert-timeline__axis" aria-hidden="true">
+                            <span>{{ win_start | strftime("%a %-d %b %H:%M", tz) }}</span>
+                            <span>{{ win_end | strftime("%a %-d %b %H:%M", tz) }}</span>
+                        </div>
+                    </div>
+                {% endif %}
                 {% for alert in alerts %}
                     {% set ev = alert.event | lower | trim %}
                     {% if ev[:8] == 'moderate' %}
@@ -640,7 +686,7 @@
                     {% else %}
                         {% set level = "severe" %}
                     {% endif %}
-                    <article class="alert-card alert-card--{{ level }}">
+                    <article class="alert-card alert-card--{{ level }}" id="alert-{{ alert.start }}">
                         <header class="alert-card__header">
                             <h2 class="alert-card__event">
                                 <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
@@ -900,10 +946,11 @@
                     minute: '2-digit'
                 });
                 const wetClass = popPct > 2 ? 'hourly-strip__pop--wet' : 'hourly-strip__pop--dry';
+                const popContent = popPct > 2 ? `<i class="fa-solid fa-droplet" aria-hidden="true"></i>${popPct}%` : '—';
 
                 const item = document.createElement('div');
                 item.className = `hourly-strip__item${isNow ? ' hourly-strip__item--now' : ''}`;
-                item.innerHTML = `<span class="hourly-strip__time">${isNow ? 'Now' : timeStr}</span><i class="fa-solid fa-fw ${faClass} hourly-strip__icon weather-icon--${h.icon}" aria-hidden="true"></i><span class="hourly-strip__temp">${h.temp}°</span><span class="hourly-strip__pop ${wetClass}"><i class="fa-solid fa-droplet" aria-hidden="true"></i>${popPct}%</span>`;
+                item.innerHTML = `<span class="hourly-strip__time">${isNow ? 'Now' : timeStr}</span><i class="fa-solid fa-fw ${faClass} hourly-strip__icon weather-icon--${h.icon}" aria-hidden="true"></i><span class="hourly-strip__temp">${h.temp}°</span><span class="hourly-strip__pop ${wetClass}">${popContent}</span>`;
                 container.appendChild(item);
             });
         }
@@ -979,14 +1026,15 @@
                         minute: '2-digit',
                         hour12: false
                     });
-                    return `<div class="hour-row"><time class="hour-row__time">${timeStr}</time><i class="fa-solid fa-fw ${faHour} hour-row__icon weather-icon--${h.icon}" aria-hidden="true"></i><data class="hour-row__temp">${h.temp}°</data><data class="hour-row__feel">feels ${h.feels_like}°</data><data class="hour-row__pop ${popPct > 1 ? 'hour-row__pop--wet' : 'hour-row__pop--dry'}" aria-label="${popPct}% precipitation chance">${popPct > 1 ? popPct + '%' : '-'}</data><data class="hour-row__wind">${toBft(h.wind_speed)} bft ${windDir(h.wind_deg)}</data><data class="hour-row__hum">${h.humidity}%</data></div>`;
+                    const hourPopHtml = popPct > 1 ? `<i class="fa-solid fa-droplet" aria-hidden="true"></i>${popPct}%` : '—';
+                    return `<div class="hour-row"><time class="hour-row__time">${timeStr}</time><i class="fa-solid fa-fw ${faHour} hour-row__icon weather-icon--${h.icon}" aria-hidden="true"></i><data class="hour-row__temp">${h.temp}°</data><data class="hour-row__feel">feels ${h.feels_like}°</data><data class="hour-row__pop ${popPct > 1 ? 'hour-row__pop--wet' : 'hour-row__pop--dry'}" aria-label="${popPct}% precipitation chance">${hourPopHtml}</data><data class="hour-row__wind">${toBft(h.wind_speed)} bft ${windDir(h.wind_deg)}</data><data class="hour-row__hum"><i class="fa-solid fa-water" aria-hidden="true"></i>${h.humidity}%</data></div>`;
                 }).join('');
 
                 const details = document.createElement('details');
                 details.className = 'period-row';
                 if (isCurrentPeriod) details.open = true;
 
-                details.innerHTML = `<summary class="period-row__summary"><div class="period-row__label"><span class="period-row__name">${dayLabel} - ${period.label}</span><span class="period-row__time-range">${timeRange}</span></div><i class="fa-solid fa-fw ${faClass} period-row__icon weather-icon--${icon}" aria-hidden="true"></i><span class="period-row__temps"><data class="period-row__temp-max">${maxTemp}°</data><span class="period-row__temp-sep" aria-hidden="true">/</span><data class="period-row__temp-min">${minTemp}°</data></span><data class="period-row__pop" aria-label="${maxPop > 0.02 ? Math.round(maxPop*100)+'% precipitation chance' : 'no precipitation'}">${maxPop > 0.02 ? Math.round(maxPop * 100) + '%' : '-'}</data><data class="period-row__wind">${toBft(avgWind)} bft</data></summary><div class="period-row__hours">${hourRows}</div>`;
+                details.innerHTML = `<summary class="period-row__summary"><div class="period-row__label"><span class="period-row__name">${dayLabel} - ${period.label}</span><span class="period-row__time-range">${timeRange}</span></div><i class="fa-solid fa-fw ${faClass} period-row__icon weather-icon--${icon}" aria-hidden="true"></i><span class="period-row__temps"><data class="period-row__temp-max">${maxTemp}°</data><span class="period-row__temp-sep" aria-hidden="true">/</span><data class="period-row__temp-min">${minTemp}°</data></span><data class="period-row__pop" aria-label="${maxPop > 0.02 ? Math.round(maxPop*100)+'% precipitation chance' : 'no precipitation'}">${maxPop > 0.02 ? `<i class="fa-solid fa-droplet" aria-hidden="true"></i>${Math.round(maxPop * 100)}%` : '—'}</data><data class="period-row__wind">${toBft(avgWind)} bft</data></summary><div class="period-row__hours">${hourRows}</div>`;
 
                 container.appendChild(details);
             });

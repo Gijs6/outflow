@@ -64,7 +64,7 @@
                                     {% if place.state or place.country %}
                                         <span class="home__place-meta">
                                             {%- if place.state -%}{{ place.state }}{%- endif -%}
-                                                {%- if place.state and place.country -%}, {%- endif -%}
+                                                {%- if place.state and place.country -%}, {% endif -%}
                                                     {%- if place.country -%}{{ place.country }}{%- endif -%}
                                                     </span>
                                                 {% endif %}

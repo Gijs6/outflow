@@ -168,26 +168,28 @@
                     Rain from about {{ ns.first }} to {{ ns.last + 1 }} min, up to {{ "%.1f" | format(ns.max_p) }} mm/h
                 {% endif %}
             </p>
-            <div class="rain__strip" aria-hidden="true">
-                {% for m in minutely %}
-                    {% set p = m.precipitation %}
-                    {% if p <= 0 %}
-                        {% set level = 0 %}
-                    {% elif p < 0.5 %}
-                        {% set level = 1 %}
-                    {% elif p < 2 %}
-                        {% set level = 2 %}
-                    {% elif p < 5 %}
-                        {% set level = 3 %}
-                    {% else %}
-                        {% set level = 4 %}
-                    {% endif %}
-                    <span class="rain__seg" data-level="{{ level }}"></span>
-                {% endfor %}
-            </div>
-            <div class="rain__axis" aria-hidden="true">
-                <span>now</span><span>+30 min</span><span>+60 min</span>
-            </div>
+            {% if ns.first != -1 %}
+                <div class="rain__strip" aria-hidden="true">
+                    {% for m in minutely %}
+                        {% set p = m.precipitation %}
+                        {% if p <= 0 %}
+                            {% set level = 0 %}
+                        {% elif p < 0.5 %}
+                            {% set level = 1 %}
+                        {% elif p < 2 %}
+                            {% set level = 2 %}
+                        {% elif p < 5 %}
+                            {% set level = 3 %}
+                        {% else %}
+                            {% set level = 4 %}
+                        {% endif %}
+                        <span class="rain__seg" data-level="{{ level }}"></span>
+                    {% endfor %}
+                </div>
+                <div class="rain__axis" aria-hidden="true">
+                    <span>now</span><span>+30 min</span><span>+60 min</span>
+                </div>
+            {% endif %}
         </section>
     {% endif %}
 

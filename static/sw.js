@@ -1,5 +1,5 @@
-const CACHE = "outflow-v1";
-const STATIC = ["/static/styles/main.min.css", "/static/vendor/htmx.min.js", "/static/images/logo-white.svg", "/static/images/icon-192.png", "/static/images/icon-512.png", "/static/favicon.ico"];
+const CACHE = "outflow-v2";
+const STATIC = ["/static/styles/app.min.css", "/static/js/icons.js", "/static/vendor/htmx.min.js", "/static/images/icon-192.png", "/static/images/icon-512.png", "/static/favicon.svg", "/static/favicon.ico"];
 
 self.addEventListener("install", (e) => {
     e.waitUntil(caches.open(CACHE).then((c) => c.addAll(STATIC)));

@@ -1,65 +1,92 @@
-{% extends "skeleton.jinja" %}
+{% extends "base.jinja" %}
+
+{% from "_macros.jinja" import icon %}
 
 {% block title %}{{ query }} - Search{% endblock %}
 
 {% block content %}
-    <div class="city-search">
-        <label for="city-search-input" class="city-search__label">Search for a city</label>
-        <div class="city-search__field">
-            <i class="fa-solid fa-fw fa-magnifying-glass city-search__icon"
-               aria-hidden="true"></i>
+    <div class="page-head">
+        <h1>Search</h1>
+    </div>
+
+    <div class="search-page">
+        <div class="search-page__field">
             <form action="{{ url_for('search') }}"
                   method="get"
-                  class="city-search__form">
-                <input id="city-search-input"
-                       class="city-search__input"
+                  role="search"
+                  aria-label="Place search"
+                  class="home__search-form input-affix">
+                {{ icon("search") }}
+                <label for="search-page-input" class="visually-hidden">Search for a place</label>
+                <input id="search-page-input"
+                       class="field__control field__control--full"
                        type="search"
                        name="q"
                        value="{{ query }}"
-                       placeholder="Amsterdam, London, New York…"
+                       placeholder="Amsterdam, London, New York"
                        autocomplete="off"
                        aria-autocomplete="list"
-                       aria-controls="city-search-results"
+                       aria-controls="search-page-dropdown"
                        hx-get="{{ url_for('search') }}"
                        hx-trigger="input changed delay:300ms"
-                       hx-target="#city-search-results"
-                       hx-indicator="#city-search-spinner" />
+                       hx-target="#search-page-dropdown"
+                       hx-indicator="#search-page-status" />
             </form>
-            <span id="city-search-spinner"
-                  class="city-search__spinner htmx-indicator"
-                  aria-hidden="true"></span>
-            <div id="city-search-results" class="city-search__dropdown" role="listbox"></div>
+            <span id="search-page-status"
+                  class="htmx-indicator search-page__status"
+                  aria-hidden="true">Searching</span>
+            <div id="search-page-dropdown"
+                 class="search-page__dropdown search-dropdown-wrap"
+                 role="listbox"></div>
+        </div>
+
+        <div class="search-page__results">
+            {% if query %}
+                {% if error %}
+                    <div class="notice notice--danger">
+                        {{ icon('triangle-alert', 'notice__icon') }}
+                        <div class="notice__body">Search is unavailable right now.</div>
+                    </div>
+                {% elif places %}
+                    <p class="search-page__count">{{ places | length }} result{{ 's' if places | length != 1 }}</p>
+                    <ul class="row-list" role="list">
+                        {% for place in places %}
+                            <li>
+                                <a href="{{ url_for('weather', place_id=place.place_id) }}"
+                                   class="row-list__row">
+                                    <span class="row-list__main"><span class="row-list__name">{{ place.name }}</span></span>
+                                    <span class="row-list__meta{% if place.is_direct %} row-list__meta--direct{% endif %}">
+                                        {%- if place.is_direct -%}
+                                            {{ icon("map-pin") }} Coordinates
+                                        {%- elif place.state -%}
+                                            {{ place.state }}, {{ place.country }}
+                                        {%- else -%}
+                                            {{ place.country }}
+                                        {%- endif -%}
+                                    </span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="empty empty--framed">
+                        {{ icon('search', 'empty__icon') }}
+                        <p class="empty__title">No results</p>
+                        <p class="empty__text">Nothing matched "{{ query }}". Try a different place or a pair of coordinates.</p>
+                    </div>
+                {% endif %}
+            {% endif %}
         </div>
     </div>
+{% endblock %}
 
-    <div class="search-results">
-        {% if query %}
-            {% if error %}
-                <p class="search-results__error">Search unavailable: {{ error }}</p>
-            {% elif places %}
-                <p class="search-results__count">{{ places|length }} result{{ 's' if places|length != 1 }}</p>
-                <ul class="search-results__list">
-                    {% for place in places %}
-                        <li>
-                            <a href="{{ url_for('weather', place_id=place.place_id) }}"
-                               class="search-results__result">
-                                <span class="search-results__result-name">{{ place.name }}</span>
-                                <span class="search-results__result-meta{% if place.is_direct %} search-results__result-meta--direct{% endif %}">
-                                    {%- if place.is_direct -%}
-                                        <i class="fa-solid fa-fw fa-location-dot" aria-hidden="true"></i> Coordinates
-                                    {%- elif place.state -%}
-                                        {{ place.state }}, {{ place.country }}
-                                    {%- else -%}
-                                        {{ place.country }}
-                                    {%- endif -%}
-                                </span>
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="search-results__empty">No results for "{{ query }}"</p>
-            {% endif %}
-        {% endif %}
-    </div>
+{% block extra_scripts %}
+    <script>
+        (function() {
+            setupSearchDropdown(
+                document.getElementById("search-page-input"),
+                document.getElementById("search-page-dropdown")
+            );
+        }());
+    </script>
 {% endblock %}

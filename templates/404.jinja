@@ -1,13 +1,15 @@
 {% extends "skeleton.jinja" %}
 
-{% block title %}Page not found{% endblock %}
+{% from "_macros.jinja" import icon %}
 
-{% block content %}
-    <section class="error-page" aria-labelledby="error-title">
-        <i class="fa-solid fa-fw fa-circle-question error-page__icon"
-           aria-hidden="true"></i>
-        <h1 class="error-page__title" id="error-title">Page not found</h1>
-        <p class="error-page__message">The page you're looking for doesn't exist.</p>
-        <a href="{{ url_for('index') }}" class="button">Go home</a>
-    </section>
+{% block title %}Not found{% endblock %}
+{% block body_class %}page page--bare{% endblock %}
+
+{% block body_content %}
+    <main class="page__main">
+        <p class="error__code">404</p>
+        <h1>Not found</h1>
+        <p class="lead">The page you are looking for does not exist.</p>
+        <a href="{{ url_for('index') }}" class="button">{{ icon("cloud-sun") }} Go home</a>
+    </main>
 {% endblock %}

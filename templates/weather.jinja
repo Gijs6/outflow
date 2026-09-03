@@ -1,12 +1,15 @@
-{% extends "skeleton.jinja" %}
+{% extends "base.jinja" %}
+
+{% from "_macros.jinja" import icon %}
 
 {% block title %}Weather{% endblock %}
 
 {% block content %}
     <section id="weather-island"
-             class="island weather-page-island"
+             class="island island--loading"
              hx-get="{{ island_url }}"
              hx-trigger="load"
              hx-swap="innerHTML">
+        <p class="island__loading">{{ icon("cloud-sun") }} Loading weather</p>
     </section>
 {% endblock %}

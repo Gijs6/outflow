@@ -5,6 +5,8 @@ setup() {
   i:venv
   i:npm_install
   i:vendor htmx.org/dist/htmx.min.js
+  i:vendor leaflet/dist/leaflet.js
+  i:vendor leaflet/dist/leaflet.css
   .venv/bin/python scripts/import_geonames.py
 }
 

@@ -1,266 +1,61 @@
+{% from "_macros.jinja" import icon %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>{%- block title -%}{%- endblock %} - Outlow</title>
+        <title>{%- block title -%}{%- endblock %} - Outflow</title>
         <meta name="description" content="A simple weather app" />
-        <meta name="theme-color" content="#ff922b" />
+        <meta name="theme-color" content="#0f766e" />
 
-        <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
-
-        <link rel="license" href="https://unlicense.org/" />
-        <link rel="robots" href="/robots.txt" />
-        <link rel="security" href="/.well-known/security.txt" />
-
+        <link rel="icon"
+              href="{{ url_for('static', filename='favicon.svg') }}"
+              type="image/svg+xml" />
+        <link rel="alternate icon"
+              href="{{ url_for('static', filename='favicon.ico') }}" />
         <link rel="manifest"
               href="{{ url_for('static', filename='manifest.json') }}" />
 
+        <link rel="stylesheet" href="https://cdn.gijs6.nl/theme/v1/all.css" />
+        <link rel="stylesheet" href="https://cdn.gijs6.nl/theme/v1/accent/teal.css" />
         {% if config.DEBUG %}
             <link rel="stylesheet"
-                  href="{{ url_for('static', filename='styles/skeleton.css') }}" />
-            <link rel="stylesheet"
-                  href="{{ url_for('static', filename='styles/colors.css') }}" />
-            <link rel="stylesheet"
-                  href="{{ url_for('static', filename='styles/theming.css') }}" />
-            <link rel="stylesheet"
-                  href="{{ url_for('static', filename='styles/base.css') }}" />
-            <link rel="stylesheet"
-                  href="{{ url_for('static', filename='styles/islands.css') }}" />
-            <link rel="stylesheet"
-                  href="{{ url_for('static', filename='styles/weather.css') }}" />
+                  href="{{ url_for('static', filename='styles/app.css') }}" />
         {% else %}
             <link rel="stylesheet"
-                  href="{{ url_for('static', filename='styles/main.min.css') }}" />
+                  href="{{ url_for('static', filename='styles/app.min.css') }}" />
         {% endif %}
 
-        <script src="https://kit.fontawesome.com/4a94c21782.js"
-                crossorigin="anonymous"></script>
+        <script src="{{ url_for('static', filename='js/icons.js') }}" defer></script>
         <script src="{{ url_for('static', filename='vendor/htmx.min.js') }}" defer></script>
-
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap"
-              rel="stylesheet" />
+        <script src="https://cdn.gijs6.nl/theme/v1/js/toast.js" defer></script>
 
         {% block extra_headers %}{% endblock %}
     </head>
 
-    <body>
-        <header class="page-header">
-            <a href="{{ url_for('index') }}" class="wordmark">
-                <img src="{{ url_for('static', filename='images/logo-white.svg') }}"
-                     alt=""
-                     class="wordmark__logo" />
-                <span class="wordmark__text">Outflow</span>
-            </a>
-            <div class="header-search">
-                <form action="{{ url_for('search') }}"
-                      method="get"
-                      class="header-search__form">
-                    <i class="fa-solid fa-fw fa-magnifying-glass header-search__icon"
-                       aria-hidden="true"></i>
-                    <input class="header-search__input"
-                           type="search"
-                           name="q"
-                           placeholder="Search…"
-                           autocomplete="off"
-                           hx-get="{{ url_for('search') }}"
-                           hx-trigger="input changed delay:300ms"
-                           hx-target="#header-search-results"
-                           hx-indicator="#header-search-spinner" />
-                    <span id="header-search-spinner"
-                          class="header-search__spinner htmx-indicator"
-                          aria-hidden="true"></span>
-                </form>
-                <div id="header-search-results" class="header-search__dropdown"></div>
-            </div>
-        </header>
-
-        <main class="page-main">
-            {% block content %}{% endblock %}
-        </main>
-
-        <dialog class="shortcuts-modal"
-                id="shortcuts-modal"
-                aria-label="Keyboard shortcuts">
-            <div class="shortcuts-modal__inner">
-                <div class="shortcuts-modal__header">
-                    <h2 class="shortcuts-modal__title">Keyboard shortcuts</h2>
-                    <button class="shortcuts-modal__close" autofocus aria-label="Close">
-                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-                    </button>
+    <body class="{% block body_class %}{% endblock %}">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="toaster" aria-live="polite">
+                    {% for category, message in messages %}
+                        {% set kind = "success" if category == "success" else "danger" if category == "error" else "info" %}
+                        <div class="toast toast--{{ kind }}"
+                             role="status"
+                             data-auto-dismiss="6000">
+                            {% if kind == "success" %}
+                                {{ icon('circle-check', 'toast__icon') }}
+                            {%- elif kind == "danger" %}{{ icon('triangle-alert', 'toast__icon') }}
+                            {%- else %}{{ icon('info', 'toast__icon') }}
+                            {% endif %}
+                            <div class="toast__body">{{ message }}</div>
+                            <button type="button" class="toast__dismiss" aria-label="Dismiss">{{ icon("x") }}</button>
+                        </div>
+                    {% endfor %}
                 </div>
-                <dl class="shortcuts-modal__list">
-                    <div class="shortcuts-modal__item">
-                        <dt>
-                            <kbd>/</kbd>
-                        </dt>
-                        <dd>
-                            Focus search
-                        </dd>
-                    </div>
-                    <div class="shortcuts-modal__item">
-                        <dt>
-                            <kbd>←</kbd> <kbd>→</kbd>
-                        </dt>
-                        <dd>
-                            Navigate weather tabs
-                        </dd>
-                    </div>
-                    <div class="shortcuts-modal__item">
-                        <dt>
-                            <kbd>?</kbd>
-                        </dt>
-                        <dd>
-                            Show this help
-                        </dd>
-                    </div>
-                </dl>
-            </div>
-        </dialog>
+            {% endif %}
+        {% endwith %}
 
-
-        <script>
-            document.addEventListener("htmx:beforeSwap", function(e) {
-                var status = e.detail.xhr.status;
-                if (status >= 400 && status < 500) {
-                    e.detail.shouldSwap = true;
-                    e.detail.isError = false;
-                }
-            });
-
-            function handleIslandError(target) {
-                if (!target.classList.contains("island") && !target.classList.contains("island-loading")) return;
-                target.classList.remove("island-loading");
-                target.classList.add("island--error");
-                target.innerHTML =
-                    '<p class="island__error-message"><i class="fa-solid fa-fw fa-triangle-exclamation" aria-hidden="true"></i> Something went wrong while loading.</p><button type="button" class="button" onclick="window.location.reload()"><i class="fa-solid fa-fw fa-rotate-right" aria-hidden="true"></i> Try again</button>';
-            }
-
-            document.addEventListener("htmx:responseError", (e) => handleIslandError(e.detail.target));
-            document.addEventListener("htmx:sendError", (e) => handleIslandError(e.detail.target));
-
-            document.addEventListener("htmx:afterSwap", (e) => {
-                const id = e.detail.target.id;
-                if (!id) return;
-                const newEl = document.getElementById(id);
-                const titleEl = newEl?.dataset.title ? newEl : newEl?.querySelector('[data-title]');
-                if (titleEl?.dataset.title) document.title = titleEl.dataset.title + " - Outflow";
-            });
-
-            function setupSearchDropdown(inputEl, dropdownEl) {
-                if (!inputEl || !dropdownEl) return;
-
-                function getItems() {
-                    return Array.from(dropdownEl.querySelectorAll("a"));
-                }
-
-                inputEl.addEventListener("keydown", (e) => {
-                    const items = getItems();
-                    if (!items.length) return;
-                    if (e.key === "ArrowDown" || (e.key === "Tab" && !e.shiftKey)) {
-                        e.preventDefault();
-                        items[0].focus();
-                    } else if (e.key === "Escape") {
-                        dropdownEl.hidden = true;
-                        inputEl.focus();
-                    }
-                });
-
-                dropdownEl.addEventListener("keydown", (e) => {
-                    const items = getItems();
-                    const idx = items.indexOf(document.activeElement);
-                    if (idx === -1) return;
-                    if (e.key === "ArrowDown") {
-                        e.preventDefault();
-                        if (idx < items.length - 1) items[idx + 1].focus();
-                    } else if (e.key === "ArrowUp") {
-                        e.preventDefault();
-                        if (idx > 0) items[idx - 1].focus();
-                        else inputEl.focus();
-                    } else if (e.key === "Escape") {
-                        e.preventDefault();
-                        dropdownEl.hidden = true;
-                        inputEl.focus();
-                    }
-                });
-
-                inputEl.addEventListener("blur", () => setTimeout(() => {
-                    if (!inputEl.matches(":focus") && !dropdownEl.contains(document.activeElement)) {
-                        dropdownEl.hidden = true;
-                    }
-                }, 150));
-
-                inputEl.addEventListener("focus", () => {
-                    if (getItems().length) dropdownEl.hidden = false;
-                });
-            }
-
-            const headerInput = document.querySelector(".header-search__input");
-            if (headerInput) {
-                const headerDropdown = document.querySelector(".header-search__dropdown");
-                setupSearchDropdown(headerInput, headerDropdown);
-            }
-
-            const shortcutsModal = document.getElementById("shortcuts-modal");
-            shortcutsModal.querySelector(".shortcuts-modal__close").addEventListener("click", () => shortcutsModal.close());
-            shortcutsModal.addEventListener("click", (e) => {
-                if (e.target === shortcutsModal) shortcutsModal.close();
-            });
-
-            document.addEventListener("keydown", (e) => {
-                const tag = document.activeElement.tagName;
-                const editable = tag === "INPUT" || tag === "TEXTAREA" || document.activeElement.isContentEditable;
-                if (e.ctrlKey || e.metaKey || e.altKey) return;
-                if (e.key === "/" && !editable) {
-                    e.preventDefault();
-                    headerInput?.focus();
-                } else if (e.key === "?" && !editable) {
-                    e.preventDefault();
-                    shortcutsModal.showModal();
-                } else if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && !editable) {
-                    const tablist = document.getElementById("weather-tablist");
-                    if (!tablist) return;
-                    const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
-                    const activeIdx = tabs.findIndex(t => t.getAttribute("aria-selected") === "true");
-                    if (activeIdx === -1) return;
-                    e.preventDefault();
-                    const next = e.key === "ArrowRight" ?
-                        tabs[(activeIdx + 1) % tabs.length] :
-                        tabs[(activeIdx - 1 + tabs.length) % tabs.length];
-                    next.focus();
-                    next.click();
-                }
-            });
-
-            document.addEventListener("htmx:afterSwap", (e) => {
-                const t = e.detail.target;
-                if (t.classList.contains("city-search__dropdown") || t.classList.contains("header-search__dropdown") || t.classList.contains("home__search-dropdown")) {
-                    t.hidden = false;
-                }
-            });
-
-            function setupSearchSubmit(formSelector, dropdownId) {
-                const form = document.querySelector(formSelector);
-                if (!form) return;
-                form.addEventListener("submit", (e) => {
-                    const items = document.getElementById(dropdownId)
-                        ?.querySelectorAll(".search-dropdown__item a");
-                    if (items?.length === 1) {
-                        e.preventDefault();
-                        window.location.href = items[0].href;
-                    }
-                });
-            }
-            setupSearchSubmit(".header-search__form", "header-search-results");
-            setupSearchSubmit(".city-search__form", "city-search-results");
-
-            if ("serviceWorker" in navigator) {
-                navigator.serviceWorker.register("/sw.js");
-            }
-        </script>
-        {% block extra_scripts %}{% endblock %}
+        {% block body_content %}{% endblock %}
     </body>
 </html>

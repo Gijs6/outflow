@@ -1,0 +1,185 @@
+{% extends "skeleton.jinja" %}
+
+{% from "_macros.jinja" import icon %}
+
+{% block body_class %}page page--topnav{% endblock %}
+
+{% block body_content %}
+    <header class="app-bar">
+        <a href="{{ url_for('index') }}" class="wordmark">
+            <span class="wordmark__mark">{{ icon("cloud-sun") }}</span>
+            <span class="wordmark__text">Outflow</span>
+        </a>
+
+        <div class="app-bar__actions">
+            <div class="header-search">
+                <form action="{{ url_for('search') }}"
+                      method="get"
+                      role="search"
+                      aria-label="Search for a place"
+                      class="search header-search__form">
+                    {{ icon("search") }}
+                    <label for="header-search-input" class="visually-hidden">Search for a place</label>
+                    <input id="header-search-input"
+                           class="header-search__input"
+                           type="search"
+                           name="q"
+                           placeholder="Search a place"
+                           autocomplete="off"
+                           hx-get="{{ url_for('search') }}"
+                           hx-trigger="input changed delay:300ms"
+                           hx-target="#header-search-results"
+                           hx-indicator="#header-search-status" />
+                    <span id="header-search-status"
+                          class="header-search__status htmx-indicator"
+                          aria-hidden="true">Searching</span>
+                </form>
+                <div id="header-search-results"
+                     class="header-search__dropdown search-dropdown-wrap"
+                     aria-live="polite"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="page__main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <ul class="site-footer__credits">
+            <li>
+                Weather data from <a href="https://openweathermap.org/" rel="noopener">OpenWeatherMap</a>
+            </li>
+            <li>
+                Map tiles from <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a> contributors
+            </li>
+        </ul>
+        <p class="site-footer__meta">
+            <span class="site-footer__id">
+                <span class="site-footer__mark">{{ icon("cloud-sun") }}</span>
+                <b class="site-footer__name">Outflow</b> by <a class="site-footer__by" href="https://gijs6.nl">Gijs6</a>
+            </span>
+            <a href="https://unlicense.org" rel="license">Unlicensed</a>
+        </p>
+    </footer>
+
+    <script>
+        document.addEventListener("htmx:beforeSwap", function(e) {
+            var status = e.detail.xhr.status;
+            if (status >= 400 && status < 500) {
+                e.detail.shouldSwap = true;
+                e.detail.isError = false;
+            }
+        });
+
+        function handleIslandError(target) {
+            if (!target || (!target.classList.contains("island") && !target.classList.contains("island--loading"))) return;
+            target.classList.remove("island--loading");
+            target.classList.add("island--error");
+            target.innerHTML =
+                '<div class="notice notice--danger notice--loud">' +
+                window.wxIcon("triangle-alert", "notice__icon") +
+                '<div class="notice__body"><p>Something went wrong while loading.</p>' +
+                '<div class="notice__actions"><button type="button" class="button button--sm" onclick="window.location.reload()">' +
+                window.wxIcon("rotate-cw") + " Try again</button></div></div></div>";
+        }
+
+        document.addEventListener("htmx:responseError", function(e) {
+            handleIslandError(e.detail.target);
+        });
+        document.addEventListener("htmx:sendError", function(e) {
+            handleIslandError(e.detail.target);
+        });
+
+        document.addEventListener("htmx:afterSwap", function(e) {
+            var id = e.detail.target.id;
+            if (!id) return;
+            var newEl = document.getElementById(id);
+            var titleEl = newEl && newEl.dataset.title ? newEl : newEl && newEl.querySelector("[data-title]");
+            if (titleEl && titleEl.dataset.title) document.title = titleEl.dataset.title + " - Outflow";
+        });
+
+        function setupSearchDropdown(inputEl, dropdownEl) {
+            if (!inputEl || !dropdownEl) return;
+
+            function getItems() {
+                return Array.from(dropdownEl.querySelectorAll("a"));
+            }
+
+            inputEl.addEventListener("keydown", function(e) {
+                var items = getItems();
+                if (!items.length) return;
+                if (e.key === "ArrowDown" || (e.key === "Tab" && !e.shiftKey)) {
+                    e.preventDefault();
+                    items[0].focus();
+                } else if (e.key === "Escape") {
+                    dropdownEl.hidden = true;
+                    inputEl.focus();
+                }
+            });
+
+            dropdownEl.addEventListener("keydown", function(e) {
+                var items = getItems();
+                var idx = items.indexOf(document.activeElement);
+                if (idx === -1) return;
+                if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    if (idx < items.length - 1) items[idx + 1].focus();
+                } else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    if (idx > 0) items[idx - 1].focus();
+                    else inputEl.focus();
+                } else if (e.key === "Escape") {
+                    e.preventDefault();
+                    dropdownEl.hidden = true;
+                    inputEl.focus();
+                }
+            });
+
+            inputEl.addEventListener("blur", function() {
+                setTimeout(function() {
+                    if (!inputEl.matches(":focus") && !dropdownEl.contains(document.activeElement)) {
+                        dropdownEl.hidden = true;
+                    }
+                }, 150);
+            });
+
+            inputEl.addEventListener("focus", function() {
+                if (getItems().length) dropdownEl.hidden = false;
+            });
+        }
+
+        var headerInput = document.querySelector(".header-search__input");
+        if (headerInput) {
+            setupSearchDropdown(headerInput, document.querySelector(".header-search__dropdown"));
+        }
+
+        document.addEventListener("htmx:afterSwap", function(e) {
+            var t = e.detail.target;
+            if (t.classList.contains("header-search__dropdown") || t.classList.contains("home__search-dropdown")) {
+                t.hidden = false;
+            }
+        });
+
+        function setupSearchSubmit(formSelector, dropdownId) {
+            var form = document.querySelector(formSelector);
+            if (!form) return;
+            form.addEventListener("submit", function(e) {
+                var dd = document.getElementById(dropdownId);
+                var items = dd ? dd.querySelectorAll(".search-dropdown__item a") : [];
+                if (items.length === 1) {
+                    e.preventDefault();
+                    window.location.href = items[0].href;
+                }
+            });
+        }
+        setupSearchSubmit(".header-search__form", "header-search-results");
+        setupSearchSubmit(".home__search-form", "home-search-results");
+
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/sw.js");
+        }
+    </script>
+    {% block extra_scripts %}
+    {% endblock %}
+{% endblock %}

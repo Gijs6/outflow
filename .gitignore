@@ -6,3 +6,4 @@ node_modules
 *.min.js
 *.sqlite3
 data/.secret_key
+static/vendor

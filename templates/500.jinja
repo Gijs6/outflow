@@ -1,13 +1,15 @@
 {% extends "skeleton.jinja" %}
 
-{% block title %}Server error{% endblock %}
+{% from "_macros.jinja" import icon %}
 
-{% block content %}
-    <section class="error-page" aria-labelledby="error-title">
-        <i class="fa-solid fa-fw fa-triangle-exclamation error-page__icon"
-           aria-hidden="true"></i>
-        <h1 class="error-page__title" id="error-title">Something went wrong</h1>
-        <p class="error-page__message">An unexpected error occurred. Please try again later.</p>
-        <a href="{{ url_for('index') }}" class="button">Go home</a>
-    </section>
+{% block title %}Server error{% endblock %}
+{% block body_class %}page page--bare{% endblock %}
+
+{% block body_content %}
+    <main class="page__main">
+        <p class="error__code">500</p>
+        <h1>Something went wrong</h1>
+        <p class="lead">An unexpected error occurred. Try again in a moment.</p>
+        <a href="{{ url_for('index') }}" class="button">{{ icon("cloud-sun") }} Go home</a>
+    </main>
 {% endblock %}

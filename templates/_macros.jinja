@@ -1,0 +1,19 @@
+{% macro icon(name, cls="") -%}
+    <svg class="icon{% if cls %} {{ cls }}{% endif %}"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="2"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         aria-hidden="true">
+        {%- include "icons/" ~ name ~ ".svg" -%}
+    </svg>
+{%- endmacro %}
+
+{% set _weather_glyphs = {'01d': ('sun', 'amber'), '01n': ('moon', 'night'), '02d': ('cloud-sun', 'amber'), '02n': ('cloud-moon', 'night'), '03d': ('cloud', 'cloud'), '03n': ('cloud', 'cloud'), '04d': ('cloud', 'cloud'), '04n': ('cloud', 'cloud'), '09d': ('cloud-drizzle', 'rain'), '09n': ('cloud-drizzle', 'rain'), '10d': ('cloud-rain', 'rain'), '10n': ('cloud-rain', 'rain'), '11d': ('cloud-lightning', 'storm'), '11n': ('cloud-lightning', 'storm'), '13d': ('cloud-snow', 'snow'), '13n': ('cloud-snow', 'snow'), '50d': ('cloud-fog', 'fog'), '50n': ('cloud-fog', 'fog')} %}
+
+{% macro weather_icon(code, cls="") -%}
+    {%- set glyph = _weather_glyphs.get(code, ("cloud", "cloud")) -%}
+    {{ icon(glyph[0], "weather-glyph weather-glyph--" ~ glyph[1] ~ (" " ~ cls if cls else "") ) }}
+{%- endmacro %}

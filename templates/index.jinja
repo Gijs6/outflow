@@ -1,68 +1,65 @@
-{% extends "skeleton.jinja" %}
+{% extends "base.jinja" %}
+
+{% from "_macros.jinja" import icon %}
 
 {% block title %}Home{% endblock %}
 
 {% block content %}
     <div class="home">
-        <div class="home__search-area">
-            <h1 class="home__title">Weather</h1>
-            <p class="home__subtitle">Search for any city or enter coordinates.</p>
+        <section class="home__intro">
+            <h1>Weather</h1>
+            <p class="lead">Search for any city, or enter a pair of coordinates.</p>
+
             <div class="home__search">
-                <i class="fa-solid fa-fw fa-magnifying-glass home__search-icon"
-                   aria-hidden="true"></i>
                 <form action="{{ url_for('search') }}"
                       method="get"
                       role="search"
-                      aria-label="City search">
-                    <label for="city-search-input" class="sr-only">Search for a city</label>
-                    <input id="city-search-input"
-                           class="home__search-input"
+                      aria-label="Place search"
+                      class="home__search-form input-affix">
+                    {{ icon("search") }}
+                    <label for="home-search-input" class="visually-hidden">Search for a place</label>
+                    <input id="home-search-input"
+                           class="field__control field__control--full"
                            type="search"
                            name="q"
-                           placeholder="Amsterdam, London, New York…"
+                           placeholder="Amsterdam, London, New York"
                            autocomplete="off"
                            aria-autocomplete="list"
-                           aria-controls="city-search-results"
+                           aria-controls="home-search-results"
                            hx-get="{{ url_for('search') }}"
                            hx-trigger="input changed delay:300ms"
-                           hx-target="#city-search-results"
-                           hx-indicator="#city-search-spinner" />
+                           hx-target="#home-search-results"
+                           hx-indicator="#home-search-status" />
                 </form>
-                <span id="city-search-spinner"
-                      class="home__search-spinner htmx-indicator"
-                      aria-hidden="true"></span>
-                <div id="city-search-results"
-                     class="home__search-dropdown"
+                <span id="home-search-status"
+                      class="home__search-status htmx-indicator"
+                      aria-hidden="true">Searching</span>
+                <div id="home-search-results"
+                     class="home__search-dropdown search-dropdown-wrap"
                      role="listbox"
                      aria-label="Search suggestions"></div>
             </div>
-            <div class="home__actions">
-                <button type="button" class="home__action-btn" id="home-geo-btn">
-                    <i class="fa-solid fa-fw fa-location-dot" aria-hidden="true"></i>
-                    Use my location
-                </button>
-                <a href="{{ url_for('lucky') }}" class="home__action-btn">
-                    <i class="fa-solid fa-fw fa-dice" aria-hidden="true"></i>
-                    Feeling lucky
-                </a>
+
+            <div class="cluster">
+                <button type="button"
+                        class="button button--ghost button--sm"
+                        id="home-geo-btn">{{ icon("locate-fixed") }} Use my location</button>
+                <a href="{{ url_for('lucky') }}" class="button button--ghost button--sm">{{ icon("dices") }} Feeling lucky</a>
             </div>
-        </div>
+        </section>
 
         {% if favourite_places %}
-            <nav class="home__places" aria-label="Favourite places">
-                <h2 class="home__places-label">
-                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                    Favourites
-                </h2>
-                <ol class="home__places-list home__places-list--favourites" role="list">
+            <nav class="home__group" aria-label="Favourite places">
+                <h2 class="home__group-label">Favourites</h2>
+                <ul class="row-list" role="list">
                     {% for place in favourite_places %}
                         <li>
                             <a href="{{ url_for('weather', place_id=place.place_id) }}"
-                               class="home__place-card">
-                                <span class="home__place-card__info">
-                                    <span class="home__place-name">{{ place.name }}</span>
+                               class="row-list__row">
+                                <span class="row-list__main">
+                                    <span class="row-list__name">{{ place.name }}</span>
                                     {% if place.state or place.country %}
-                                        <span class="home__place-meta">
+                                        <span class="row-list__meta">
                                             {%- if place.state -%}{{ place.state }}{%- endif -%}
                                                 {%- if place.state and place.country -%},
                                                 {% endif -%}
@@ -70,61 +67,52 @@
                                                 </span>
                                             {% endif %}
                                         </span>
-                                        <span class="home__place-weather home__place-weather--loading"
+                                        <span class="place-weather place-weather--loading"
                                               hx-get="{{ url_for('place_weather_mini', place_id=place.place_id) }}"
                                               hx-trigger="load"
                                               hx-swap="outerHTML"></span>
                                     </a>
                                 </li>
                             {% endfor %}
-                        </ol>
+                        </ul>
                     </nav>
                 {% endif %}
 
                 {% if recent_places %}
-                    <nav class="home__places"
+                    <nav class="home__group"
                          id="home-recents"
                          aria-label="Recently viewed places">
-                        <h2 class="home__places-label">
-                            <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
-                            Recent
-                            <button class="home__places-clear"
+                        <div class="home__group-head">
+                            <h2 class="home__group-label">Recent</h2>
+                            <button class="button button--quiet button--sm"
                                     hx-post="{{ url_for('clear_recents') }}"
                                     hx-target="#home-recents"
                                     hx-swap="outerHTML">Clear</button>
-                        </h2>
-                        <ol class="home__places-list" role="list">
+                        </div>
+                        <ul class="chip-list" role="list">
                             {% for place in recent_places %}
                                 <li>
-                                    <a href="{{ url_for('weather', place_id=place.place_id) }}"
-                                       class="home__place-chip">{{ place.name }}{%- if place.state -%}, {{ place.state }}{%- endif -%}{%- if place.country -%}, {{ place.country }}{%- endif -%}</a>
+                                    <a href="{{ url_for('weather', place_id=place.place_id) }}" class="chip">{{ place.name }}{%- if place.state -%}, {{ place.state }}{%- endif -%}{%- if place.country -%}, {{ place.country }}{%- endif -%}</a>
                                 </li>
                             {% endfor %}
-                        </ol>
+                        </ul>
                     </nav>
                 {% endif %}
 
                 {% if suggested_cities %}
-                    <nav class="home__places" aria-label="Suggested places">
-                        <h2 class="home__places-label">
-                            <i class="fa-solid fa-compass" aria-hidden="true"></i>
-                            Discover
-                        </h2>
-                        <ol class="home__places-list" role="list">
+                    <nav class="home__group" aria-label="Suggested places">
+                        <h2 class="home__group-label">Discover</h2>
+                        <ul class="chip-list" role="list">
                             {% for place in suggested_cities %}
                                 <li>
-                                    <a href="{{ url_for('weather', place_id=place.place_id) }}"
-                                       class="home__place-chip">{{ place.name }}</a>
+                                    <a href="{{ url_for('weather', place_id=place.place_id) }}" class="chip">{{ place.name }}</a>
                                 </li>
                             {% endfor %}
-                        </ol>
+                        </ul>
                     </nav>
                 {% endif %}
 
-                <p class="home__db-stats">
-                    <i class="fa-solid fa-database" aria-hidden="true"></i>
-                    {{ db_stats.city_count | thousands }} cities across {{ db_stats.country_count }} countries
-                </p>
+                <p class="home__db">{{ db_stats.city_count | thousands }} cities across {{ db_stats.country_count }} countries</p>
             </div>
         {% endblock %}
 
@@ -132,30 +120,31 @@
             <script>
                 (function() {
                     setupSearchDropdown(
-                        document.getElementById('city-search-input'),
-                        document.getElementById('city-search-results')
+                        document.getElementById("home-search-input"),
+                        document.getElementById("home-search-results")
                     );
 
-                    const geoBtn = document.getElementById('home-geo-btn');
+                    var geoBtn = document.getElementById("home-geo-btn");
                     if (geoBtn) {
-                        geoBtn.addEventListener('click', function() {
+                        geoBtn.addEventListener("click", function() {
                             if (!navigator.geolocation) return;
                             geoBtn.disabled = true;
-                            geoBtn.querySelector('i').className = 'fa-solid fa-fw fa-spinner fa-spin';
+                            geoBtn.lastChild.textContent = " Locating";
                             navigator.geolocation.getCurrentPosition(
-                                pos => {
-                                    window.location.href = `/goto/${pos.coords.latitude},${pos.coords.longitude}`;
+                                function(pos) {
+                                    window.location.href = "/goto/" + pos.coords.latitude + "," + pos.coords.longitude;
                                 },
-                                () => {
+                                function() {
                                     geoBtn.disabled = false;
-                                    geoBtn.querySelector('i').className = 'fa-solid fa-fw fa-location-dot';
+                                    geoBtn.lastChild.textContent = " Use my location";
                                 }
                             );
                         });
                     }
 
-                    if (window.matchMedia('(hover: hover)').matches) {
-                        document.getElementById('city-search-input')?.focus();
+                    if (window.matchMedia("(hover: hover)").matches) {
+                        var el = document.getElementById("home-search-input");
+                        if (el) el.focus();
                     }
                 }());
             </script>

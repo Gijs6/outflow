@@ -522,6 +522,9 @@
     flex: none;
 }
 
+.day-list {
+    max-inline-size: 38rem;
+}
 .day-list__day {
     flex: none;
     inline-size: 5.5rem;
@@ -565,6 +568,9 @@
 .weather .table th:not(.th--num),
 .weather .table td:not(.td--num) {
     padding-inline-end: var(--sp-lg);
+}
+.weather .table tbody tr:not(.hour-table__day):hover td {
+    background: var(--gray-1);
 }
 .hour-table td {
     white-space: nowrap;

@@ -604,7 +604,13 @@
                 var panel = document.getElementById(tab.getAttribute("aria-controls"));
                 if (panel) panel.hidden = false;
 
-                if (tab.dataset.tab === "map") initMap();
+                if (tab.dataset.tab === "map") {
+                    initMap();
+                    if (mapInstance) {
+                        mapInstance.invalidateSize();
+                        mapInstance.setView([MAP_LAT, MAP_LON], 9);
+                    }
+                }
                 if (tab.dataset.tab === "hourly") buildHourly();
 
                 if (updateHash !== false) history.replaceState(null, "", "#" + tab.dataset.tab);
@@ -807,6 +813,11 @@
                 radius: 6,
                 weight: 2
             }).addTo(mapInstance);
+
+            setTimeout(function() {
+                mapInstance.invalidateSize();
+                mapInstance.setView([MAP_LAT, MAP_LON], 9);
+            }, 0);
 
             document.querySelectorAll(".map-layers__btn").forEach(function(btn) {
                 btn.addEventListener("click", function() {

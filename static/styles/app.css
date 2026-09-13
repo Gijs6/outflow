@@ -12,6 +12,7 @@
 .header-search__input {
     inline-size: 12rem;
     max-inline-size: 44vw;
+    min-inline-size: 0;
 }
 .header-search__status {
     position: absolute;
@@ -25,8 +26,9 @@
 .header-search__dropdown {
     position: absolute;
     inset-block-start: calc(100% + var(--sp-2xs));
-    inset-inline: 0;
+    inset-inline-end: 0;
     min-inline-size: 18rem;
+    max-inline-size: calc(100vw - var(--sp-md) * 2);
     z-index: var(--z-nav);
 }
 

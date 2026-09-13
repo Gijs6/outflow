@@ -1,4 +1,4 @@
-const CACHE = "outflow-v2";
+const CACHE = "outflow-v3";
 const STATIC = ["/static/styles/app.min.css", "/static/js/icons.js", "/static/vendor/htmx.min.js", "/static/images/icon-192.png", "/static/images/icon-512.png", "/static/favicon.svg", "/static/favicon.ico"];
 
 self.addEventListener("install", (e) => {

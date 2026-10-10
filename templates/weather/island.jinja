@@ -31,7 +31,8 @@
     </div>
 
     <p class="place-summary">
-        {% if place_parts %}{{ place_parts | join(", ") }}, {% endif %}<time datetime="{{ weather.current.dt | to_iso(tz) }}">{{ weather.current.dt | strftime("%a %-d %b %Y, %H:%M", tz) }}</time>
+        {% if place_parts %}{{ place_parts | join(", ") }},{% endif %}
+        <time datetime="{{ weather.current.dt | to_iso(tz) }}">{{ weather.current.dt | strftime("%a %-d %b %Y, %H:%M", tz) }}</time>
     </p>
 
     <div class="conditions">
@@ -247,9 +248,7 @@
                         aria-controls="tab-panel-alerts"
                         tabindex="-1"
                         class="tabs__tab"
-                        data-tab="alerts">
-                    Alerts ({{ alerts | length }})
-                </button>
+                        data-tab="alerts">Alerts ({{ alerts | length }})</button>
             {% endif %}
         </div>
     </nav>
@@ -324,7 +323,6 @@
         {% else %}
             <div class="empty">
                 <p class="empty__title">No hourly forecast</p>
-                <p>Hourly data is unavailable for this place.</p>
             </div>
         {% endif %}
     </section>
@@ -364,7 +362,8 @@
                                 {% endif %}
                                 <dt>Wind</dt>
                                 <dd>
-                                    {{ day.wind_speed | to_bft }} bft{% if day.wind_gust %}, gusts {{ day.wind_gust | to_bft }} bft{% endif %}
+                                    {{ day.wind_speed | to_bft }} bft
+                                    {% if day.wind_gust %}, gusts {{ day.wind_gust | to_bft }} bft{% endif %}
                                 </dd>
                                 <dt>Humidity</dt>
                                 <dd>
@@ -421,7 +420,6 @@
         {% else %}
             <div class="empty">
                 <p class="empty__title">No daily forecast</p>
-                <p>Daily data is unavailable for this place.</p>
             </div>
         {% endif %}
     </section>
@@ -487,7 +485,6 @@
         {% else %}
             <div class="empty">
                 <p class="empty__title">No air quality data</p>
-                <p>Air quality data is unavailable for this place.</p>
             </div>
         {% endif %}
     </section>
@@ -536,7 +533,7 @@
                             </dd>
                         </dl>
                         {% if alert.description %}<p class="weather-alert__desc">{{ alert.description }}</p>{% endif %}
-                        {% if alert.tags %}<p>Tags: {{ alert.tags | map('lower') | join(", ") }}</p>{% endif %}
+                        {% if alert.tags %}<p>Tags: {{ alert.tags | map("lower") | join(", ") }}</p>{% endif %}
                     </div>
                 </article>
             {% endfor %}

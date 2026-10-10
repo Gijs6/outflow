@@ -49,7 +49,8 @@
                     {% for place in places %}
                         <li class="list__item place-row">
                             <span>
-                                <a href="{{ url_for('weather', place_id=place.place_id) }}" class="place-row__name">{{ place.name }}</a>
+                                <a href="{{ url_for('weather', place_id=place.place_id) }}"
+                                   class="place-row__name">{{ place.name }}</a>
                                 <span class="muted">
                                     {%- if place.is_direct -%}
                                         Coordinates
@@ -67,7 +68,7 @@
         {% else %}
             <div class="empty">
                 <p class="empty__title">No results</p>
-                <p>No place matches "{{ query }}". Try another place or a pair of coordinates.</p>
+                <p>No place matches "{{ query }}".</p>
             </div>
         {% endif %}
     {% endif %}

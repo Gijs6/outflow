@@ -16,7 +16,7 @@
         <link rel="manifest"
               href="{{ url_for('static', filename='manifest.json') }}" />
 
-        {% set theme = "http://localhost:8000/theme/v1" if config.DEBUG else "https://cdn.gijs6.nl/theme/v1" %}
+        {% set theme = "http://localhost:8000/theme/v2" if config.DEBUG else "https://cdn.gijs6.nl/theme/v2" %}
         <link rel="stylesheet" href="{{ theme }}/all.css" />
         <link rel="stylesheet" href="{{ theme }}/accent/teal.css" />
         {% if config.DEBUG %}

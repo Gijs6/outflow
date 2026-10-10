@@ -1,6 +1,6 @@
 {% extends "skeleton.jinja" %}
 
-{% block title %}Server error{% endblock %}
+{% block title %}{{ code }} {{ title }}{% endblock %}
 
 {% block body_content %}
     <header class="navbar">
@@ -10,9 +10,9 @@
     </header>
 
     <main class="page page--narrow error">
-        <p class="error__code">500</p>
-        <h1>Something went wrong</h1>
-        <p class="lead">An unexpected error occurred. Try again in a moment.</p>
+        <p class="error__code">{{ code }}</p>
+        <h1>{{ title }}</h1>
+        <p class="lead">{{ description }}</p>
         <a href="{{ url_for('index') }}" class="btn">Go home</a>
     </main>
 {% endblock %}

@@ -358,13 +358,23 @@ def toggle_favourite(place_id):
 
 
 @app.errorhandler(404)
-def page_not_found(e):
-    return render_template("404.jinja"), 404
+def not_found(_e):
+    return render_template(
+        "error.jinja",
+        code=404,
+        title="Not found",
+        description="The page you're looking for doesn't exist.",
+    ), 404
 
 
 @app.errorhandler(500)
-def internal_server_error(e):
-    return render_template("500.jinja"), 500
+def server_error(_e):
+    return render_template(
+        "error.jinja",
+        code=500,
+        title="Server error",
+        description="Something went wrong on our end. Try again later.",
+    ), 500
 
 
 if __name__ == "__main__":

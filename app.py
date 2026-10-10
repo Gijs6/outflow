@@ -155,7 +155,9 @@ def place_weather_mini(place_id):
         temp = round(data["current"]["temp"], 1)
     except Exception:
         return ""
-    return render_template("home_place_weather.jinja", description=description, temp=temp)
+    return render_template(
+        "home_place_weather.jinja", description=description, temp=temp
+    )
 
 
 @app.route("/lucky")

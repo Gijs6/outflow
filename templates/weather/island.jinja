@@ -1,11 +1,9 @@
-{% from "_macros.jinja" import icon, weather_icon %}
 {% set tz = weather.timezone %}
 {% set hourly_data = hourly_forecast if hourly_forecast else weather.hourly if weather.hourly else [] %}
 {% set daily_data = daily_16 if daily_16 else weather.daily if weather.daily else [] %}
 {% set alerts = alerts if alerts else [] %}
 {% set aqi_labels = {1: 'good', 2: 'fair', 3: 'moderate', 4: 'poor', 5: 'very poor'} %}
 {% set aqi_tone = {1: 'ok', 2: 'ok', 3: 'warn', 4: 'bad', 5: 'bad'} %}
-{% set current_code = weather.current.weather[0].icon %}
 
 <div class="weather island__content" data-title="{{ name }}">
 
@@ -24,27 +22,26 @@
     {% endif %}
 
     {% set place_parts = [location.state, country_name] | select | list %}
-    <div class="place-head">
-        <div class="place-head__titles">
-            <h1>{{ location.name or "%.4f, %.4f" | format(lat, lon) }}</h1>
-            {% if place_parts %}<p class="place-head__place">{{ place_parts | join(", ") }}</p>{% endif %}
-            <p class="place-head__time">
-                <time datetime="{{ weather.current.dt | to_iso(tz) }}">{{ weather.current.dt | strftime("%a %-d %b %Y, %H:%M", tz) }}</time>
-            </p>
-        </div>
-        {% include "weather/favourite_btn.jinja" %}
+    <div class="page-head">
+        <h1>{{ location.name or "%.4f, %.4f" | format(lat, lon) }}</h1>
+        <div class="page-head__actions">
+            {% include "weather/favourite_btn.jinja" %}
 
+        </div>
     </div>
 
+    <p class="place-summary">
+        {% if place_parts %}{{ place_parts | join(", ") }}, {% endif %}<time datetime="{{ weather.current.dt | to_iso(tz) }}">{{ weather.current.dt | strftime("%a %-d %b %Y, %H:%M", tz) }}</time>
+    </p>
+
     <div class="conditions">
-        {{ weather_icon(current_code, "conditions__glyph") }}
         <p class="conditions__temp">
             <data value="{{ weather.current.temp }}">{{ weather.current.temp | round(1) }}°</data>
         </p>
         <div class="conditions__meta">
             <p class="conditions__desc">{{ weather.current.weather | map(attribute='description') | join(', ') | ucfirst }}</p>
             <p class="conditions__feels">
-                feels like <data value="{{ weather.current.feels_like }}">{{ weather.current.feels_like | round | int }}°</data>
+                Feels like <data value="{{ weather.current.feels_like }}">{{ weather.current.feels_like | round(1) }}°</data>
             </p>
         </div>
     </div>
@@ -134,8 +131,8 @@
             {% set aqi = air_pollution.list[0].main.aqi %}
             <div>
                 <dt>Air quality</dt>
-                <dd class="readings__flag readings__flag--{{ aqi_tone.get(aqi, 'warn') }}">
-                    {{ aqi_labels.get(aqi, aqi) }}
+                <dd>
+                    <span class="status status--{{ aqi_tone.get(aqi, 'warn') }}">{{ aqi_labels.get(aqi, aqi) | ucfirst }}</span>
                 </dd>
             </div>
         {% endif %}
@@ -187,7 +184,7 @@
                     {% endfor %}
                 </div>
                 <div class="rain__axis" aria-hidden="true">
-                    <span>now</span><span>+30 min</span><span>+60 min</span>
+                    <span>Now</span><span>+30 min</span><span>+60 min</span>
                 </div>
             {% endif %}
         </section>
@@ -198,14 +195,11 @@
         {% set alert_kind = "danger" if ev0[:7] == "extreme" else "warning" %}
         {% set alert_extra = alerts | length - 1 %}
         {% set alert_headline = alerts[0].event | trim ~ (", and " ~ alert_extra ~ " more" if alert_extra else "") ~ "." %}
-        <div class="notice notice--{{ alert_kind }}" role="alert">
-            {{ icon('triangle-alert', 'notice__icon') }}
-            <div class="notice__body">
-                <p>
-                    <strong>{{ alert_headline }}</strong>
-                    <a href="#alerts" data-tab-target="alerts">View {{ "alerts" if alert_extra else "alert" }}</a>
-                </p>
-            </div>
+        <div class="alert alert--{{ alert_kind }}" role="alert">
+            <p>
+                <strong>{{ alert_headline }}</strong>
+                <a href="#alerts" data-tab-target="alerts">View {{ "alerts" if alert_extra else "alert" }}</a>
+            </p>
         </div>
     {% endif %}
 
@@ -254,7 +248,7 @@
                         tabindex="-1"
                         class="tabs__tab"
                         data-tab="alerts">
-                    Alerts <span class="count count--bad">{{ alerts | length }}</span>
+                    Alerts ({{ alerts | length }})
                 </button>
             {% endif %}
         </div>
@@ -265,8 +259,8 @@
              aria-labelledby="tab-btn-overview"
              class="tab-panel forecast-panel">
         {% if hourly_data %}
-            <section class="forecast-block">
-                <h2>Next 2 days</h2>
+            <section class="panel">
+                <h2 class="panel__heading">Next 2 days</h2>
                 <div class="reel hourly-reel"
                      id="overview-hourly-strip"
                      aria-label="Hourly forecast"></div>
@@ -274,15 +268,15 @@
         {% endif %}
 
         {% if daily_data %}
-            <section class="forecast-block">
-                <h2>Week ahead</h2>
+            <section class="panel">
+                <h2 class="panel__heading">Week ahead</h2>
                 <div class="table-wrap">
                     <table class="table forecast-table">
                         <thead>
                             <tr>
                                 <th>Day</th>
                                 <th>Conditions</th>
-                                <th class="th--num">Low / high</th>
+                                <th class="table__num">Low / high</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -291,8 +285,8 @@
                                     <td>
                                         <time datetime="{{ day.dt | to_iso(tz) }}">{{ day.dt | strftime("%a %-d %b", tz) }}</time>
                                     </td>
-                                    <td class="forecast-table__cond">{{ weather_icon(day.weather[0].icon) }} {{ day.weather | map(attribute='description') | join(', ') | ucfirst }}</td>
-                                    <td class="td--num">{{ day.temp.min | round | int }}° / {{ day.temp.max | round | int }}°</td>
+                                    <td>{{ day.weather | map(attribute='description') | join(', ') | ucfirst }}</td>
+                                    <td class="table__num">{{ day.temp.min | round | int }}° / {{ day.temp.max | round | int }}°</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -317,9 +311,9 @@
                         <tr>
                             <th>Time</th>
                             <th>Sky</th>
-                            <th class="th--num">Temp</th>
-                            <th class="th--num">Feels</th>
-                            <th class="th--num">Precip</th>
+                            <th class="table__num">Temp</th>
+                            <th class="table__num">Feels</th>
+                            <th class="table__num">Precip</th>
                             <th>Wind</th>
                         </tr>
                     </thead>
@@ -345,7 +339,6 @@
                             <span class="day-list__day">
                                 <time datetime="{{ day.dt | to_iso(tz) }}">{{ day.dt | strftime("%a %-d %b", tz) }}</time>
                             </span>
-                            {{ weather_icon(day.weather[0].icon) }}
                             <span class="day-list__desc">{{ day.weather | map(attribute='description') | join(', ') | ucfirst }}</span>
                             <span class="day-list__temps">{{ day.temp.min | round | int }}° / {{ day.temp.max | round | int }}°</span>
                         </summary>
@@ -358,18 +351,17 @@
                                 </dd>
                                 <dt>Daytime</dt>
                                 <dd>
-                                    morning {{ day.temp.morn | round | int }}°, day {{ day.temp.day | round | int }}°, evening {{ day.temp.eve | round | int }}°, night {{ day.temp.night | round | int }}°
+                                    Morning {{ day.temp.morn | round | int }}°, day {{ day.temp.day | round | int }}°, evening {{ day.temp.eve | round | int }}°, night {{ day.temp.night | round | int }}°
                                 </dd>
                                 {% if day.feels_like %}
                                     <dt>Feels like</dt>
                                     <dd>
-                                        morning {{ day.feels_like.morn | round | int }}°, day {{ day.feels_like.day | round | int }}°, evening {{ day.feels_like.eve | round | int }}°, night {{ day.feels_like.night | round | int }}°
+                                        Morning {{ day.feels_like.morn | round | int }}°, day {{ day.feels_like.day | round | int }}°, evening {{ day.feels_like.eve | round | int }}°, night {{ day.feels_like.night | round | int }}°
                                     </dd>
                                 {% endif %}
                                 <dt>Wind</dt>
                                 <dd>
-                                    {{ day.wind_speed | to_bft }} bft
-                                    {% if day.wind_gust %}, gusts {{ day.wind_gust | to_bft }} bft{% endif %}
+                                    {{ day.wind_speed | to_bft }} bft{% if day.wind_gust %}, gusts {{ day.wind_gust | to_bft }} bft{% endif %}
                                 </dd>
                                 <dt>Humidity</dt>
                                 <dd>
@@ -436,52 +428,51 @@
         {% if air_pollution %}
             {% set aqi = air_pollution.list[0].main.aqi %}
             {% set comp = air_pollution.list[0].components %}
-            <div class="aqi">
-                <span class="aqi__badge aqi__badge--{{ aqi_tone.get(aqi, 'warn') }}">{{ aqi_labels.get(aqi, "unknown") | ucfirst }}</span>
-                <span class="aqi__sub">air quality index {{ aqi }} of 5</span>
-            </div>
-            <section class="forecast-block">
-                <h2>Pollutants</h2>
+            <p class="aqi">
+                <span class="status status--{{ aqi_tone.get(aqi, 'warn') }}">{{ aqi_labels.get(aqi, "unknown") | ucfirst }}</span>, air quality index {{ aqi }} of 5
+            </p>
+            <section class="panel">
+                <h2 class="panel__heading">Pollutants</h2>
                 <div class="table-wrap">
                     <table class="table">
                         <thead>
                             <tr>
                                 <th>Pollutant</th>
-                                <th class="th--num">Concentration</th>
+                                <th class="table__num">Concentration</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>Fine particles (PM2.5)</td>
-                                <td class="td--num">{{ "%.1f" | format(comp.pm2_5) }} ug/m3</td>
+                                <td class="table__num">{{ "%.1f" | format(comp.pm2_5) }} ug/m3</td>
                             </tr>
                             <tr>
                                 <td>Coarse particles (PM10)</td>
-                                <td class="td--num">{{ "%.1f" | format(comp.pm10) }} ug/m3</td>
+                                <td class="table__num">{{ "%.1f" | format(comp.pm10) }} ug/m3</td>
                             </tr>
                             <tr>
                                 <td>Ozone (O3)</td>
-                                <td class="td--num">{{ "%.1f" | format(comp.o3) }} ug/m3</td>
+                                <td class="table__num">{{ "%.1f" | format(comp.o3) }} ug/m3</td>
                             </tr>
                             <tr>
                                 <td>Nitrogen dioxide (NO2)</td>
-                                <td class="td--num">{{ "%.1f" | format(comp.no2) }} ug/m3</td>
+                                <td class="table__num">{{ "%.1f" | format(comp.no2) }} ug/m3</td>
                             </tr>
                             <tr>
                                 <td>Sulphur dioxide (SO2)</td>
-                                <td class="td--num">{{ "%.1f" | format(comp.so2) }} ug/m3</td>
+                                <td class="table__num">{{ "%.1f" | format(comp.so2) }} ug/m3</td>
                             </tr>
                             <tr>
                                 <td>Carbon monoxide (CO)</td>
-                                <td class="td--num">{{ "%.0f" | format(comp.co) }} ug/m3</td>
+                                <td class="table__num">{{ "%.0f" | format(comp.co) }} ug/m3</td>
                             </tr>
                             <tr>
                                 <td>Nitrogen monoxide (NO)</td>
-                                <td class="td--num">{{ "%.2f" | format(comp.no) }} ug/m3</td>
+                                <td class="table__num">{{ "%.2f" | format(comp.no) }} ug/m3</td>
                             </tr>
                             <tr>
                                 <td>Ammonia (NH3)</td>
-                                <td class="td--num">{{ "%.2f" | format(comp.nh3) }} ug/m3</td>
+                                <td class="table__num">{{ "%.2f" | format(comp.nh3) }} ug/m3</td>
                             </tr>
                         </tbody>
                     </table>
@@ -497,11 +488,11 @@
              aria-labelledby="tab-btn-map"
              class="tab-panel forecast-panel forecast-panel--map"
              hidden>
-        <div class="segmented map-layers" role="group" aria-label="Map layer">
+        <div class="form__actions map-layers" role="group" aria-label="Map layer">
             {% set layers = [('precipitation_new', 'Precipitation'), ('temp_new', 'Temperature'), ('clouds_new', 'Clouds'), ('wind_new', 'Wind'), ('pressure_new', 'Pressure')] %}
             {% for layer_id, layer_label in layers %}
                 <button type="button"
-                        class="map-layers__btn{% if loop.first %} is-active{% endif %}"
+                        class="btn btn--sm map-layers__btn{% if loop.first %} is-active{% endif %}"
                         data-layer="{{ layer_id }}"
                         aria-pressed="{{ 'true' if loop.first else 'false' }}">{{ layer_label }}</button>
             {% endfor %}
@@ -520,13 +511,12 @@
             {% for alert in alerts %}
                 {% set ev = alert.event | lower | trim %}
                 {% set kind = "danger" if ev[:7] == "extreme" else "warning" %}
-                <article class="notice notice--{{ kind }} notice--loud alert"
+                <article class="alert alert--{{ kind }} weather-alert"
                          id="alert-{{ alert.start }}">
-                    {{ icon('triangle-alert', 'notice__icon') }}
-                    <div class="notice__body">
-                        <p class="notice__title">{{ alert.event }}</p>
-                        <p class="alert__source">Issued by {{ alert.sender_name }}</p>
-                        <dl class="data-list alert__times">
+                    <div>
+                        <p class="weather-alert__title">{{ alert.event }}</p>
+                        <p class="weather-alert__source">Issued by {{ alert.sender_name }}</p>
+                        <dl class="data-list weather-alert__times">
                             <dt>From</dt>
                             <dd>
                                 <time datetime="{{ alert.start | to_iso(tz) }}">{{ alert.start | strftime("%a %-d %b, %H:%M", tz) }}</time>
@@ -536,16 +526,8 @@
                                 <time datetime="{{ alert.end | to_iso(tz) }}">{{ alert.end | strftime("%a %-d %b, %H:%M", tz) }}</time>
                             </dd>
                         </dl>
-                        {% if alert.description %}<p class="alert__desc">{{ alert.description }}</p>{% endif %}
-                        {% if alert.tags %}
-                            <ul class="cluster alert__tags" aria-label="Alert tags">
-                                {% for tag in alert.tags %}
-                                    <li>
-                                        <span class="badge">{{ tag | lower }}</span>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
+                        {% if alert.description %}<p class="weather-alert__desc">{{ alert.description }}</p>{% endif %}
+                        {% if alert.tags %}<p>Tags: {{ alert.tags | map('lower') | join(", ") }}</p>{% endif %}
                     </div>
                 </article>
             {% endfor %}
@@ -564,7 +546,7 @@
         var MAP_LON = parseFloat(coordsEl.dataset.lon);
 
         function fmtTime(d, opts) {
-            return d.toLocaleString("en", Object.assign({
+            return d.toLocaleString("en-GB", Object.assign({
                 timeZone: TZ,
                 hour12: false
             }, opts));
@@ -575,6 +557,11 @@
             for (var i = 0; i < t.length; i++)
                 if (ms < t[i]) return i;
             return 12;
+        }
+
+        function describe(weather) {
+            var text = (weather && weather[0] && weather[0].description) || "";
+            return text.charAt(0).toUpperCase() + text.slice(1);
         }
 
         function windDir(deg) {
@@ -693,7 +680,7 @@
                     return {
                         date: new Date(d.dt * 1000),
                         temp: Math.round(d.temp),
-                        icon: d.weather[0].icon
+                        desc: describe(d.weather)
                     };
                 })
                 .filter(function(d) {
@@ -717,8 +704,8 @@
                 item.className = "hourly-reel__item";
                 item.innerHTML =
                     '<span class="hourly-reel__time">' + timeStr + "</span>" +
-                    window.wxWeatherIcon(h.icon, "hourly-reel__glyph") +
-                    '<span class="hourly-reel__temp">' + h.temp + "°</span>";
+                    '<span class="hourly-reel__temp">' + h.temp + "°</span>" +
+                    '<span class="hourly-reel__cond">' + h.desc + "</span>";
                 container.appendChild(item);
             });
         }
@@ -748,10 +735,10 @@
                 });
                 html += "<tr>" +
                     "<td>" + timeStr + "</td>" +
-                    '<td class="hour-table__cond">' + window.wxWeatherIcon(d.weather[0].icon) + "</td>" +
-                    '<td class="td--num">' + Math.round(d.temp) + "°</td>" +
-                    '<td class="td--num">' + Math.round(d.feels_like) + "°</td>" +
-                    '<td class="td--num">' + popPct + "%</td>" +
+                    '<td>' + describe(d.weather) + "</td>" +
+                    '<td class="table__num">' + Math.round(d.temp) + "°</td>" +
+                    '<td class="table__num">' + Math.round(d.feels_like) + "°</td>" +
+                    '<td class="table__num">' + popPct + "%</td>" +
                     "<td>" + toBft(d.wind_speed || 0) + " bft " + windDir(d.wind_deg || 0) + "</td>" +
                     "</tr>";
             });
@@ -802,6 +789,7 @@
             if (!mapEl || mapInstance) return;
 
             mapInstance = L.map("weather-map").setView([MAP_LAT, MAP_LON], 9);
+            mapInstance.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
 
             L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',

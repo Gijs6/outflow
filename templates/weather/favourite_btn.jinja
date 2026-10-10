@@ -1,4 +1,3 @@
-{% from "_macros.jinja" import icon %}
 <form class="favourite-form"
       method="post"
       action="{{ url_for('toggle_favourite', place_id=place_id) }}"
@@ -7,8 +6,5 @@
     <input type="hidden" name="name" value="{{ name }}">
     <input type="hidden" name="state" value="{{ state }}">
     <input type="hidden" name="country" value="{{ country_name }}">
-    <button type="submit"
-            class="icon-button favourite-btn{% if is_favourite %} is-active{% endif %}"
-            aria-pressed="{{ 'true' if is_favourite else 'false' }}"
-            aria-label="{{ 'Remove from favourites' if is_favourite else 'Add to favourites' }}">{{ icon("star") }}</button>
+    <button type="submit" class="btn" id="favourite-btn">{{ 'Remove from favourites' if is_favourite else 'Add to favourites' }}</button>
 </form>

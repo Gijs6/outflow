@@ -797,7 +797,12 @@
             var mapEl = document.getElementById("weather-map");
             if (!mapEl || mapInstance) return;
 
-            mapInstance = L.map("weather-map").setView([MAP_LAT, MAP_LON], 9);
+            mapInstance = L.map("weather-map", {
+                fadeAnimation: false,
+                zoomAnimation: false,
+                markerZoomAnimation: false,
+                inertia: false
+            }).setView([MAP_LAT, MAP_LON], 9);
             mapInstance.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
 
             L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {

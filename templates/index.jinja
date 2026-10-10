@@ -104,35 +104,35 @@
 {% endblock %}
 
 {% block extra_scripts %}
-            <script>
-                (function() {
-                    setupSearchDropdown(
-                        document.getElementById("home-search-input"),
-                        document.getElementById("home-search-results")
+    <script>
+        (function() {
+            setupSearchDropdown(
+                document.getElementById("home-search-input"),
+                document.getElementById("home-search-results")
+            );
+
+            var geoBtn = document.getElementById("home-geo-btn");
+            if (geoBtn) {
+                geoBtn.addEventListener("click", function() {
+                    if (!navigator.geolocation) return;
+                    geoBtn.disabled = true;
+                    geoBtn.textContent = "Locating...";
+                    navigator.geolocation.getCurrentPosition(
+                        function(pos) {
+                            window.location.href = "/goto/" + pos.coords.latitude + "," + pos.coords.longitude;
+                        },
+                        function() {
+                            geoBtn.disabled = false;
+                            geoBtn.textContent = "Use my location";
+                        }
                     );
+                });
+            }
 
-                    var geoBtn = document.getElementById("home-geo-btn");
-                    if (geoBtn) {
-                        geoBtn.addEventListener("click", function() {
-                            if (!navigator.geolocation) return;
-                            geoBtn.disabled = true;
-                            geoBtn.textContent = "Locating...";
-                            navigator.geolocation.getCurrentPosition(
-                                function(pos) {
-                                    window.location.href = "/goto/" + pos.coords.latitude + "," + pos.coords.longitude;
-                                },
-                                function() {
-                                    geoBtn.disabled = false;
-                                    geoBtn.textContent = "Use my location";
-                                }
-                            );
-                        });
-                    }
-
-                    if (window.matchMedia("(hover: hover)").matches) {
-                        var el = document.getElementById("home-search-input");
-                        if (el) el.focus();
-                    }
-                }());
-            </script>
-        {% endblock %}
+            if (window.matchMedia("(hover: hover)").matches) {
+                var el = document.getElementById("home-search-input");
+                if (el) el.focus();
+            }
+        }());
+    </script>
+{% endblock %}

@@ -1,5 +1,5 @@
-const CACHE = "outflow-v3";
-const STATIC = ["/static/styles/app.min.css", "/static/js/icons.js", "/static/vendor/htmx.min.js", "/static/images/icon-192.png", "/static/images/icon-512.png", "/static/favicon.svg", "/static/favicon.ico"];
+const CACHE = "outflow-v5";
+const STATIC = ["/static/styles/app.min.css", "/static/vendor/htmx.min.js", "/static/images/icon-192.png", "/static/images/icon-512.png", "/static/favicon.svg", "/static/favicon.ico"];
 
 self.addEventListener("install", (e) => {
     e.waitUntil(caches.open(CACHE).then((c) => c.addAll(STATIC)));
@@ -12,22 +12,19 @@ self.addEventListener("activate", (e) => {
 });
 
 self.addEventListener("fetch", (e) => {
+    if (e.request.method !== "GET") return;
     const url = new URL(e.request.url);
+    if (url.origin !== location.origin) return;
 
-    if (url.pathname.startsWith("/static/")) {
-        e.respondWith(
-            caches.match(e.request).then(
-                (cached) =>
-                    cached ||
-                    fetch(e.request).then((res) => {
-                        const clone = res.clone();
-                        caches.open(CACHE).then((c) => c.put(e.request, clone));
-                        return res;
-                    })
-            )
-        );
-        return;
-    }
-
-    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    e.respondWith(
+        fetch(e.request)
+            .then((res) => {
+                if (res.ok && url.pathname.startsWith("/static/")) {
+                    const clone = res.clone();
+                    caches.open(CACHE).then((c) => c.put(e.request, clone));
+                }
+                return res;
+            })
+            .catch(() => caches.match(e.request))
+    );
 });

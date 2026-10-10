@@ -1,5 +1,5 @@
 {% if error %}
-    <p class="search-dropdown__note search-dropdown__note--error">Search unavailable</p>
+    <p class="search-dropdown__note search-dropdown__note--error">Search is unavailable right now.</p>
 {% elif places %}
     <ul class="search-dropdown" role="listbox" aria-label="Search results">
         {% for place in places %}
@@ -21,5 +21,5 @@
         {% endfor %}
     </ul>
 {% else %}
-    <p class="search-dropdown__note">No results for "{{ query }}"</p>
+    <p class="search-dropdown__note">No place matches "{{ query }}".</p>
 {% endif %}

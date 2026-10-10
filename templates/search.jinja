@@ -44,7 +44,7 @@
             </div>
         {% elif places %}
             <section class="panel">
-                <h2 class="panel__heading">{{ places | length }} result{{ 's' if places | length != 1 }}</h2>
+                <h2 class="panel__heading">Results ({{ places | length }})</h2>
                 <ul class="list">
                     {% for place in places %}
                         <li class="list__item place-row">
@@ -67,7 +67,7 @@
         {% else %}
             <div class="empty">
                 <p class="empty__title">No results</p>
-                <p class="empty__text">Nothing matched "{{ query }}". Try a different place or a pair of coordinates.</p>
+                <p>No place matches "{{ query }}". Try another place or a pair of coordinates.</p>
             </div>
         {% endif %}
     {% endif %}

@@ -33,12 +33,14 @@
     </main>
 
     <footer class="footer">
-        <p>
-            <a href="{{ url_for('index') }}" class="footer__app">{% include "mark.svg" %}Outflow</a> by <a href="https://gijs6.nl">Gijs6</a>
-        </p>
-        <p>
-            <a href="https://unlicense.org" rel="license">Unlicensed</a>
-        </p>
+        <div class="footer__inner">
+            <p>
+                <a href="{{ url_for('index') }}" class="footer__app">{% include "mark.svg" %}Outflow</a> by <a href="https://gijs6.nl">Gijs6</a>
+            </p>
+            <p>
+                <a href="https://unlicense.org" rel="license">Unlicensed</a>
+            </p>
+        </div>
     </footer>
 
     <script>

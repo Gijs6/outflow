@@ -1,6 +1,5 @@
-{% from "_macros.jinja" import icon %}
 {% if error %}
-    <p class="search-dropdown__note search-dropdown__note--error">{{ icon("triangle-alert") }} Search unavailable</p>
+    <p class="search-dropdown__note search-dropdown__note--error">Search unavailable</p>
 {% elif places %}
     <ul class="search-dropdown" role="listbox" aria-label="Search results">
         {% for place in places %}
@@ -8,9 +7,9 @@
                 <a href="{{ url_for('weather', place_id=place.place_id) }}"
                    class="search-dropdown__row">
                     <span class="search-dropdown__name">{{ place.name }}</span>
-                    <span class="search-dropdown__meta{% if place.is_direct %} search-dropdown__meta--direct{% endif %}">
+                    <span class="search-dropdown__meta">
                         {%- if place.is_direct -%}
-                            {{ icon("map-pin") }} Coordinates
+                            Coordinates
                         {%- elif place.state -%}
                             {{ place.state }}, {{ place.country }}
                         {%- else -%}

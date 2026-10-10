@@ -4,27 +4,29 @@
     <header class="navbar">
         <div class="navbar__inner">
             <a href="{{ url_for('index') }}" class="navbar__brand">{% include "mark.svg" %}Outflow</a>
-            <div class="header-search">
-                <form action="{{ url_for('search') }}"
-                      method="get"
-                      role="search"
-                      aria-label="Search for a place"
-                      class="header-search__form">
-                    <label for="header-search-input" class="visually-hidden">Search for a place</label>
-                    <input id="header-search-input"
-                           class="header-search__input"
-                           type="search"
-                           name="q"
-                           placeholder="Search a place"
-                           autocomplete="off"
-                           hx-get="{{ url_for('search') }}"
-                           hx-trigger="input changed delay:300ms"
-                           hx-target="#header-search-results" />
-                </form>
-                <div id="header-search-results"
-                     class="header-search__dropdown search-dropdown-wrap"
-                     aria-live="polite"></div>
-            </div>
+            {% block header_search %}
+                <div class="header-search">
+                    <form action="{{ url_for('search') }}"
+                          method="get"
+                          role="search"
+                          aria-label="Search for a place"
+                          class="header-search__form">
+                        <label for="header-search-input" class="visually-hidden">Search for a place</label>
+                        <input id="header-search-input"
+                               class="header-search__input"
+                               type="search"
+                               name="q"
+                               placeholder="Search for a place"
+                               autocomplete="off"
+                               hx-get="{{ url_for('search') }}"
+                               hx-trigger="input changed delay:300ms"
+                               hx-target="#header-search-results" />
+                    </form>
+                    <div id="header-search-results"
+                         class="header-search__dropdown search-dropdown-wrap"
+                         aria-live="polite"></div>
+                </div>
+            {% endblock %}
         </div>
     </header>
 

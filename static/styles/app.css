@@ -340,7 +340,7 @@
 
 .map-layers__btn.is-active {
     font-weight: 700;
-    background: var(--btn-hover);
+    border-color: var(--fg);
 }
 
 .map-canvas {

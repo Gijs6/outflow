@@ -1,2 +1,1 @@
-{% from "_macros.jinja" import weather_icon %}
-<span class="place-weather">{{ weather_icon(icon) }}{{ temp }}°</span>
+<span class="place-weather">{{ temp }}° <span class="muted">{{ description | ucfirst }}</span></span>

@@ -151,11 +151,11 @@ def place_weather_mini(place_id):
     try:
         lat, lon = decode_place_id(place_id)
         data = get_weather(lat, lon)
-        icon = data["current"]["weather"][0]["icon"]
+        description = data["current"]["weather"][0]["description"]
         temp = round(data["current"]["temp"], 1)
     except Exception:
         return ""
-    return render_template("home_place_weather.jinja", icon=icon, temp=temp)
+    return render_template("home_place_weather.jinja", description=description, temp=temp)
 
 
 @app.route("/lucky")

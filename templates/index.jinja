@@ -1,122 +1,107 @@
 {% extends "base.jinja" %}
 
-{% from "_macros.jinja" import icon %}
+{% from "_macros.jinja" import place_meta %}
 
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    <div class="home">
-        <section class="home__intro">
-            <h1>Weather</h1>
-            <p class="lead">Search for any city, or enter a pair of coordinates.</p>
+    <div class="page-head">
+        <h1>Weather</h1>
+    </div>
 
-            <div class="home__search">
-                <form action="{{ url_for('search') }}"
-                      method="get"
-                      role="search"
-                      aria-label="Place search"
-                      class="home__search-form input-affix">
-                    {{ icon("search") }}
-                    <label for="home-search-input" class="visually-hidden">Search for a place</label>
-                    <input id="home-search-input"
-                           class="field__control field__control--full"
-                           type="search"
-                           name="q"
-                           placeholder="Amsterdam, London, New York"
-                           autocomplete="off"
-                           aria-autocomplete="list"
-                           aria-controls="home-search-results"
-                           hx-get="{{ url_for('search') }}"
-                           hx-trigger="input changed delay:300ms"
-                           hx-target="#home-search-results"
-                           hx-indicator="#home-search-status" />
-                </form>
-                <span id="home-search-status"
-                      class="home__search-status htmx-indicator"
-                      aria-hidden="true">Searching</span>
-                <div id="home-search-results"
-                     class="home__search-dropdown search-dropdown-wrap"
-                     role="listbox"
-                     aria-label="Search suggestions"></div>
-            </div>
+    <p class="lead">Search for any city, or enter a pair of coordinates.</p>
 
-            <div class="cluster">
-                <button type="button"
-                        class="button button--ghost button--sm"
-                        id="home-geo-btn">{{ icon("locate-fixed") }} Use my location</button>
-                <a href="{{ url_for('lucky') }}" class="button button--ghost button--sm">{{ icon("dices") }} Feeling lucky</a>
-            </div>
-        </section>
+    <div class="home__search">
+        <form action="{{ url_for('search') }}"
+              method="get"
+              role="search"
+              aria-label="Place search"
+              class="field home__search-form">
+            <label class="field__label" for="home-search-input">Search for a place</label>
+            <input id="home-search-input"
+                   type="search"
+                   name="q"
+                   placeholder="Amsterdam, London, New York"
+                   autocomplete="off"
+                   aria-autocomplete="list"
+                   aria-controls="home-search-results"
+                   hx-get="{{ url_for('search') }}"
+                   hx-trigger="input changed delay:300ms"
+                   hx-target="#home-search-results"
+                   hx-indicator="#home-search-status" />
+            <span id="home-search-status"
+                  class="field__hint htmx-indicator"
+                  aria-hidden="true">Searching...</span>
+        </form>
+        <div id="home-search-results"
+             class="home__search-dropdown search-dropdown-wrap"
+             role="listbox"
+             aria-label="Search suggestions"></div>
+    </div>
 
-        {% if favourite_places %}
-            <nav class="home__group" aria-label="Favourite places">
-                <h2 class="home__group-label">Favourites</h2>
-                <ul class="row-list" role="list">
-                    {% for place in favourite_places %}
-                        <li>
-                            <a href="{{ url_for('weather', place_id=place.place_id) }}"
-                               class="row-list__row">
-                                <span class="row-list__main">
-                                    <span class="row-list__name">{{ place.name }}</span>
-                                    {% if place.state or place.country %}
-                                        <span class="row-list__meta">
-                                            {%- if place.state -%}{{ place.state }}{%- endif -%}
-                                                {%- if place.state and place.country -%},
-                                                {% endif -%}
-                                                {%- if place.country -%}{{ place.country }}{%- endif -%}
-                                                </span>
-                                            {% endif %}
-                                        </span>
-                                        <span class="place-weather place-weather--loading"
-                                              hx-get="{{ url_for('place_weather_mini', place_id=place.place_id) }}"
-                                              hx-trigger="load"
-                                              hx-swap="outerHTML"></span>
-                                    </a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </nav>
-                {% endif %}
+    <div class="form__actions home__actions">
+        <button type="button" class="btn" id="home-geo-btn">Use my location</button>
+        <a href="{{ url_for('lucky') }}" class="btn">Feeling lucky</a>
+    </div>
 
-                {% if recent_places %}
-                    <nav class="home__group"
-                         id="home-recents"
-                         aria-label="Recently viewed places">
-                        <div class="home__group-head">
-                            <h2 class="home__group-label">Recent</h2>
-                            <button class="button button--quiet button--sm"
-                                    hx-post="{{ url_for('clear_recents') }}"
-                                    hx-target="#home-recents"
-                                    hx-swap="outerHTML">Clear</button>
-                        </div>
-                        <ul class="chip-list" role="list">
-                            {% for place in recent_places %}
-                                <li>
-                                    <a href="{{ url_for('weather', place_id=place.place_id) }}" class="chip">{{ place.name }}{%- if place.state -%}, {{ place.state }}{%- endif -%}{%- if place.country -%}, {{ place.country }}{%- endif -%}</a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </nav>
-                {% endif %}
+    {% if favourite_places %}
+        <nav class="panel" aria-label="Favourite places">
+            <h2 class="panel__heading">Favourites</h2>
+            <ul class="list">
+                {% for place in favourite_places %}
+                    <li class="list__item place-row">
+                        <span>
+                            <a href="{{ url_for('weather', place_id=place.place_id) }}" class="place-row__name">{{ place.name }}</a>
+                            {% if place.state or place.country %}<span class="muted">{{ place_meta(place) }}</span>{% endif %}
+                        </span>
+                        <span class="place-weather place-weather--loading"
+                              hx-get="{{ url_for('place_weather_mini', place_id=place.place_id) }}"
+                              hx-trigger="load"
+                              hx-swap="outerHTML"></span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    {% endif %}
 
-                {% if suggested_cities %}
-                    <nav class="home__group" aria-label="Suggested places">
-                        <h2 class="home__group-label">Discover</h2>
-                        <ul class="chip-list" role="list">
-                            {% for place in suggested_cities %}
-                                <li>
-                                    <a href="{{ url_for('weather', place_id=place.place_id) }}" class="chip">{{ place.name }}</a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </nav>
-                {% endif %}
+    {% if recent_places %}
+        <nav class="panel" id="home-recents" aria-label="Recently viewed places">
+            <h2 class="panel__heading">
+                Recent
+                <button class="btn btn--sm"
+                        hx-post="{{ url_for('clear_recents') }}"
+                        hx-target="#home-recents"
+                        hx-swap="outerHTML">Clear</button>
+            </h2>
+            <ul class="list">
+                {% for place in recent_places %}
+                    <li class="list__item place-row">
+                        <span>
+                            <a href="{{ url_for('weather', place_id=place.place_id) }}" class="place-row__name">{{ place.name }}</a>
+                            {% if place.state or place.country %}<span class="muted">{{ place_meta(place) }}</span>{% endif %}
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    {% endif %}
 
-                <p class="home__db">{{ db_stats.city_count | thousands }} cities across {{ db_stats.country_count }} countries</p>
-            </div>
-        {% endblock %}
+    {% if suggested_cities %}
+        <nav class="panel" aria-label="Suggested places">
+            <h2 class="panel__heading">Discover</h2>
+            <p class="panel__body">
+                {% for place in suggested_cities -%}
+                    <a href="{{ url_for('weather', place_id=place.place_id) }}">{{ place.name }}</a>
+                    {%- if not loop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+        </nav>
+    {% endif %}
 
-        {% block extra_scripts %}
+    <p class="muted">{{ db_stats.city_count | thousands }} cities across {{ db_stats.country_count }} countries</p>
+{% endblock %}
+
+{% block extra_scripts %}
             <script>
                 (function() {
                     setupSearchDropdown(
@@ -129,14 +114,14 @@
                         geoBtn.addEventListener("click", function() {
                             if (!navigator.geolocation) return;
                             geoBtn.disabled = true;
-                            geoBtn.lastChild.textContent = " Locating";
+                            geoBtn.textContent = "Locating...";
                             navigator.geolocation.getCurrentPosition(
                                 function(pos) {
                                     window.location.href = "/goto/" + pos.coords.latitude + "," + pos.coords.longitude;
                                 },
                                 function() {
                                     geoBtn.disabled = false;
-                                    geoBtn.lastChild.textContent = " Use my location";
+                                    geoBtn.textContent = "Use my location";
                                 }
                             );
                         });

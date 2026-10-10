@@ -1,24 +1,15 @@
 {% extends "skeleton.jinja" %}
 
-{% from "_macros.jinja" import icon %}
-
-{% block body_class %}page page--topnav{% endblock %}
-
 {% block body_content %}
-    <header class="app-bar">
-        <a href="{{ url_for('index') }}" class="wordmark">
-            <span class="wordmark__mark">{{ icon("cloud-sun") }}</span>
-            <span class="wordmark__text">Outflow</span>
-        </a>
-
-        <div class="app-bar__actions">
+    <header class="navbar">
+        <div class="navbar__inner">
+            <a href="{{ url_for('index') }}" class="navbar__brand">{% include "mark.svg" %}Outflow</a>
             <div class="header-search">
                 <form action="{{ url_for('search') }}"
                       method="get"
                       role="search"
                       aria-label="Search for a place"
-                      class="search header-search__form">
-                    {{ icon("search") }}
+                      class="header-search__form">
                     <label for="header-search-input" class="visually-hidden">Search for a place</label>
                     <input id="header-search-input"
                            class="header-search__input"
@@ -28,11 +19,7 @@
                            autocomplete="off"
                            hx-get="{{ url_for('search') }}"
                            hx-trigger="input changed delay:300ms"
-                           hx-target="#header-search-results"
-                           hx-indicator="#header-search-status" />
-                    <span id="header-search-status"
-                          class="header-search__status htmx-indicator"
-                          aria-hidden="true">Searching</span>
+                           hx-target="#header-search-results" />
                 </form>
                 <div id="header-search-results"
                      class="header-search__dropdown search-dropdown-wrap"
@@ -41,24 +28,15 @@
         </div>
     </header>
 
-    <main class="page__main">
+    <main class="page">
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="site-footer">
-        <ul class="site-footer__credits">
-            <li>
-                Weather data from <a href="https://openweathermap.org/" rel="noopener">OpenWeatherMap</a>
-            </li>
-            <li>
-                Map tiles from <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a> contributors
-            </li>
-        </ul>
-        <p class="site-footer__meta">
-            <span class="site-footer__id">
-                <span class="site-footer__mark">{{ icon("cloud-sun") }}</span>
-                <b class="site-footer__name">Outflow</b> by <a class="site-footer__by" href="https://gijs6.nl">Gijs6</a>
-            </span>
+    <footer class="footer">
+        <p>
+            <a href="{{ url_for('index') }}" class="footer__app">{% include "mark.svg" %}Outflow</a> by <a href="https://gijs6.nl">Gijs6</a>
+        </p>
+        <p>
             <a href="https://unlicense.org" rel="license">Unlicensed</a>
         </p>
     </footer>
@@ -77,11 +55,8 @@
             target.classList.remove("island--loading");
             target.classList.add("island--error");
             target.innerHTML =
-                '<div class="notice notice--danger notice--loud">' +
-                window.wxIcon("triangle-alert", "notice__icon") +
-                '<div class="notice__body"><p>Something went wrong while loading.</p>' +
-                '<div class="notice__actions"><button type="button" class="button button--sm" onclick="window.location.reload()">' +
-                window.wxIcon("rotate-cw") + " Try again</button></div></div></div>";
+                '<div class="alert alert--danger"><p>Something went wrong while loading.</p>' +
+                '<div class="form__actions island__retry"><button type="button" class="btn btn--sm" onclick="window.location.reload()">Try again</button></div></div>';
         }
 
         document.addEventListener("htmx:responseError", function(e) {
@@ -106,6 +81,8 @@
                 return Array.from(dropdownEl.querySelectorAll("a"));
             }
 
+            var dismissed = false;
+
             inputEl.addEventListener("keydown", function(e) {
                 var items = getItems();
                 if (!items.length) return;
@@ -114,7 +91,6 @@
                     items[0].focus();
                 } else if (e.key === "Escape") {
                     dropdownEl.hidden = true;
-                    inputEl.focus();
                 }
             });
 
@@ -132,6 +108,7 @@
                 } else if (e.key === "Escape") {
                     e.preventDefault();
                     dropdownEl.hidden = true;
+                    dismissed = true;
                     inputEl.focus();
                 }
             });
@@ -145,6 +122,10 @@
             });
 
             inputEl.addEventListener("focus", function() {
+                if (dismissed) {
+                    dismissed = false;
+                    return;
+                }
                 if (getItems().length) dropdownEl.hidden = false;
             });
         }

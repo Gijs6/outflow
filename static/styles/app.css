@@ -27,7 +27,6 @@
     min-inline-size: 16rem;
     background: var(--page);
     border: 1px solid var(--rule);
-    box-shadow: 0 2px 6px var(--shadow);
 
     &:empty {
         display: none;

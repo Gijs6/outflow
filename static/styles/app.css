@@ -274,10 +274,6 @@
     background: var(--head-soft);
 }
 
-.forecast-empty {
-    color: var(--muted);
-}
-
 .day-list {
     margin: 0 calc(-1 * var(--space-sm)) var(--space-2xl);
     border-block: 1px solid var(--rule);

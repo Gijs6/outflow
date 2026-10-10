@@ -322,7 +322,10 @@
                 </table>
             </div>
         {% else %}
-            <p class="forecast-empty">Hourly data is unavailable for this place.</p>
+            <div class="empty">
+                <p class="empty__title">No hourly forecast</p>
+                <p>Hourly data is unavailable for this place.</p>
+            </div>
         {% endif %}
     </section>
 
@@ -416,7 +419,10 @@
                 {% endfor %}
             </div>
         {% else %}
-            <p class="forecast-empty">Daily forecast is unavailable for this place.</p>
+            <div class="empty">
+                <p class="empty__title">No daily forecast</p>
+                <p>Daily data is unavailable for this place.</p>
+            </div>
         {% endif %}
     </section>
 
@@ -479,7 +485,10 @@
                 </div>
             </section>
         {% else %}
-            <p class="forecast-empty">Air quality data is unavailable for this place.</p>
+            <div class="empty">
+                <p class="empty__title">No air quality data</p>
+                <p>Air quality data is unavailable for this place.</p>
+            </div>
         {% endif %}
     </section>
 

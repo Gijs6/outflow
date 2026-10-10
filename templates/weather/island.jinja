@@ -377,7 +377,7 @@
                                 {% if day.uvi %}
                                     <dt>UV index</dt>
                                     <dd>
-                                        {{ "%.1f" | format(day.uvi) }}
+                                        {{ "%.0f" | format(day.uvi) }}
                                     </dd>
                                 {% endif %}
                                 <dt>Pressure</dt>

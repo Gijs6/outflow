@@ -39,9 +39,7 @@
 
     {% if query %}
         {% if error %}
-            <div class="alert alert--danger">
-                <p>Search is unavailable right now.</p>
-            </div>
+            <p class="alert alert--danger">Search is unavailable right now. Try again later.</p>
         {% elif places %}
             <section class="panel">
                 <h2 class="panel__heading">Results ({{ places | length }})</h2>

@@ -501,11 +501,11 @@
              aria-labelledby="tab-btn-map"
              class="tab-panel forecast-panel forecast-panel--map"
              hidden>
-        <div class="form__actions map-layers" role="group" aria-label="Map layer">
+        <div class="btn-group map-layers" role="group" aria-label="Map layer">
             {% set layers = [('precipitation_new', 'Precipitation'), ('temp_new', 'Temperature'), ('clouds_new', 'Clouds'), ('wind_new', 'Wind'), ('pressure_new', 'Pressure')] %}
             {% for layer_id, layer_label in layers %}
                 <button type="button"
-                        class="btn btn--sm map-layers__btn{% if loop.first %} is-active{% endif %}"
+                        class="btn btn--sm map-layers__btn"
                         data-layer="{{ layer_id }}"
                         aria-pressed="{{ 'true' if loop.first else 'false' }}">{{ layer_label }}</button>
             {% endfor %}
@@ -828,10 +828,8 @@
             document.querySelectorAll(".map-layers__btn").forEach(function(btn) {
                 btn.addEventListener("click", function() {
                     document.querySelectorAll(".map-layers__btn").forEach(function(b) {
-                        b.classList.remove("is-active");
                         b.setAttribute("aria-pressed", "false");
                     });
-                    btn.classList.add("is-active");
                     btn.setAttribute("aria-pressed", "true");
                     currentLayer = btn.dataset.layer;
                     if (mapOverlayLayer) mapInstance.removeLayer(mapOverlayLayer);

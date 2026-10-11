@@ -338,11 +338,6 @@
     margin-block-end: var(--space-md);
 }
 
-.map-layers__btn.is-active {
-    font-weight: 700;
-    border-color: var(--fg);
-}
-
 .map-canvas {
     block-size: 420px;
     border: 1px solid var(--rule);

@@ -1,12 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
         <title>{%- block title -%}{%- endblock %} - Outflow</title>
-        <meta name="description" content="A simple weather app" />
-        <meta name="theme-color" content="#087f5b" />
+        <meta name="description" content="Weather forecasts for any place." />
+        <meta name="theme-color"
+              content="#087f5b"
+              media="(prefers-color-scheme: light)" />
+        <meta name="theme-color"
+              content="#086a4d"
+              media="(prefers-color-scheme: dark)" />
 
         <link rel="icon"
               href="{{ url_for('static', filename='favicon.svg') }}"

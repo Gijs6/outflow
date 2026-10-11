@@ -2,6 +2,7 @@ from flask import (
     Flask,
     Response,
     abort,
+    flash,
     render_template,
     url_for,
     redirect,
@@ -20,6 +21,8 @@ from dotenv import load_dotenv
 import pycountry
 
 from utils.filters import register_filters
+from utils.toasts import register_toasts
+from utils.version import register_version
 import utils.owm as owm_module
 from utils.owm import (
     get_weather,
@@ -60,6 +63,8 @@ app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=365)
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
 register_filters(app)
+register_toasts(app)
+register_version(app, "wind")
 owm_module.DEBUG = app.debug
 
 
@@ -143,6 +148,7 @@ def index():
 @app.route("/recents/clear", methods=["POST"])
 def clear_recents():
     session["recent_places"] = []
+    flash("Recent places cleared.", "success")
     return ""
 
 
@@ -346,6 +352,14 @@ def toggle_favourite(place_id):
         )
 
     session["favourite_places"] = favourites
+    label = name or "Place"
+    if is_favourite:
+        flash(f"Removed {label} from favourites.", "success")
+    else:
+        flash(f"Added {label} to favourites.", "success")
+
+    if not request.headers.get("HX-Request"):
+        return redirect(url_for("weather", place_id=place_id), code=303)
 
     return render_template(
         "weather/favourite_btn.jinja",

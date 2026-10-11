@@ -20,5 +20,6 @@ build() {
 
 deploy() {
   build
+  i:version
   g:deploy
 }

@@ -7,3 +7,4 @@ node_modules
 *.sqlite3
 data/.secret_key
 static/vendor
+VERSION

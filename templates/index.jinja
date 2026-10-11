@@ -57,6 +57,7 @@
                             {% if place.state or place.country %}<span class="muted">{{ place_meta(place) }}</span>{% endif %}
                         </span>
                         <span class="place-weather place-weather--loading"
+                              data-error-inline
                               hx-get="{{ url_for('place_weather_mini', place_id=place.place_id) }}"
                               hx-trigger="load"
                               hx-swap="outerHTML"></span>

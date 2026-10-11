@@ -555,7 +555,7 @@
             return d.toLocaleString("en-GB", Object.assign({
                 timeZone: TZ,
                 hour12: false
-            }, opts));
+            }, opts)).replace("Sept", "Sep");
         }
 
         function toBft(ms) {

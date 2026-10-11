@@ -269,6 +269,7 @@
                 <h2 class="panel__heading">Next 2 days</h2>
                 <div class="reel hourly-reel"
                      id="overview-hourly-strip"
+                     role="group"
                      aria-label="Hourly forecast"></div>
             </section>
         {% endif %}
@@ -310,7 +311,8 @@
         {% if hourly_data %}
             <div class="reel hourly-reel"
                  id="hourly-reel"
-                 aria-label="Coming days at a glance"></div>
+                 role="group"
+                 aria-label="Hourly forecast"></div>
             <div class="table-wrap">
                 <table class="table hour-table">
                     <thead>
@@ -512,7 +514,8 @@
         </div>
         <div id="weather-map"
              class="map-canvas"
-             aria-label="Interactive weather map"></div>
+             role="region"
+             aria-label="Weather map"></div>
     </section>
 
     {% if alerts %}

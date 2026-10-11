@@ -204,54 +204,61 @@
         </div>
     {% endif %}
 
-    <nav class="forecast-tabs" aria-label="Weather sections">
-        <div class="tabs" role="tablist" id="weather-tablist">
-            <button role="tab"
-                    id="tab-btn-overview"
-                    aria-selected="true"
-                    aria-controls="tab-panel-overview"
-                    tabindex="0"
-                    class="tabs__tab is-active"
-                    data-tab="overview">Overview</button>
-            <button role="tab"
-                    id="tab-btn-hourly"
+    <div class="tabs"
+         role="tablist"
+         id="weather-tablist"
+         aria-label="Weather sections">
+        <button type="button"
+                role="tab"
+                id="tab-btn-overview"
+                aria-selected="true"
+                aria-controls="tab-panel-overview"
+                tabindex="0"
+                class="tabs__tab is-active"
+                data-tab="overview">Overview</button>
+        <button type="button"
+                role="tab"
+                id="tab-btn-hourly"
+                aria-selected="false"
+                aria-controls="tab-panel-hourly"
+                tabindex="-1"
+                class="tabs__tab"
+                data-tab="hourly">Hourly</button>
+        <button type="button"
+                role="tab"
+                id="tab-btn-daily"
+                aria-selected="false"
+                aria-controls="tab-panel-daily"
+                tabindex="-1"
+                class="tabs__tab"
+                data-tab="daily">{{ daily_data | length }}-day</button>
+        <button type="button"
+                role="tab"
+                id="tab-btn-air"
+                aria-selected="false"
+                aria-controls="tab-panel-air"
+                tabindex="-1"
+                class="tabs__tab"
+                data-tab="air">Air quality</button>
+        <button type="button"
+                role="tab"
+                id="tab-btn-map"
+                aria-selected="false"
+                aria-controls="tab-panel-map"
+                tabindex="-1"
+                class="tabs__tab"
+                data-tab="map">Map</button>
+        {% if alerts %}
+            <button type="button"
+                    role="tab"
+                    id="tab-btn-alerts"
                     aria-selected="false"
-                    aria-controls="tab-panel-hourly"
+                    aria-controls="tab-panel-alerts"
                     tabindex="-1"
                     class="tabs__tab"
-                    data-tab="hourly">Hourly</button>
-            <button role="tab"
-                    id="tab-btn-daily"
-                    aria-selected="false"
-                    aria-controls="tab-panel-daily"
-                    tabindex="-1"
-                    class="tabs__tab"
-                    data-tab="daily">{{ daily_data | length }}-day</button>
-            <button role="tab"
-                    id="tab-btn-air"
-                    aria-selected="false"
-                    aria-controls="tab-panel-air"
-                    tabindex="-1"
-                    class="tabs__tab"
-                    data-tab="air">Air quality</button>
-            <button role="tab"
-                    id="tab-btn-map"
-                    aria-selected="false"
-                    aria-controls="tab-panel-map"
-                    tabindex="-1"
-                    class="tabs__tab"
-                    data-tab="map">Map</button>
-            {% if alerts %}
-                <button role="tab"
-                        id="tab-btn-alerts"
-                        aria-selected="false"
-                        aria-controls="tab-panel-alerts"
-                        tabindex="-1"
-                        class="tabs__tab"
-                        data-tab="alerts">Alerts ({{ alerts | length }})</button>
-            {% endif %}
-        </div>
-    </nav>
+                    data-tab="alerts">Alerts ({{ alerts | length }})</button>
+        {% endif %}
+    </div>
 
     <section role="tabpanel"
              id="tab-panel-overview"

@@ -3,8 +3,8 @@
       action="{{ url_for('toggle_favourite', place_id=place_id) }}"
       hx-post="{{ url_for('toggle_favourite', place_id=place_id) }}"
       hx-swap="outerHTML">
-    <input type="hidden" name="name" value="{{ name }}">
-    <input type="hidden" name="state" value="{{ state }}">
-    <input type="hidden" name="country" value="{{ country_name }}">
+    <input type="hidden" name="name" value="{{ name }}" />
+    <input type="hidden" name="state" value="{{ state }}" />
+    <input type="hidden" name="country" value="{{ country_name }}" />
     <button type="submit" class="btn" id="favourite-btn">{{ 'Remove from favourites' if is_favourite else 'Add to favourites' }}</button>
 </form>

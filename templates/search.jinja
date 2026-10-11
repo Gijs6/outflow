@@ -1,6 +1,6 @@
 {% extends "base.jinja" %}
 
-{% block title %}{{ query }} - Search{% endblock %}
+{% block title %}{% if query %}{{ query }} - {% endif %}Search{% endblock %}
 
 {% block header_search %}{% endblock %}
 

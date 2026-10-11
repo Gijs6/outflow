@@ -128,11 +128,6 @@
     margin-block-start: var(--space-sm);
 }
 
-.place-summary {
-    margin-block-end: var(--space-xl);
-    color: var(--muted);
-}
-
 .conditions {
     display: flex;
     flex-wrap: wrap;
@@ -163,7 +158,7 @@
 .readings {
     display: grid;
     grid-template-columns: max-content 1fr max-content 1fr;
-    margin: 0 calc(-1 * var(--space-sm)) var(--space-2xl);
+    margin: 0 0 var(--space-2xl);
     border-block: 1px solid var(--rule);
 
     div {
@@ -238,7 +233,6 @@
 .hourly-reel {
     display: flex;
     overflow-x: auto;
-    margin-inline: calc(-1 * var(--space-sm));
     border-block: 1px solid var(--rule);
 }
 
@@ -275,7 +269,7 @@
 }
 
 .day-list {
-    margin: 0 calc(-1 * var(--space-sm)) var(--space-2xl);
+    margin: 0 0 var(--space-2xl);
     border-block: 1px solid var(--rule);
 }
 

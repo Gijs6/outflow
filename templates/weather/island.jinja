@@ -23,17 +23,17 @@
 
     {% set place_parts = [location.state, country_name] | select | list %}
     <div class="page-head">
-        <h1>{{ location.name or "%.4f, %.4f" | format(lat, lon) }}</h1>
+        <div>
+            <h1>{{ location.name or "%.4f, %.4f" | format(lat, lon) }}</h1>
+            <p class="page-head__sub">
+                {% if place_parts %}{{ place_parts | join(", ") }},{% endif %}
+                <time datetime="{{ weather.current.dt | to_iso(tz) }}">{{ weather.current.dt | strftime("%a %-d %b %Y, %H:%M", tz) }}</time>
+            </p>
+        </div>
         <div class="page-head__actions">
             {% include "weather/favourite_btn.jinja" %}
-
         </div>
     </div>
-
-    <p class="place-summary">
-        {% if place_parts %}{{ place_parts | join(", ") }},{% endif %}
-        <time datetime="{{ weather.current.dt | to_iso(tz) }}">{{ weather.current.dt | strftime("%a %-d %b %Y, %H:%M", tz) }}</time>
-    </p>
 
     <div class="conditions">
         <p class="conditions__temp">

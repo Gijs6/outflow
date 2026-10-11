@@ -37,12 +37,12 @@
 
     <div class="conditions">
         <p class="conditions__temp">
-            <data value="{{ weather.current.temp }}">{{ weather.current.temp | round(1) }}°</data>
+            <data value="{{ weather.current.temp }}">{{ weather.current.temp | round(1) }} °C</data>
         </p>
         <div class="conditions__meta">
             <p class="conditions__desc">{{ weather.current.weather | map(attribute='description') | join(', ') | ucfirst }}</p>
             <p class="conditions__feels">
-                Feels like <data value="{{ weather.current.feels_like }}">{{ weather.current.feels_like | round(1) }}°</data>
+                Feels like <data value="{{ weather.current.feels_like }}">{{ weather.current.feels_like | round(1) }} °C</data>
             </p>
         </div>
     </div>
@@ -71,7 +71,7 @@
         <div>
             <dt>Dew point</dt>
             <dd>
-                {{ weather.current.dew_point | round | int }}°
+                {{ weather.current.dew_point | round | int }} °C
             </dd>
         </div>
         <div>
@@ -293,7 +293,7 @@
                                         <time datetime="{{ day.dt | to_iso(tz) }}">{{ day.dt | strftime("%a %-d %b", tz) }}</time>
                                     </td>
                                     <td>{{ day.weather | map(attribute='description') | join(', ') | ucfirst }}</td>
-                                    <td class="table__num">{{ day.temp.min | round | int }}° / {{ day.temp.max | round | int }}°</td>
+                                    <td class="table__num">{{ day.temp.min | round | int }} °C / {{ day.temp.max | round | int }} °C</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -350,7 +350,7 @@
                                 <time datetime="{{ day.dt | to_iso(tz) }}">{{ day.dt | strftime("%a %-d %b", tz) }}</time>
                             </span>
                             <span class="day-list__desc">{{ day.weather | map(attribute='description') | join(', ') | ucfirst }}</span>
-                            <span class="day-list__temps">{{ day.temp.min | round | int }}° / {{ day.temp.max | round | int }}°</span>
+                            <span class="day-list__temps">{{ day.temp.min | round | int }} °C / {{ day.temp.max | round | int }} °C</span>
                         </summary>
                         <div class="accordion__panel">
                             {% if day.summary is defined and day.summary %}<p class="day-list__note">{{ day.summary | ucfirst }}</p>{% endif %}
@@ -361,12 +361,12 @@
                                 </dd>
                                 <dt>Daytime</dt>
                                 <dd>
-                                    Morning {{ day.temp.morn | round | int }}°, day {{ day.temp.day | round | int }}°, evening {{ day.temp.eve | round | int }}°, night {{ day.temp.night | round | int }}°
+                                    Morning {{ day.temp.morn | round | int }} °C, day {{ day.temp.day | round | int }} °C, evening {{ day.temp.eve | round | int }} °C, night {{ day.temp.night | round | int }} °C
                                 </dd>
                                 {% if day.feels_like %}
                                     <dt>Feels like</dt>
                                     <dd>
-                                        Morning {{ day.feels_like.morn | round | int }}°, day {{ day.feels_like.day | round | int }}°, evening {{ day.feels_like.eve | round | int }}°, night {{ day.feels_like.night | round | int }}°
+                                        Morning {{ day.feels_like.morn | round | int }} °C, day {{ day.feels_like.day | round | int }} °C, evening {{ day.feels_like.eve | round | int }} °C, night {{ day.feels_like.night | round | int }} °C
                                     </dd>
                                 {% endif %}
                                 <dt>Wind</dt>
@@ -395,7 +395,7 @@
                                 {% if day.dew_point %}
                                     <dt>Dew point</dt>
                                     <dd>
-                                        {{ day.dew_point | round | int }}°
+                                        {{ day.dew_point | round | int }} °C
                                     </dd>
                                 {% endif %}
                                 {% if day.sunrise %}
@@ -720,7 +720,7 @@
                 item.className = "hourly-reel__item";
                 item.innerHTML =
                     '<span class="hourly-reel__time">' + timeStr + "</span>" +
-                    '<span class="hourly-reel__temp">' + h.temp + "°</span>" +
+                    '<span class="hourly-reel__temp">' + h.temp + " °C</span>" +
                     '<span class="hourly-reel__cond">' + h.desc + "</span>";
                 container.appendChild(item);
             });
@@ -752,8 +752,8 @@
                 html += "<tr>" +
                     "<td>" + timeStr + "</td>" +
                     '<td>' + describe(d.weather) + "</td>" +
-                    '<td class="table__num">' + Math.round(d.temp) + "°</td>" +
-                    '<td class="table__num">' + Math.round(d.feels_like) + "°</td>" +
+                    '<td class="table__num">' + Math.round(d.temp) + " °C</td>" +
+                    '<td class="table__num">' + Math.round(d.feels_like) + " °C</td>" +
                     '<td class="table__num">' + popPct + "%</td>" +
                     "<td>" + toBft(d.wind_speed || 0) + " bft " + windDir(d.wind_deg || 0) + "</td>" +
                     "</tr>";

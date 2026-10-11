@@ -70,10 +70,11 @@
         <nav class="panel" id="home-recents" aria-label="Recently viewed places">
             <h2 class="panel__heading">
                 Recent
-                <button class="btn btn--sm"
+                <button type="button"
+                        class="btn btn--sm"
                         hx-post="{{ url_for('clear_recents') }}"
                         hx-target="#home-recents"
-                        hx-swap="outerHTML">Clear</button>
+                        hx-swap="outerHTML">Clear recent</button>
             </h2>
             <ul class="list">
                 {% for place in recent_places %}

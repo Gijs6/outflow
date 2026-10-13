@@ -43,12 +43,12 @@
 
     <div class="form__actions home__actions">
         <button type="button" class="btn" id="home-geo-btn">Use my location</button>
-        <a href="{{ url_for('lucky') }}" class="btn">Feeling lucky</a>
+        <a href="{{ url_for('lucky') }}" class="btn">Show a random place</a>
     </div>
 
     {% if favourite_places %}
-        <nav class="panel" aria-label="Favourite places">
-            <h2 class="panel__heading">Favourites</h2>
+        <section class="panel" aria-labelledby="favourites-heading">
+            <h2 class="panel__heading" id="favourites-heading">Favourites</h2>
             <ul class="list">
                 {% for place in favourite_places %}
                     <li class="list__item place-row">
@@ -64,11 +64,11 @@
                     </li>
                 {% endfor %}
             </ul>
-        </nav>
+        </section>
     {% endif %}
 
     {% if recent_places %}
-        <nav class="panel" id="home-recents" aria-label="Recently viewed places">
+        <section class="panel" id="home-recents" aria-labelledby="recents-heading">
             <h2 class="panel__heading">
                 Recent
                 <button type="button"
@@ -87,19 +87,19 @@
                     </li>
                 {% endfor %}
             </ul>
-        </nav>
+        </section>
     {% endif %}
 
     {% if suggested_cities %}
-        <nav class="panel" aria-label="Suggested places">
-            <h2 class="panel__heading">Discover</h2>
+        <section class="panel" aria-labelledby="discover-heading">
+            <h2 class="panel__heading" id="discover-heading">Discover</h2>
             <p class="panel__body">
                 {% for place in suggested_cities -%}
                     <a href="{{ url_for('weather', place_id=place.place_id) }}">{{ place.name }}</a>
                     {%- if not loop.last %}, {% endif %}
                 {% endfor %}
             </p>
-        </nav>
+        </section>
     {% endif %}
 
     <div class="table-wrap">
@@ -126,9 +126,9 @@
             );
 
             var geoBtn = document.getElementById("home-geo-btn");
-            if (geoBtn) {
+            if (geoBtn && !navigator.geolocation) geoBtn.hidden = true;
+            if (geoBtn && navigator.geolocation) {
                 geoBtn.addEventListener("click", function() {
-                    if (!navigator.geolocation) return;
                     geoBtn.disabled = true;
                     geoBtn.textContent = "Locating...";
                     navigator.geolocation.getCurrentPosition(
@@ -138,6 +138,9 @@
                         function() {
                             geoBtn.disabled = false;
                             geoBtn.textContent = "Use my location";
+                            window.toast("Couldn't get your location. Check that this site may use it, or search for a place instead.", {
+                                type: "danger"
+                            });
                         }
                     );
                 });

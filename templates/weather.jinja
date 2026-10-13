@@ -1,8 +1,18 @@
 {% extends "base.jinja" %}
 
-{% block title %}Weather{% endblock %}
+{% block title %}{{ name }}{% endblock %}
 
 {% block content %}
+    <div class="page-head">
+        <div>
+            <h1>{{ name }}</h1>
+            {% if state or country_name %}<p class="page-head__sub">{{ [state, country_name] | select | join(", ") }}</p>{% endif %}
+        </div>
+        <div class="page-head__actions">
+            {% include "weather/favourite_btn.jinja" %}
+        </div>
+    </div>
+
     <section id="weather-island"
              data-error-inline
              class="island island--loading"

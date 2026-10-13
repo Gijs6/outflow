@@ -21,20 +21,6 @@
         {# djlint:on #}
     {% endif %}
 
-    {% set place_parts = [location.state, country_name] | select | list %}
-    <div class="page-head">
-        <div>
-            <h1>{{ location.name or "%.4f, %.4f" | format(lat, lon) }}</h1>
-            <p class="page-head__sub">
-                {% if place_parts %}{{ place_parts | join(", ") }},{% endif %}
-                <time datetime="{{ weather.current.dt | to_iso(tz) }}">{{ weather.current.dt | strftime("%a %-d %b %Y, %H:%M", tz) }}</time>
-            </p>
-        </div>
-        <div class="page-head__actions">
-            {% include "weather/favourite_btn.jinja" %}
-        </div>
-    </div>
-
     <div class="conditions">
         <p class="conditions__temp">
             <data value="{{ weather.current.temp }}">{{ weather.current.temp | round(1) }} °C</data>
@@ -48,6 +34,12 @@
     </div>
 
     <dl class="readings">
+        <div>
+            <dt>Observed</dt>
+            <dd>
+                <time datetime="{{ weather.current.dt | to_iso(tz) }}">{{ weather.current.dt | strftime("%a %-d %b %Y, %H:%M", tz) }}</time>
+            </dd>
+        </div>
         <div>
             <dt>Wind</dt>
             <dd>
@@ -256,7 +248,7 @@
                     aria-controls="tab-panel-alerts"
                     tabindex="-1"
                     class="tabs__tab"
-                    data-tab="alerts">Alerts ({{ alerts | length }})</button>
+                    data-tab="alerts">Alerts <span class="count">{{ alerts | length }}</span></button>
         {% endif %}
     </div>
 
@@ -276,7 +268,12 @@
 
         {% if daily_data %}
             <section class="panel">
-                <h2 class="panel__heading">Week ahead</h2>
+                <h2 class="panel__heading">
+                    Today and tomorrow
+                    {% if daily_data | length > 2 %}
+                        <a href="#daily" class="btn btn--sm" data-tab-target="daily">All {{ daily_data | length }} days</a>
+                    {% endif %}
+                </h2>
                 <div class="table-wrap">
                     <table class="table forecast-table">
                         <thead>
@@ -287,7 +284,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for day in daily_data[:7] %}
+                            {% for day in daily_data[:2] %}
                                 <tr>
                                     <td>
                                         <time datetime="{{ day.dt | to_iso(tz) }}">{{ day.dt | strftime("%a %-d %b", tz) }}</time>
@@ -738,7 +735,7 @@
                 var dayKey = getDayKey(date);
                 if (dayKey !== lastDay) {
                     lastDay = dayKey;
-                    html += '<tr class="hour-table__day"><th colspan="6" scope="colgroup">' +
+                    html += '<tr class="table__group"><th colspan="6" scope="colgroup">' +
                         getDayLabel(date) + ", " + fmtTime(date, {
                             day: "numeric",
                             month: "short"

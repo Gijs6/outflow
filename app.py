@@ -235,10 +235,51 @@ def weather_coords_redirect(coords):
     )
 
 
+def describe_location(location, lat, lon):
+    country_code = location.get("country")
+    country = pycountry.countries.get(alpha_2=country_code) if country_code else None
+    country_name = (
+        (getattr(country, "common_name", None) or country.name) if country else ""
+    )
+    return {
+        "name": location.get("name") or f"{lat:.4f}, {lon:.4f}",
+        "state": location.get("state") or "",
+        "country": country_name,
+    }
+
+
+def known_place(place_id):
+    for key in ("favourite_places", "recent_places"):
+        for place in session.get(key, []):
+            if place["place_id"] == place_id:
+                return {
+                    "name": place["name"],
+                    "state": place.get("state") or "",
+                    "country": place.get("country") or "",
+                }
+    return None
+
+
 @app.route("/weather/<place_id>")
 def weather(place_id):
-    island_url = url_for("weather_island", place_id=place_id)
-    return render_template("weather.jinja", island_url=island_url)
+    place = known_place(place_id)
+    if place is None:
+        lat, lon = decode_place_id(place_id)
+        try:
+            location = get_location(lat, lon)
+        except Exception:
+            location = {}
+        place = describe_location(location, lat, lon)
+    favourites = session.get("favourite_places", [])
+    return render_template(
+        "weather.jinja",
+        island_url=url_for("weather_island", place_id=place_id),
+        place_id=place_id,
+        name=place["name"],
+        state=place["state"],
+        country_name=place["country"],
+        is_favourite=any(p["place_id"] == place_id for p in favourites),
+    )
 
 
 @app.route("/weather/<place_id>/island")
@@ -286,14 +327,10 @@ def weather_island(place_id):
 
     alerts = sorted((data or {}).get("alerts") or [], key=alert_sort_key)
 
-    country_code = location.get("country")
-    country = pycountry.countries.get(alpha_2=country_code) if country_code else None
-
-    name = location.get("name") or f"{lat}, {lon}"
-    country_name = (
-        (getattr(country, "common_name", None) or country.name) if country else ""
-    )
-    state = location.get("state") or ""
+    place = describe_location(location, lat, lon)
+    name = place["name"]
+    state = place["state"]
+    country_name = place["country"]
     entry = {
         "place_id": place_id,
         "name": name,
@@ -312,9 +349,6 @@ def weather_island(place_id):
     recent.insert(0, entry)
     session["recent_places"] = recent[:5]
 
-    favourites = session.get("favourite_places", [])
-    is_favourite = any(p["place_id"] == place_id for p in favourites)
-
     return render_template(
         "weather/island.jinja",
         weather=data,
@@ -324,14 +358,12 @@ def weather_island(place_id):
         minutely=minutely,
         alerts=alerts,
         location=location,
-        country=country,
         lat=lat,
         lon=lon,
         place_id=place_id,
         name=name,
         state=state,
         country_name=country_name,
-        is_favourite=is_favourite,
     )
 
 

@@ -1,4 +1,5 @@
 import math
+from functools import lru_cache
 import os
 import sqlite3
 
@@ -124,6 +125,7 @@ def get_16day_forecast(lat, lon, units="metric"):
         return None
 
 
+@lru_cache(maxsize=1024)
 def get_location(lat, lon):
     r = session.get(
         f"{OWM_BASE}/geo/1.0/reverse",

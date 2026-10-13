@@ -5,7 +5,7 @@
         <div class="navbar__inner">
             <a href="{{ url_for('index') }}" class="navbar__brand">{% include "mark.svg" %}Outflow</a>
             {% block header_search %}
-                <div class="header-search">
+                <div class="header-search autocomplete">
                     <form action="{{ url_for('search') }}"
                           method="get"
                           role="search"
@@ -23,7 +23,7 @@
                                hx-target="#header-search-results" />
                     </form>
                     <div id="header-search-results"
-                         class="header-search__dropdown search-dropdown-wrap"
+                         class="header-search__dropdown autocomplete__menu"
                          aria-live="polite"></div>
                 </div>
             {% endblock %}
@@ -132,7 +132,7 @@
             if (!form) return;
             form.addEventListener("submit", function(e) {
                 var dd = document.getElementById(dropdownId);
-                var items = dd ? dd.querySelectorAll(".search-dropdown__item a") : [];
+                var items = dd ? dd.querySelectorAll(".autocomplete__option") : [];
                 if (items.length === 1) {
                     e.preventDefault();
                     window.location.href = items[0].href;

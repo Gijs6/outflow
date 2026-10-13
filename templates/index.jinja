@@ -13,7 +13,7 @@
 
     <p class="lead">Search for any city, or enter a pair of coordinates.</p>
 
-    <div class="home__search">
+    <div class="home__search autocomplete">
         <form action="{{ url_for('search') }}"
               method="get"
               role="search"
@@ -36,7 +36,7 @@
                   aria-hidden="true">Searching...</span>
         </form>
         <div id="home-search-results"
-             class="home__search-dropdown search-dropdown-wrap"
+             class="home__search-dropdown autocomplete__menu"
              role="listbox"
              aria-label="Search suggestions"></div>
     </div>
@@ -102,7 +102,19 @@
         </nav>
     {% endif %}
 
-    <p class="muted">{{ db_stats.city_count | thousands }} cities across {{ db_stats.country_count }} countries</p>
+    <div class="table-wrap">
+        <table class="table table--kv table--fit">
+            <caption class="visually-hidden">Summary</caption>
+            <tbody>
+                <tr>
+                    <th scope="row">Cities</th>
+                    <td>{{ db_stats.city_count | thousands }}</td>
+                    <th scope="row">Countries</th>
+                    <td>{{ db_stats.country_count | thousands }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
 
 {% block extra_scripts %}

@@ -9,7 +9,7 @@
         <h1>Search</h1>
     </div>
 
-    <div class="home__search">
+    <div class="home__search autocomplete">
         <form action="{{ url_for('search') }}"
               method="get"
               role="search"
@@ -33,7 +33,7 @@
                   aria-hidden="true">Searching...</span>
         </form>
         <div id="search-page-dropdown"
-             class="search-page__dropdown search-dropdown-wrap"
+             class="search-page__dropdown autocomplete__menu"
              role="listbox"></div>
     </div>
 
@@ -42,7 +42,9 @@
             <p class="alert alert--danger">Search is unavailable right now. Try again later.</p>
         {% elif places %}
             <section class="panel">
-                <h2 class="panel__heading">Results ({{ places | length }})</h2>
+                <h2 class="panel__heading">
+                    <span>Results <span class="count">{{ places | length }}</span></span>
+                </h2>
                 <ul class="list">
                     {% for place in places %}
                         <li class="list__item place-row">

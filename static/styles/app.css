@@ -1,11 +1,3 @@
-.htmx-indicator {
-    visibility: hidden;
-}
-.htmx-request.htmx-indicator,
-.htmx-request .htmx-indicator {
-    visibility: visible;
-}
-
 .header-search {
     position: relative;
     padding-block: var(--space-xs);
@@ -18,23 +10,9 @@
     padding: var(--space-2xs) var(--space-sm);
 }
 
-.search-dropdown-wrap {
-    position: absolute;
-    inset-block-start: 100%;
-    inset-inline-start: 0;
-    z-index: 50;
-    inline-size: 100%;
-    min-inline-size: 16rem;
-    background: var(--page);
-    border: 1px solid var(--rule);
-
-    &:empty {
-        display: none;
-    }
-}
-
 .header-search__dropdown {
     inset-block-start: calc(100% - var(--space-xs));
+    min-inline-size: 16rem;
 }
 
 .search-dropdown {
@@ -43,38 +21,9 @@
     list-style: none;
 }
 
-.search-dropdown__item + .search-dropdown__item {
-    border-top: 1px solid var(--line);
-}
-
-.search-dropdown__row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 0 var(--space-md);
-    padding: var(--space-xs) var(--space-sm);
-    color: var(--fg);
-    text-decoration: none;
-
-    &:hover,
-    &:focus-visible {
-        color: var(--fg);
-        background: var(--head);
-    }
-}
-
-.search-dropdown__name {
-    color: var(--link);
-    text-decoration: underline;
-}
-
-.search-dropdown__meta {
-    color: var(--muted);
-}
-
 .search-dropdown__note {
     margin: 0;
-    padding: var(--space-xs) var(--space-sm);
+    padding: var(--space-xs) var(--space-lg);
     color: var(--muted);
 }
 .search-dropdown__note--error {
@@ -141,13 +90,13 @@
 }
 
 .conditions__temp {
-    font-size: 32px;
+    font-size: var(--text-2xl);
     font-weight: 700;
     line-height: 1.25;
 }
 
 .conditions__desc {
-    font-size: 15px;
+    font-size: var(--text-lg);
     font-weight: 700;
 }
 
@@ -159,7 +108,7 @@
     display: grid;
     grid-template-columns: max-content 1fr max-content 1fr;
     margin: 0 0 var(--space-2xl);
-    border-block: 1px solid var(--rule);
+    border: 1px solid var(--rule);
 
     div {
         display: contents;
@@ -226,14 +175,14 @@
     display: flex;
     justify-content: space-between;
     margin-block-start: var(--space-2xs);
-    font-size: 12px;
+    font-size: var(--text-sm);
     color: var(--muted);
 }
 
 .hourly-reel {
     display: flex;
     overflow-x: auto;
-    border-block: 1px solid var(--rule);
+    border: 1px solid var(--rule);
 }
 
 .tab-panel .hourly-reel {
@@ -251,12 +200,12 @@
 
 .hourly-reel__time,
 .hourly-reel__cond {
-    font-size: 12px;
+    font-size: var(--text-sm);
     color: var(--muted);
 }
 
 .hourly-reel__temp {
-    font-size: 15px;
+    font-size: var(--text-lg);
     font-weight: 700;
 }
 
@@ -264,13 +213,9 @@
     white-space: nowrap;
 }
 
-.hour-table__day th {
-    background: var(--head-soft);
-}
-
 .day-list {
     margin: 0 0 var(--space-2xl);
-    border-block: 1px solid var(--rule);
+    border: 1px solid var(--rule);
 }
 
 .accordion__item + .accordion__item {
@@ -288,7 +233,7 @@
         display: none;
     }
     &:hover {
-        background: var(--head);
+        background: var(--btn-hover);
     }
 }
 

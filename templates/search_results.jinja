@@ -3,11 +3,11 @@
 {% elif places %}
     <ul class="search-dropdown" role="listbox" aria-label="Search results">
         {% for place in places %}
-            <li class="search-dropdown__item" role="option">
+            <li role="option">
                 <a href="{{ url_for('weather', place_id=place.place_id) }}"
-                   class="search-dropdown__row">
-                    <span class="search-dropdown__name">{{ place.name }}</span>
-                    <span class="search-dropdown__meta">
+                   class="autocomplete__option">
+                    <span>{{ place.name }}</span>
+                    <span class="autocomplete__meta">
                         {%- if place.is_direct -%}
                             Coordinates
                         {%- elif place.state -%}

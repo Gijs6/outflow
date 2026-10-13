@@ -227,12 +227,22 @@ def search():
     return render_template("search.jinja", places=places, query=query, error=error)
 
 
+def place_coords(place_id):
+    try:
+        return decode_place_id(place_id)
+    except ValueError:
+        abort(404)
+
+
 @app.route("/goto/<coords>")
 def weather_coords_redirect(coords):
-    lat, lon = coords.split(",")
-    return redirect(
-        url_for("weather", place_id=encode_place_id(float(lat), float(lon))), 301
-    )
+    try:
+        lat, lon = (float(part) for part in coords.split(","))
+    except ValueError:
+        abort(404)
+    if not (-90 <= lat <= 90 and -180 <= lon <= 180):
+        abort(404)
+    return redirect(url_for("weather", place_id=encode_place_id(lat, lon)), 301)
 
 
 def describe_location(location, lat, lon):
@@ -262,9 +272,9 @@ def known_place(place_id):
 
 @app.route("/weather/<place_id>")
 def weather(place_id):
+    lat, lon = place_coords(place_id)
     place = known_place(place_id)
     if place is None:
-        lat, lon = decode_place_id(place_id)
         try:
             location = get_location(lat, lon)
         except Exception:
@@ -284,7 +294,7 @@ def weather(place_id):
 
 @app.route("/weather/<place_id>/island")
 def weather_island(place_id):
-    lat, lon = decode_place_id(place_id)
+    lat, lon = place_coords(place_id)
 
     with ThreadPoolExecutor(max_workers=6) as executor:
         futures = {

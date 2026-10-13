@@ -38,6 +38,8 @@ def decode_place_id(encoded, precision=5):
     lat_int = combined >> 26
     lat = lat_int / 10**precision - 90
     lon = lon_int / 10**precision - 180
+    if not (-90 <= lat <= 90 and -180 <= lon <= 180):
+        raise ValueError(f"Place id out of range: {encoded}")
     return round(lat, precision), round(lon, precision)
 
 

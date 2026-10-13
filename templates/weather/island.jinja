@@ -316,9 +316,15 @@
                         <tr>
                             <th>Time</th>
                             <th>Sky</th>
-                            <th class="table__num">Temp</th>
-                            <th class="table__num">Feels</th>
-                            <th class="table__num">Precip</th>
+                            <th class="table__num">
+                                <abbr title="Temperature">Temp</abbr>
+                            </th>
+                            <th class="table__num">
+                                <abbr title="Feels like">Feels</abbr>
+                            </th>
+                            <th class="table__num">
+                                <abbr title="Chance of precipitation">Precip</abbr>
+                            </th>
                             <th>Wind</th>
                         </tr>
                     </thead>
@@ -369,7 +375,7 @@
                                 <dt>Wind</dt>
                                 <dd>
                                     {{ day.wind_speed | to_bft }} bft
-                                    {% if day.wind_gust %}, gusts {{ day.wind_gust | to_bft }} bft{% endif %}
+                                    {%- if day.wind_gust %}, gusts {{ day.wind_gust | to_bft }} bft{% endif %}
                                 </dd>
                                 <dt>Humidity</dt>
                                 <dd>
@@ -816,9 +822,12 @@
             }).addTo(mapInstance);
 
             mapOverlayLayer = makeOverlay().addTo(mapInstance);
+            var markerColour = getComputedStyle(mapEl).getPropertyValue("--link").trim();
             L.circleMarker([MAP_LAT, MAP_LON], {
                 radius: 6,
-                weight: 2
+                weight: 2,
+                color: markerColour,
+                fillColor: markerColour
             }).addTo(mapInstance);
 
             setTimeout(function() {

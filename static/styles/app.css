@@ -280,11 +280,32 @@
 .map-canvas {
     block-size: 420px;
     border: 1px solid var(--rule);
+}
 
-    .leaflet-bar,
-    .leaflet-bar a,
-    .leaflet-control-attribution {
+.map-canvas.leaflet-container {
+    .leaflet-bar {
+        border: 1px solid var(--btn-line);
         border-radius: 0;
+        box-shadow: none;
+    }
+    .leaflet-bar a,
+    .leaflet-bar a:first-child,
+    .leaflet-bar a:last-child {
+        color: var(--fg);
+        background: var(--btn-bg);
+        border-color: var(--btn-line);
+        border-radius: 0;
+    }
+    .leaflet-bar a:hover {
+        background: var(--btn-hover);
+    }
+    .leaflet-control-attribution {
+        color: var(--muted);
+        background: var(--page);
+        border-radius: 0;
+    }
+    .leaflet-control-attribution a {
+        color: var(--link);
     }
 }
 

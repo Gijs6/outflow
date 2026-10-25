@@ -20,6 +20,7 @@ import requests
 from dotenv import load_dotenv
 import pycountry
 
+from utils.errors import register_errors
 from utils.filters import register_filters
 from utils.toasts import register_toasts
 from utils.version import register_version
@@ -61,10 +62,12 @@ def get_secret_key():
 app.secret_key = get_secret_key()
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=365)
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"] = True
 
 register_filters(app)
 register_toasts(app)
 register_version(app, "wind")
+register_errors(app, "wind")
 owm_module.DEBUG = app.debug
 
 
@@ -434,4 +437,5 @@ def server_error(_e):
 
 
 if __name__ == "__main__":
+    app.config["SESSION_COOKIE_SECURE"] = False
     app.run(host="0.0.0.0", port=4000, debug=True)
